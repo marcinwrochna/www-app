@@ -1,0 +1,11 @@
+body { font: 9pt verdana, arial, helvetica, sans-serif; background: #ffffff; }
+h1 { font-size: 16pt; color: #255B73; margin-top: 0pt; margin-bottom: 10pt }
+h4 { font-size: 11pt; color: #255B73; margin-top: 5pt; margin-bottom: 5pt }
+p { margin-top: 5pt; margin-bottom: 5pt; line-height:1.3 }
+ul { margin-top: 0pt; margin-bottom: 5pt; line-height: 1.3 }
+a { color: #255B73 }
+a:hover { color: #909090 }
+a.menu { color: #ffffff; text-decoration: none }
+a.menu:hover { color: #ffff00 }
+hr { border: 0; color: #909090; background-color: #909090; height: 1px }
+img { border: 0 }

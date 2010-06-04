@@ -1,0 +1,54 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>{$lang_insert_latex_desc}</title>
+	<script language="javascript" type="text/javascript" src="../../tiny_mce_popup.js"></script>
+	<script language="javascript" type="text/javascript" src="jscripts/latex.js"></script>
+	<script language="javascript" type="text/javascript" src="../../utils/mctabs.js"></script>
+	<link href="css/latex.css" rel="stylesheet" type="text/css" />
+	<base target="_self" />
+</head>
+<body onload="tinyMCEPopup.executeOnLoad('init();');">
+<form onsubmit="insertLatex();return false;" action="#">
+	<div class="tabs">
+		<ul>
+			<li id="general_tab" class="current"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');" onmousedown="return false;">{$lang_insert_latex_desc}</a></span></li>
+		</ul>
+	</div>
+
+	<div class="panel_wrapper">
+		<div id="general_panel" class="panel current">
+			<fieldset>
+				<legend>{$lang_insert_latex_formula}</legend>
+				<div>{$lang_insert_latex_explain}</div>
+				<table border="0" cellpadding="4" cellspacing="0">
+	                    <tr>
+	                        <!--<td><label for="formula">{$lang_insert_latex_formula}</label></td>-->
+	                        <td nowrap="nowrap" align="center">
+	                            <textarea id="formula" name="formula" cols="100" rows="8" ></textarea>
+	                            <input type="hidden" name="lrurl" value="" />
+	                        </td>
+	                    </tr>
+	                    <tr id="preview_row">
+	                    	<td><input type="button" class="updateButton" value="{$lang_insert_latex_preview2}" onclick="updatePreview();" /></td>
+	                    </tr>
+	            </table>
+            </fieldset>
+            <fieldset id="preview_fieldset">
+            	<legend>{$lang_insert_latex_preview1}</legend>
+            		<div class="previewImg"><img name="preview" src="" /></div>
+            </fieldset>
+		</div>
+	</div>
+
+	<div class="mceActionPanel">
+		<div style="float: left">
+			<input type="button" id="insert" name="insert" value="{$lang_insert}" onclick="insertLatex();" />
+		</div>
+
+		<div style="float: right">
+			<input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onclick="tinyMCEPopup.close();" />
+		</div>
+	</div>
+</form>
+</body>
+</html>

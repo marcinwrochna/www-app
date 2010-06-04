@@ -1,0 +1,76 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>{#latex.desc}</title>
+	<link rel="stylesheet" href="editor/styles.css" type="text/css" />
+	<script src="editor/functions.js" type="text/javascript"></script>
+	<script src="editor/menu_items.js" type="text/javascript"></script>
+	
+	<script language="javascript" type="text/javascript" src="../../tiny_mce_popup_src.js"></script>
+	<script language="javascript" type="text/javascript" src="jscripts/latex.js"></script>
+	<script language="javascript" type="text/javascript" src="../../utils/mctabs.js"></script>
+	<link href="css/latex.css" rel="stylesheet" type="text/css" />
+	<base target="_self" />
+</head>
+<body>
+<form onsubmit="return false;" action="#" id="latexform">
+	<div class="tabs">
+		<ul>
+			<li id="general_tab" class="current"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');" onmousedown="return false;">{#latex.desc}</a></span></li>
+		</ul>
+	</div>
+
+	<div class="panel_wrapper">
+		<div id="general_panel" class="panel current">
+			<fieldset>
+				<legend>{#latex.formula}</legend>
+				<div>mathmode mimetex (<a href="http://www.forkosh.dreamhost.com/source_mimetexmanual.html#reference">manual</a>) 
+					<a class="tip" href="#">(przykład)
+						<div class="tipInside">
+							\lim_{n\to\infty} \sum_{k=0}^n {n\choose k}
+							\left(\frac1{\beta n}\right)^k<br/>
+							\hspace{40} = \sqrt[\beta]{\Huge e}\\<br/><br/>
+							<img src="/cgi-bin/mimetex.cgi?\lim_{n\to\infty} \sum_{k=0}^n {n\choose k}
+								\left(\frac1{\beta n}\right)^k \hspace{40} = \sqrt[\beta]{\Huge e}\\"/><br/><br/>
+							\forall_{\varepsilon>0} \exists_{n_0\in\mathbb{N}} \\ <br/>
+							\Delta\dot{x} \qquad\equiv \left|\begin{matrix}a&amp;b\\c&amp;d\end{matrix}\right|<br/><br/>
+							<img src="/cgi-bin/mimetex.cgi?\forall_{\varepsilon>0}
+								\exists_{n_0\in\mathbb{N}} \\ \Delta \dot{x} \qquad \equiv
+								\left|\begin{matrix}a&b\\c&d\end{matrix}\right|"/>
+						</div>
+					</a>
+				</div>
+				<table border="0" cellpadding="4" cellspacing="0">
+	                    <tr>
+	                        <!--<td><label for="formula">{#latex.formula}</label></td>-->
+	                        <td nowrap="nowrap" align="center">
+	                            <textarea id="formula" name="formula" cols="100" rows="8" ></textarea>
+	                            <input type="hidden" name="lrurl" value="" />
+	                        </td>
+	                    </tr>
+	                    <tr id="preview_row">
+	                    	<td><input type="button" class="updateButton" value="{#latex.preview2}" onclick="LatexDialog.updatePreview();" /></td>
+	                    </tr>
+	            </table>
+            </fieldset>
+            <fieldset id="preview_fieldset">
+            	<legend>{#latex.preview1}</legend>
+            		<div class="previewImg"><img name="preview" src="" /></div>
+            </fieldset>
+		</div>
+	</div>
+
+	<div class="mceActionPanel">
+		<div style="float: left">
+			<input type="button" id="insert" name="insert" value="{#insert}" onclick="LatexDialog.insertLatex();" />
+		</div>
+
+		<div style="float: right">
+			<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
+		</div>
+	</div>
+</form>
+<script type="text/javascript"><!--//
+								new menu (MENU_ITEMS);
+							//--></script>
+</body>
+</html>

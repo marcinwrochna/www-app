@@ -1,0 +1,210 @@
+Menuitem Math Mode Accents
+
+\hat{a}   \check{a} \tilde{a}   \acute{a}
+\grave{a} \dot{a}   \ddot{a}    \breve{a}
+\bar{a}   \vec{a}   \widehat{A} \widetilde{A}
+
+Menuitem Lowercase Greek Letters
+
+\alpha      \theta    o         \upsilon  
+\beta       \vartheta \pi       \phi      
+\gamma      \iota     \varpi    \varphi   
+\delta      \kappa    \rho      \chi      
+\epsilon    \lambda   \varrho   \psi      
+\varepsilon \mu       \sigma    \omega    
+\zeta       \nu       \varsigma _blank_            
+\eta        \xi       \tau
+
+Menuitem Uppercase Greek Letters
+
+\Gamma    \Lambda   \Sigma    \Psi      
+\Delta    \Xi       \Upsilon  \Omega    
+\Theta    \Pi       \Phi
+
+Menuitem Binary Relations
+
+<           >           =          
+\leq        \geq        \equiv     
+\ll         \gg         \doteq     
+\prec       \succ       \sim       
+\preceq     \succeq     \simeq     
+\subset     \supset     \approx    
+\subseteq   \supseteq   \cong      
+\sqsubset   \sqsupset   \Join 
+\sqsubseteq \sqsupseteq \bowtie    
+\in         \ni         \propto    
+\vdash      \dashv      \models    
+\mid        \parallel   \perp      
+\smile      \frown      \asymp     
+:           \notin      \neq
+
+Menuitem Binary Operators
+
++              -                _blank_              
+\pm            \mp              \triangleleft 
+\cdot          \div             \triangleright
+\times         \setminus        \star         
+\cup           \cap             \ast          
+\sqcup         \sqcap           \circ         
+\vee           \wedge           \bullet       
+\oplus         \ominus          \diamond      
+\odot          \oslash          \uplus        
+\otimes        \bigcirc         \amalg        
+\bigtriangleup \bigtriangledown \dagger       
+\lhd           \rhd             \ddagger      
+\unlhd         \unrhd           \wr
+
+Menuitem BIG Operators
+
+\sum     \bigcup   \bigvee    \bigoplus
+\prod    \bigcap   \bigwedge  \bigotimes
+\coprod  \bigsqcup _blank_    \bigodot 
+\int     \oint     _blank_    \biguplus
+
+Menuitem Arrows
+
+\leftarrow         \longleftarrow      \uparrow          
+\rightarrow        \longrightarrow     \downarrow        
+\leftrightarrow    \longleftrightarrow \updownarrow      
+\Leftarrow         \Longleftarrow      \Uparrow          
+\Rightarrow        \Longrightarrow     \Downarrow        
+\Leftrightarrow    \Longleftrightarrow \Updownarrow      
+\mapsto            \longmapsto         \nearrow          
+\hookleftarrow     \hookrightarrow     \searrow          
+\leftharpoonup     \rightharpoonup     \swarrow          
+\leftharpoondown   \rightharpoondown   \nwarrow          
+\rightleftharpoons \iff                \leadsto
+
+Menuitem Delimiters
+
+(           )           \uparrow     \Uparrow    
+[           ]           \downarrow   \Downarrow  
+\{          \}          \updownarrow \Updownarrow
+\langle     \rangle     |            \|
+\lfloor     \rfloor     \lceil       \rceil      
+/           \backslash
+
+Menuitem Large Delimiters
+
+\lgroup     \rgroup     \lmoustache \rmoustache 
+\arrowvert  \Arrowvert  \bracevert
+
+Menuitem Miscellaneous Symbols
+
+\dots        \cdots     \vdots     \ddots     
+\hbar        \imath     \jmath     \ell       
+\Re          \Im        \aleph     \wp        
+\forall      \exists    \mho       \partial   
+'            \prime     \emptyset  \infty     
+\nabla       \triangle  \Box       \Diamond
+\bot         \top       \angle     \surd      
+\diamondsuit \heartsuit \clubsuit  \spadesuit 
+\neg         \flat      \natural   \sharp
+
+Menuitem Non-Mathematical Symbols
+
+\dag  \S  \copyright \textregistered 
+\ddag \P  \pounds    \%
+
+Menuitem AMS Delimiters
+
+\ulcorner \urcorner \llcorner \lrcorner
+\lvert    \rvert    \lVert    \rVert
+
+Menuitem AMS Greek and Hebrew
+
+\digamma \varkappa \beth \gimel \daleth    
+
+Menuitem AMS Binary Relations
+
+\lessdot          \gtrdot           \doteqdot 
+\leqslant         \geqslant         \risingdotseq     
+\eqslantless      \eqslantgtr       \fallingdotseq    
+\leqq             \geqq             \eqcirc           
+\lll              \ggg              \circeq  
+\lesssim          \gtrsim           \triangleq        
+\lessapprox       \gtrapprox        \bumpeq           
+\lessgtr          \gtrless          \Bumpeq           
+\lesseqgtr        \gtreqless        \thicksim         
+\lesseqqgtr       \gtreqqless       \thickapprox      
+\preccurlyeq      \succcurlyeq      \approxeq         
+\curlyeqprec      \curlyeqsucc      \backsim          
+\precsim          \succsim          \backsimeq        
+\precapprox       \succapprox       \vDash            
+\subseteqq        \supseteqq        \Vdash            
+\Subset           \Supset           \Vvdash           
+\sqsubset         \sqsupset         \backepsilon      
+\therefore        \because          \varpropto        
+\shortmid         \shortparallel    \between          
+\smallsmile       \smallfrown       \pitchfork        
+\vartriangleleft  \vartriangleright \blacktriangleleft
+\trianglelefteq   \trianglerighteq  \blacktriangleright
+
+Menuitem AMS Arrows
+
+\dashleftarrow     \dashrightarrow    \multimap          
+\leftleftarrows    \rightrightarrows  \upuparrows        
+\leftrightarrows   \rightleftarrows   \downdownarrows    
+\Lleftarrow        \Rrightarrow       \upharpoonleft     
+\twoheadleftarrow  \twoheadrightarrow \upharpoonright    
+\leftarrowtail     \rightarrowtail    \downharpoonleft   
+\leftrightharpoons \rightleftharpoons \downharpoonright  
+\Lsh               \Rsh               \rightsquigarrow   
+\looparrowleft     \looparrowright    \leftrightsquigarrow
+\curvearrowleft    \curvearrowright   _blank_                      
+\circlearrowleft   \circlearrowright
+
+Menuitem AMS Negated Symbols
+
+\nless          \ngtr           \varsubsetneqq  
+\lneq           \gneq           \varsupsetneqq  
+\nleq           \ngeq           \nsubseteqq     
+\nleqslant      \ngeqslant      \nsupseteqq     
+\lneqq          \gneqq          \nmid           
+\lvertneqq      \gvertneqq      \nparallel      
+\nleqq          \ngeqq          \nshortmid      
+\lnsim          \gnsim          \nshortparallel 
+\lnapprox       \gnapprox       \nsim           
+\nprec          \nsucc          \ncong          
+\npreceq        \nsucceq        \nvdash         
+\precneqq       \succneqq       \nvDash         
+\precnsim       \succnsim       \nVdash         
+\precnapprox    \succnapprox    \nVDash         
+\subsetneq      \supsetneq      \ntriangleleft  
+\varsubsetneq   \varsupsetneq   \ntriangleright 
+\nsubseteq      \nsupseteq      \ntrianglelefteq
+\subsetneqq     \supsetneqq     \ntrianglerighteq
+\nleftarrow     \nrightarrow    \nleftrightarrow
+\nLeftarrow     \nRightarrow    \nLeftrightarrow
+
+Menuitem AMS Binary Operators
+
+\dotplus        \centerdot       \intercal      
+\ltimes         \rtimes          \divideontimes 
+\Cup            \Cap             \smallsetminus 
+\veebar         \barwedge        \doublebarwedge
+\boxplus        \boxminus        \circleddash   
+\boxtimes       \boxdot          \circledcirc   
+\leftthreetimes \rightthreetimes \circledast    
+\curlyvee       \curlywedge
+
+Menuitem AMS Miscellaneous
+
+\hbar            \hslash            \Bbbk            
+\square          \blacksquare       \circledS        
+\vartriangle     \blacktriangle     \complement      
+\triangledown    \blacktriangledown \Game            
+\lozenge         \blacklozenge      \bigstar         
+\angle           \measuredangle     \sphericalangle  
+\diagup          \diagdown          \backprime       
+\nexists         \Finv              \varnothing      
+\eth             \mho
+
+Menuitem Math Alphabets
+
+\mathrm{A}
+\mathit{A}
+\mathnormal{A}
+\mathcal{A}
+\mathfrak{A}
+\mathbb{A}

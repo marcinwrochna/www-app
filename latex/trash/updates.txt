@@ -1,0 +1,38 @@
+Here are some of the updates
+----------------------------
+Version 0.8
+
+- added fact that ImageMagick calls Ghostscript
+- updated mimetex instructions for Simple Minds Forum RC1 (thanks to Orstio)
+- remove bug preventing image transparency in Windows
+- readme.txt rewrite
+- added instructions for using LatexRender with Simple Minds forums
+Thanks to treo for this
+- mimeTeX has an option to cope when system() command is disabled (thanks to Midgard)
+- added instructions for using mimeTeX with Simple Minds forums
+Thanks to Orstio for this 
+- updated blacklisted tags in class.latexrender.php. 
+Thanks to Ulrich Klauer for the help he gave for this
+- removed bug preventing color box working (thanks to Valentin Vornicu)
+- added title tag for non-IE browsers plus htmlentities protection (latter thanks to Olof Sisask)
+- added html_entity_decode in phpbb_hook_2.php for later versions of phpBB
+- ensure tooltip can deal with line breaks 
+
+Version 0.7
+-----------
+
+- default image is gif for better transparency
+- use local tmp folder instead of root which should help error checking
+- new variable in class.latexrender.php to hold latex class (default is article)
+- new variable in class.latexrender.php to hold maximum length of latex code
+- Alt text for images shows latex code
+- separate phpBB folder, files and instructions from those used for other PHP programs
+- phpBB instructions now in MOD style and include all those in 0.6's phpBB_tweaks
+- new latex.php which has a function which can be called from other PHP programs
+- instructions for other PHP programs
+- example PHP program (replaces latexrender_test.php)
+- error codes included in latex.php
+- WYSIWYG editor code included in latex.php
+- example HTML file with results of conversion
+- added demo with more sophisticated script
+- added mimetex example
