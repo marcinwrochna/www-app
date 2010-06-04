@@ -1,19 +1,15 @@
 admins see motivationLetter
----
 checklista ("dodaj zadania kwalifikacyjne", "sprawdź rozwiązania od N uczestników", ...)
 role jadący = AK + uczestnicy z punktami za kwalifikację. ręcznie (afterselekcja, nielegalni)
 pesel, czas przyjazdu, zapłacono itd. 
-
----Zadania kwalifikacyjne:
-todo checklists
+sprawdzać łączny czas trwania warsztatów 9*2*2+2 (+info, krótsze pobyty)?
+==Zadania kwalifikacyjne==
+add to user todo checklists
 green checkmark on list
 email notifications
 feedback latex?
 zmiana zadań kwalifikacyjnych, warning?
 
-
-sprawdzać łączny czas trwania warsztatów 9*2*2+2 (+info, krótsze pobyty)?
-coś innego (punktacja, komentarze, auto powiadomienia emailem,...)?
 
 --bugs
 ie6 fixed height?!?

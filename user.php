@@ -661,20 +661,6 @@ function userCan($action, $owner=false)
 		array($action));
 	$result = db_fetch_all_columns($result);
 	return (count(array_intersect($roles,$result))>0);
-	/*$requiredRole = array(
-		'editProfile' => ROLE_ADMIN | ROLE_OWNER,
-		'listPublicWorkshops' => ROLE_ADMIN | ROLE_KADRA | ROLE_UCZESTNIK,
-		'listOwnWorkshops' => ROLE_KADRA,
-		'listAllWorkshops' => ROLE_ADMIN,
-		'showWorkshop' => ROLE_ADMIN | ROLE_OWNER | ROLE_UCZESTNIK,
-		'createWorkshop' => false,
-		'editWorkshop' => ROLE_ADMIN | ROLE_OWNER,
-		'showWorkshopDetails' => ROLE_ADMIN | ROLE_OWNER,
-		'changeWorkshopStatus' => ROLE_ADMIN,
-	);
-	if (isset($requiredRole[$action]))
-		return ($requiredRole[$action] & $roles) || ($requiredRole[$action] === 0);
-	else return $roles & ROLE_ADMIN;*/
 }
 
 

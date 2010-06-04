@@ -543,7 +543,6 @@ function handleEditWorkshopForm()
 function actionSignUpForWorkshop()
 {
 	global $USER;
-	if (!isset($_GET['wid']))  throw new KnownException('Nie podano numeru bloku warsztatowego.');
 	$wid = intval($_GET['wid']);
 	if (!userCan('signUpForWorkshop'))  throw new PolicyException();
 	

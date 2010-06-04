@@ -2,7 +2,7 @@
 /*
 	common.php loads all commonly used functions and definitions.
 	Included in index.php, news.php, install.php.
-	It configures LOCAL, DEBUG, TABLE_ constants, 
+	It configures LOCAL, DEBUG constants, 
 	error reporting, connects to the database, handles sessions.
 */
 
@@ -13,7 +13,6 @@ if(!$serverName) $serverName = getenv('SERVER_NAME');
 if (in_array($serverName, $localNames))  define('LOCAL', true);
 
 // Handle sessions.
-///TODO medium: test session lifetime
 ini_set('session.gc_maxlifetime', 2*365*24*60*60);
 session_set_cookie_params(2*365*24*60*60);
 session_cache_limiter('none');
@@ -26,6 +25,7 @@ date_default_timezone_set('Europe/Warsaw');
 require_once('error.php');
 initErrors();
 
+// Unquote if someone turned magic_quotes on by accident.
 if(  (function_exists("get_magic_quotes_gpc") && get_magic_quotes_gpc())  ||
    (ini_get('magic_quotes_sybase') && ( strtolower(ini_get('magic_quotes_sybase')) != "off" ))  )  
 {
