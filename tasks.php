@@ -333,7 +333,8 @@ function actionEditSolutionForm()
 		'uid' => $USER['uid'],
 		'submitted' => time(),
 		'solution' => $_POST['solution'],
-		'status' => 1
+		'status' => 1,
+		'notified' => 0
 	));
 	showMessage('Pomyślnie zapisano rozwiązane.', 'success');
 	actionEditSolution();

@@ -177,5 +177,8 @@ switch ($version)
 		db_query('ALTER TABLE table_task_solutions ADD COLUMN status int');
 		db_query('ALTER TABLE table_task_solutions ADD COLUMN grade varchar(255)');
 		db_query('UPDATE table_task_solutions SET status=1');
-		setVersion(16);		
+		setVersion(16);	
+	case(16):	
+		db_query('ALTER TABLE table_task_solutions ADD COLUMN notified int');
+		setVersion(17);	
 }
