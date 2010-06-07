@@ -29,7 +29,7 @@ $PAGE - zawartość budowanej strony, patrz template.php
 
 == Baza danych ==
 === Funkcje ===
-Generalnie wszystkie funkcje db_cośtam (zdefiniowane w common.php)
+Generalnie wszystkie funkcje db_cośtam (zdefiniowane w database.php)
 działają jak pg_cośtam opisane w manualu PHP,
 tylko obsługują błędy i skrajne przypadki.
 W db_query i db_query_params nazwę tabeli podaje się jako table_nazwa,
@@ -44,12 +44,14 @@ Do tych funkcji nazwę tabeli podaje się bez prefixu.
 == Pliki ==
 "Pierwszego poziomu", czyli pliki, do których przeglądarka się bezpośredno odwołuje
 index.php - po prostu wywołuje akcję podaną w URLu.
+notify.php - wołany przez cron'a co godzinę, wysyła maile o rozwiązaniach zadań.
 install.php - przestarzały plik, obecnie służy do dokumentacji schematu bazy danych
 latex.php - obsługa latexa przez dystrybucję serwera. Obecnie zamiast tego używamy mimetex'a.
 
 
 "Załączniki"
-common.php - inicjuje różne drobne rzeczy i załącza pozostałe załączniki. Póki co wszystko co z bazą danych związane jest tam wrzucone.		
+common.php - inicjuje różne drobne rzeczy i załącza pozostałe załączniki. 
+database.php - funkcje initDB() i db_*
 error.php - obługa błędów. 
 	throw new KnownException('Nie udało się czegoś zrobić.');
 	if (!userCan(...))  throw new PolicyException();
