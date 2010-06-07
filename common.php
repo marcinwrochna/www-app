@@ -12,11 +12,14 @@ $serverName = $_SERVER['SERVER_NAME'];
 if(!$serverName) $serverName = getenv('SERVER_NAME');
 if (in_array($serverName, $localNames))  define('LOCAL', true);
 
-// Handle sessions.
-ini_set('session.gc_maxlifetime', 2*365*24*60*60);
-session_set_cookie_params(2*365*24*60*60);
-session_cache_limiter('none');
-session_start();
+if (!defined('STANDALONE'))
+{
+	// Handle sessions.
+	ini_set('session.gc_maxlifetime', 2*365*24*60*60);
+	session_set_cookie_params(2*365*24*60*60);
+	session_cache_limiter('none');
+	session_start();
+}
 
 setlocale(LC_ALL, 'pl_PL.UTF8','pl_PL.UTF-8','pl.UTF8','pl.UTF-8','pl_PL','pl');
 date_default_timezone_set('Europe/Warsaw');
@@ -49,6 +52,9 @@ require_once('user.php');
 include_once('log.php');
 require_once('warsztaty.php');
 initDB();
-initPage();
-initUser();
+if (!defined('STANDALONE'))
+{
+	initPage();
+	initUser();
+}
 

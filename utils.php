@@ -167,7 +167,10 @@ function sendMail($subject, $content, $to)
 	$mail->Password = "xx23ssw";
 	$mail->From = "noreply@warsztatywww.nstrefa.pl";
 	$mail->FromName = "Aplikacja WWW";
-	$mail->addAddress($to);
+	if (is_array($to))
+		foreach ($to as $t)
+			$mail->addAddress($t[1],$t[0]);
+	else  $mail->addAddress($to);
 	$mail->addReplyTo("noreply@warsztatywww.nstrefa.pl", "noreply");
 	$mail->Subject = "[WWW][app] $subject";
 	$mail->Body = $content;

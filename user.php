@@ -702,5 +702,5 @@ function gender($m='y', $f='a', $gender=null)
 {
 	global $USER;
 	if (is_null($gender))  $gender = $USER['gender'];
-	return ($gender=='f'?$f:$m);
+	return ($gender==='f'?$f:$m);
 }
