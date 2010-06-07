@@ -15,6 +15,7 @@ $solutionStatuses = array(
  	3 => 'ocenione'
 );
 
+// Called by actionShowWorkshop
 function buildTaskList($wid, $participant)
 {
 	global $USER, $participantStatuses, $solutionStatuses;
@@ -187,14 +188,20 @@ function handleCreateTaskForm()
 
 function handleEditTaskForm()
 {
-	db_update('tasks',
-		'WHERE wid='. intval($_GET['wid']) .' AND tid='. intval($_GET['tid']),
-		array(		
+	$wid = intval($_GET['wid']);
+	$tid = intval($_GET['tid']);
+	
+	$result = db_query("SELECT uid
+				FROM table_workshop_user
+				WHERE lecturer>0 AND wid=". $wid);
+	$lecturers = db_fetch_all_columns($result);	
+	if (!userCan('editTasks', $lecturers) || !userCan('editWorkshop', $lecturers))
+		throw new PolicyException();	
+	db_update('tasks',	"WHERE wid=$wid AND tid=$tid", array(		
 			'description' => $_POST['description'],
 			'inline' => 1
-		)
-	);
-	logUser('task edit', intval($_GET['wid']));
+	));
+	logUser('task edit', $wid);
 	showMessage('Pomyślnie zmieniono zadanie', 'success');
 }
 
@@ -238,7 +245,7 @@ function actionEditSolution()
 	$tid = intval($_GET['tid']);
 	$result = db_query("SELECT participant
 				FROM table_workshop_user
-				WHERE uid=". $USER['uid'] ." AND wid=". $wid);
+				WHERE uid=". $USER['uid'] ." AND wid=$wid");
 	$participant = db_fetch($result);	
 	if (!$participant)  throw new PolicyException();
 
@@ -310,10 +317,16 @@ function actionEditSolution()
 
 function actionEditSolutionForm()
 {
-	// TODO check perm
 	global $USER;
 	$wid = intval($_GET['wid']);
 	$tid = intval($_GET['tid']);
+	
+	$result = db_query("SELECT participant
+				FROM table_workshop_user
+				WHERE uid=". $USER['uid'] ." AND wid=$wid");
+	$participant = db_fetch($result);	
+	if (!$participant)  throw new PolicyException();
+	
 	db_insert('task_solutions', array(
 		'wid' => $wid,
 		'tid' => $tid,
@@ -327,6 +340,7 @@ function actionEditSolutionForm()
 	logUser('task solve', $wid);
 }
 
+// Called by actionShowWorkshop
 function buildParticipantList($wid)
 { 
 	$wid = intval($wid);
@@ -389,9 +403,9 @@ function buildParticipantList($wid)
 
 function actionEditTasksComment()
 {
-	// TODO check perm
 	global $PAGE, $USER;
 	$wid = intval($_GET['wid']);
+	checkUserCanEditTasks($wid);
 	$desc = 'Możesz tu wpisać informacje dotyczące wszystkich zadań i nadsyłania
 			rozwiązań.<br/>Jeżeli nie będziesz w stanie sprawdzać rozwiązań przez jakiś
 			czas, koniecznie tu napisz!<br/>Jeśli Ci wygodniej, możesz np. załączyć
@@ -412,8 +426,8 @@ function actionEditTasksComment()
 
 function actionEditTasksCommentForm()
 {
-	//TODO check perm
 	$wid = intval($_GET['wid']);
+	checkUserCanEditTasks($wid);
 	db_update('workshops', 'WHERE wid='. $wid, array('tasks_comment'=>$_POST['tasks_comment']));
 	showMessage('Pomyślnie zapisano komentarz do zadań.', 'success');
 	actionShowWorkshop();
@@ -425,6 +439,8 @@ function actionShowTaskSolutions()
 	$wid = intval($_GET['wid']);
 	$uid = intval($_GET['uid']);
 	$workshop = db_get('workshops', $wid, 'title');
+	
+	checkUserCanEditTasks($wid);
 	
 	$r = db_query("SELECT participant, admincomment, points FROM table_workshop_user
 		WHERE wid=$wid AND uid=$uid");
@@ -492,7 +508,10 @@ function actionShowTaskSolutions()
 	
 			if (!empty($sols))
 			{
-				//$PAGE->jsOnLoad .= '$("#task'. $tid .'oldsols").hide();';
+				// We could write (instead of display:none)
+				// $PAGE->jsOnLoad .= '$("#task'. $tid .'oldsols").hide();';
+				// but it would make a flicker at page load. So now javascript-disabled 
+				// browsers can't see old solutions.
 				echo '<a href="javascript:$(\'#task'. $tid .'oldsols\').toggle(400);">starsze rozwiązania</a>';
 				echo '<div id="task'.$tid.'oldsols" style="display:none">';
 				foreach ($sols as $sol)
@@ -520,6 +539,8 @@ function actionShowTaskSolutionsForm()
 	global $USER,$PAGE, $participantStatuses;
 	$wid = intval($_GET['wid']);
 	$uid = intval($_GET['uid']);
+	
+	checkUserCanEditTasks($wid);
 		
 	db_update('workshop_user', "WHERE wid=$wid AND uid=$uid", array(
 		'participant' => $_POST['participant'],
@@ -539,6 +560,8 @@ function actionEditSolutionsGradeForm()
 	$tid = intval($_GET['tid']);
 	$submitted = intval($_GET['submitted']);
 	
+	checkUserCanEditTasks($wid);
+	
 	db_update('task_solutions', "WHERE wid=$wid AND uid=$uid AND tid=$tid AND submitted=$submitted",
 		array(
 			'status' => $_POST['status'],
@@ -549,4 +572,14 @@ function actionEditSolutionsGradeForm()
 	showMessage("Pomyślnie zapisano informacje o zadaniu $tid.", 'success');
 	actionShowTaskSolutions();
 	logUser('task grade', $wid);	
+}
+
+function checkUserCanEditTasks($wid)
+{
+	$result = db_query("SELECT uid
+				FROM table_workshop_user
+				WHERE lecturer>0 AND wid=". $wid);
+	$lecturers = db_fetch_all_columns($result);	
+	if (!userCan('editTasks', $lecturers) || !userCan('editWorkshop', $lecturers))
+		throw new PolicyException();
 }
