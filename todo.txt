@@ -23,9 +23,7 @@ database sql aaaargh
 remove the meaningless error strings in every db_query
 autoversion .css, .js
 fix <tr>-less <thead>s
-
+change templates to 'endif' syntax
 co to jest id="theform"?
-
+when creating emails, change $email to $content or something, because it's misleading
 check perms in task solution forms
-
-test4

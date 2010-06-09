@@ -33,19 +33,20 @@ while (($row = db_fetch_assoc($result)) !== false)
 	$email .= " rozwiązania zadań kwalifikacyjnych do warsztatów\n$workshop\n";
 	$email .= "Zobacz i oceń na\n";
 	$email .= "http://warsztatywww.nstrefa.pl/?action=showTaskSolutions&wid=$wid&uid=$uid\n\n";
-	$email .= "--------\n\n";
+	$email .= "--------\n(poniżej rozwiązania, ale bez obrazków, linków i HTMLu w ogóle)\n\n";
 	$r = db_query('SELECT tid, submitted, solution FROM table_task_solutions WHERE '.
 	 "wid=$wid AND uid=$uid AND notified<1");
 	$r = db_fetch_all($r);
 	foreach ($r as $task)
 	{
-		$email .= "Zadanie ". $task['tid'] .". (". strftime($submitted, '%a %T') .")\n";
+		$email .= "Zadanie ". $task['tid'] .". (". strftime($task['submitted'], '%a %T') .")\n";
 		$email .= strip_tags($task['solution']);
 		$email .= "\n\n";
 	}	
-	db_update('task_solutions', "WHERE wid=$wid AND uid=$uid", array('notified'=>1));
+	db_update('task_solutions', "WHERE wid=$wid AND uid=$uid AND notified<1", array('notified'=>1));
 	
 	sendMail($title, $email, $address);
+	sendMail($title .' [debug]', $email, 'mwrochna@gmail.com'); // Debuguję.
 	$address = json_encode($address);
 	echo "Sent email to $address<br/>\n";
 }
