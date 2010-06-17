@@ -21,7 +21,7 @@ function actionReportBug()
 	$desc = 'Coś nie działa tak jak powinno? Coś jest niejasne, niepotrzebnie skomplikowane,
 		brzydkie, niewygodne? Zgłoś to koniecznie.<br/>';
 	if ($USER['anonymous'])
-		$desc .= '<small>Napisz jakiś kontakt jeśli chcesz mieć odpowiedź.</small>';
+		$desc .= '<small>Napisz jakiś kontakt, jeśli chcesz dostać odpowiedź.</small>';
 	else 
 		$desc .= '<small>Domyślnie odpowiem Ci na maila ('. $USER['email'] .').</small>';
 	$inputs = array( array('type'=>'textarea', 'name'=>'problem', 'description'=>$desc) );	

@@ -141,6 +141,9 @@ function buildAdminBox()
 
 function actionRegister()
 {
+	global $PAGE;
+	$PAGE->title = 'Rejestracja';
+	
 	if (isset($_GET['confirmkey']))
 	{
 		$sqlQuery = 'UPDATE table_users SET confirm=0 WHERE confirm=$1';
@@ -162,8 +165,7 @@ function actionRegister()
 		
 		$sqlQuery = "SELECT count(*) FROM table_users WHERE login=$1";
 		$r = db_query_params($sqlQuery, array($_POST['login']), 'Nie można sprawdzić loginu.');
-		$r = db_fetch_row($r);
-		if ($r[0])
+		if (db_fetch($r))
 		{
 			$submited = false;
 			showMessage('Login już jest w użyciu.', 'userError');
@@ -173,6 +175,15 @@ function actionRegister()
 		{
 			$submited = false;
 			showMessage('Hasło nie zgadza się z powtórzeniem.', 'userError');
+		}
+		
+		$sqlQuery = "SELECT count(*) FROM table_users WHERE email=$1";
+		$r = db_query_params($sqlQuery, array($_POST['email']));
+		if (db_fetch($r))
+		{
+			$submited = false;
+			showMessage('Podany adres email już jest zarejestrowany. Jeżeli nie masz maila z potwierdzeniem,
+				sprawdź spam lub <a href="?action=reportBug">zgłoś problem</a>.', 'userError');
 		}
 		
 		if ($submited)
@@ -393,7 +404,23 @@ function actionEditProfile($force=false)
 	$result = db_query('SELECT role FROM table_user_roles WHERE uid='. $uid);
 	$roles = db_fetch_all_columns($result);
 	
-	$inputs = array(
+	$inputs = array();
+	
+	if ($admin) {
+		$inputs[]= array('description'=>'zarejestrowano', 'name'=>'registered', 'type'=>'timestamp',
+			'readonly'=>true, 'default'=>$r['registered']);
+		if ($r['confirm'] > 0)
+			$inputs[]= array('description'=>'ostatnie logowanie', 'name'=>'logged',
+				'type'=>'text', 'readonly'=>true, 'default'=>'użytkownik nie potwierdził maila');
+		else if ($r['logged'] == 0)
+			$inputs[]= array('description'=>'ostatnie logowanie', 'name'=>'logged',
+				'type'=>'text', 'readonly'=>true, 'default'=>'użytkownik jeszcze się nie logował');		
+		else 
+			$inputs[]= array('description'=>'ostatnie logowanie', 'name'=>'logged',
+				'type'=>'timestamp', 'readonly'=>true, 'default'=>$r['logged']);
+	}
+	
+	$inputs = array_merge($inputs, array(
 		array('description'=>'imię i nazwisko', 'name'=>'name', 'type'=>'text', 'readonly'=>!$admin),
 		array('description'=>'login', 'name'=>'login', 'type'=>'text', 'readonly'=>!$admin),
 		array('description'=>'email', 'name'=>'email', 'type'=>'text', 'readonly'=>!$admin),
@@ -406,14 +433,7 @@ function actionEditProfile($force=false)
 		      'options'=>$maturaYearOptions, 'other'=>''),
 		array('skąd wiesz o WWW?', 'skadwieszowww', 'text'),
 		array('zainteresowania', 'zainteresowania', 'richtextarea')
-	);
-					
-	if ($admin)  $inputs = array_merge(array(
-		array('description'=>'zarejestrowano', 'name'=>'registered', 'type'=>'timestamp',
-			'readonly'=>true, 'default'=>$r['registered']),
-		array('description'=>'ostatnie logowanie', 'name'=>'logged', 'type'=>'timestamp',
-			'readonly'=>true, 'default'=>$r['logged'])		
-	), $inputs);
+	));					
 	
 	$template = new SimpleTemplate();
 	if (userCan('adminUsers')) {
