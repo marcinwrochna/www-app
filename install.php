@@ -35,7 +35,8 @@ $result = @db_query('
 		tutoruid int,
 		
 		motivationletter text,
-		proponowanyreferat text
+		proponowanyreferat text,
+		isselfcatered int
 	)
 ',false);
 if ($result)  echo 'Succesfully created database table '. TABLE_PREFIX .'users.<br/>';

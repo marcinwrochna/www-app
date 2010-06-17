@@ -180,5 +180,8 @@ switch ($version)
 		setVersion(16);	
 	case(16):	
 		db_query('ALTER TABLE table_task_solutions ADD COLUMN notified int');
-		setVersion(17);	
+		setVersion(17);
+	case(17):
+		db_query('ALTER TABLE table_users ADD COLUMN isselfcatered int');
+		setVersion(18);
 }

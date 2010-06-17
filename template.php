@@ -162,6 +162,7 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 			
 	if (!isset($properties))  $properties = '';
 	if (!isset($readonly))    $readonly = false;
+	if (!isset($text))        $text = '';
 		
 	$rtype = $type;
 	if (isset($_POST[$name]) && !$ignorePOST)  $default = $_POST[$name];
@@ -262,7 +263,7 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 				$row .= ' value="'. htmlspecialchars($default) .'"';
 			if ($rtype == 'int')  $row .= ' size="4"';
 			else if ($rtype == 'text' || $rtype == 'timestamp')  $row .= ' class="text"';
-			$row .= " />"; 
+			$row .= " />$text"; 
 			if ($rtype == 'timestamp')  $row .= '<small><i>YYYY-MM-DD HH:MM</i> lub <i>YYYY-MM-DD</i></small>';
 			$row .= "</td>";
 	}

@@ -417,7 +417,7 @@ function actionEditProfile($force=false)
 				'type'=>'text', 'readonly'=>true, 'default'=>'użytkownik jeszcze się nie logował');		
 		else 
 			$inputs[]= array('description'=>'ostatnie logowanie', 'name'=>'logged',
-				'type'=>'timestamp', 'readonly'=>true, 'default'=>$r['logged']);
+				'type'=>'timestamp', 'readonly'=>true, 'default'=>$r['logged']);		
 	}
 	
 	$inputs = array_merge($inputs, array(
@@ -432,8 +432,18 @@ function actionEditProfile($force=false)
 		array('type'=>'select', 'name'=>'maturayear', 'description'=>'rocznik (rok zdania matury)', 
 		      'options'=>$maturaYearOptions, 'other'=>''),
 		array('skąd wiesz o WWW?', 'skadwieszowww', 'text'),
-		array('zainteresowania', 'zainteresowania', 'richtextarea')
-	));					
+		array('zainteresowania', 'zainteresowania', 'richtextarea'),
+		array('description'=>'nocleg i wyżywienie', 'name'=>'isselfcatered',
+			'type'=>'checkbox', 'text'=>'we własnym zakresie <small '.
+				getTipJS('dotyczy np. mieszkańców Olsztyna') .'>[?]</small>')
+	));	
+	
+	if ($admin) {
+		$inputs[]= array('description'=>'list motywacyjny', 'name'=>'motivationletter', 'type'=>'text',
+			'readonly'=>true, 'default'=>$r['motivationletter']);
+		$inputs[]= array('description'=>'proponowany referat', 'name'=>'proponowanyreferat', 'type'=>'text',
+			'readonly'=>true, 'default'=>$r['proponowanyreferat']);
+	}				
 	
 	$template = new SimpleTemplate();
 	if (userCan('adminUsers')) {
@@ -467,7 +477,8 @@ function handleEditProfileForm()
 			'maturayear' => intval($_POST['maturayear']==VALUE_OTHER ? $_POST['maturayear_other'] : $_POST['maturayear']),
 			'school' => $_POST['school'],
 			'skadwieszowww' => $_POST['skadwieszowww'],
-			'zainteresowania' => $_POST['zainteresowania']
+			'zainteresowania' => $_POST['zainteresowania'],
+			'isselfcatered' => empty($_POST['isselfcatered'])?0:1
 		);
 		if ($admin)
 		{
@@ -483,9 +494,6 @@ function handleEditProfileForm()
 				{
 					db_insert('user_roles', array('uid'=>$uid,'role'=>$role));
 				}
-				/*if (in_array('admin', $_POST['roles']))  $role |= ROLE_ADMIN;
-				if (in_array('tutor', $_POST['roles']))  $role |= ROLE_TUTOR;
-				if (in_array('kadra', $_POST['roles']))  $role |= ROLE_KADRA;*/
 			}
 		}
 		db_update('users', 'WHERE uid='. $uid, $values, 'Nie udało się zapisać profilu');
@@ -531,7 +539,9 @@ function actionAdminUsers()
 		$js .'>link "mailto:"</a><br/>';
 	?>
 	<table>
-	<tr><th>id</th><th>imię i nazwisko</th><th>email</th><th>role</th></tr>
+	<tr><th>id</th><th>imię i nazwisko</th><th>email</th><th>role</th>
+		<th>list <small <?php echo getTipJS('słów w liście motywacyjnym'); ?>>[?]</small></th>
+		<th>referat <small <?php echo getTipJS('znaków w proponowanym temacie referatu'); ?>>[?]</small></th></tr>
 	<?php
 		$class = 'even';
 		foreach ($r as $row)
@@ -549,7 +559,8 @@ function actionAdminUsers()
 			$roles = implode(' ', $roles);
 			
 			echo "<tr class='$class'><td>${row['uid']}</td><td>${row['name']}</td>".
-				"<td>${row['email']}</td><td>$roles</td><td>".
+				"<td>${row['email']}</td><td>$roles</td>".
+				"<td>". str_word_count(strip_tags($row['motivationletter'])) ."</td><td>". strlen($row['proponowanyreferat']) ."</td><td>".
 				"<a href='?action=editProfile&uid=${row['uid']}'>edytuj</a></td></tr>";
 			$class = ($class=='even')?'odd':'even';
 		}
