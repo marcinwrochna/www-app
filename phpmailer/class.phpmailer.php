@@ -1009,7 +1009,8 @@ class PHPMailer {
       $result .= sprintf("Message-ID: <%s@%s>%s", $uniq_id, $this->ServerHostname(), $this->LE);
     }
     $result .= $this->HeaderLine('X-Priority', $this->Priority);
-    $result .= $this->HeaderLine('X-Mailer', 'PHPMailer '.$this->Version.' (phpmailer.codeworxtech.com)');
+	 // TOKEN - I removed this header because it seems to cause hard gmail rejections.
+    //$result .= $this->HeaderLine('X-Mailer', 'PHPMailer '.$this->Version.' (phpmailer.codeworxtech.com)');
 
     if($this->ConfirmReadingTo != '') {
       $result .= $this->HeaderLine('Disposition-Notification-To', '<' . trim($this->ConfirmReadingTo) . '>');

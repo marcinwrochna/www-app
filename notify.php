@@ -39,7 +39,7 @@ while (($row = db_fetch_assoc($result)) !== false)
 	$r = db_fetch_all($r);
 	foreach ($r as $task)
 	{
-		$email .= "Zadanie ". $task['tid'] .". (". strftime($task['submitted'], '%a %T') .")\n";
+		$email .= "Zadanie ". $task['tid'] .". (". strftime('%a %T', $task['submitted']) .")\n";
 		$email .= strip_tags($task['solution']);
 		$email .= "\n\n";
 	}	

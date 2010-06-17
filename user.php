@@ -202,7 +202,7 @@ function actionRegister()
 				"\n".
 				"Jeśli nie wiesz o co chodzi, po prostu usuń tego maila.\n"
 			;
-			sendMail("Nowe konto", $mail, $_POST['email']);
+			sendMail("Nowe konto", $mail, array(array($_POST['name'],$_POST['email'])));
 			showMessage("Pomyślnie utworzono nowe konto. Kliknij teraz w link
 				otrzymany przez email by dokończyć rejestrację.<br/>W razie braku
 				zaczekaj 15 minut i sprawdź spam.", 'success');
