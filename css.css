@@ -173,6 +173,7 @@ form  td { text-align: left; }
 table.workshopDescription { width: inherit; }
 .workshopDescription h3 { display: inline; }
 .box, .descriptionBox { border: 1px #AAA solid; padding: 1em; padding-left: 2em;}
+.descriptionBox { overflow: auto; }
 
 .workshopList th, thead th {
 	border-bottom: 1px #530 solid;
