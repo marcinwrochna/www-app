@@ -75,7 +75,8 @@ function actionListWorkshops($which, $where, $columns)
 	if (isset($_GET['order']) && in_array($_GET['order'], $allowed, true))
 	{
 			$orderby = $_GET['order'] .', '. $orderby;
-			$_SESSION['oldestorder'] = $_SESSION['oldorder'];
+			if (isset($_SESSION['oldorder']))
+				$_SESSION['oldestorder'] = $_SESSION['oldorder'];
 			$_SESSION['oldorder'] = $_GET['order'];
 	}
 	
