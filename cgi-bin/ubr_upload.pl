@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 #**********************************************************************************************************************************
 #	Name: ubr_upload.pl
 #	Link: http://uber-uploader.sourceforge.net/
@@ -32,7 +32,7 @@
 my $TEMP_DIR        = '/tmp/ubr_temp/';                    # * ATTENTION * : The $TEMP_DIR value MUST be duplicated in the "ubr_ini.php" file
 my $DATA_DELIMITER  = '<=>';                               # * ATTENTION * : The $DATA_DELIMITER value MUST be duplicated in the "ubr_ini.php" file
 
-my $DEBUG_PERL = 0;                                        # View version and environment variables (config will not be loaded)
+my $DEBUG_PERL = 1;                                        # View version and environment variables (config will not be loaded)
 my $UBER_VERSION = "6.8.1";                                # Version of UU
 my $THIS_VERSION = "3.6";                                  # Version of this script
 my $UPLOAD_ID = '';                                        # Initialize upload id

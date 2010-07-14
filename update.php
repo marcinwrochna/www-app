@@ -184,4 +184,13 @@ switch ($version)
 	case(17):
 		db_query('ALTER TABLE table_users ADD COLUMN isselfcatered int');
 		setVersion(18);
+	case(18):
+		insertPermission('jadący', 'editAdditionalInfo');	
+		db_query('ALTER TABLE table_users ADD COLUMN pesel varchar(30)');
+		db_query('ALTER TABLE table_users ADD COLUMN address varchar(255)');
+		db_query('ALTER TABLE table_users ADD COLUMN staybegin int');
+		db_query('ALTER TABLE table_users ADD COLUMN stayend int');
+		db_query('ALTER TABLE table_users ADD COLUMN tshirtsize varchar(30)');
+		db_query('ALTER TABLE table_users ADD COLUMN comments varchar(255)');		
+		setVersion(19);
 }

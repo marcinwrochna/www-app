@@ -16,11 +16,6 @@
 define('USER_ROOT', -1);
 define('USER_ANONYMOUS', -2);
 
-/*define('ROLE_ADMIN', 1);
-define('ROLE_TUTOR', 2);
-define('ROLE_KADRA', 4);
-define('ROLE_UCZESTNIK', 8);
-define('ROLE_OWNER', 1024);*/
 
 function initUser()
 {	
@@ -120,9 +115,9 @@ function buildUserBox()
 	global $USER;
 	$menu = array(
 		array('title'=>'profil','action'=>'editProfile','perm'=>userCan('editProfile',$USER['uid']),'icon'=>'user-green.png'),
-		array('title'=>'zmień hasło','action'=>'changePassword','perm'=>true,'icon'=>'key.png'),
 		array('title'=>'wyloguj','action'=>'logout','perm'=>true,'icon'=>'door-open.png'),
-		array('title'=>'kwalifikacja','action'=>'showQualificationStatus','icon'=>'page-white-edit.png')
+		array('title'=>'kwalifikacja','action'=>'showQualificationStatus','icon'=>'qual.png'),
+		array('title'=>'dodatkowe dane','action'=>'editAdditionalInfo','icon'=>'page-white-edit.png')
 	);
 	return buildMenuBox($USER['name'], $menu);	
 }
@@ -420,13 +415,17 @@ function actionEditProfile($force=false)
 				'type'=>'timestamp', 'readonly'=>true, 'default'=>$r['logged']);		
 	}
 	
+	$r['password'] = '<a href="?action=changePassword">zmień</a>';
+	
 	$inputs = array_merge($inputs, array(
 		array('description'=>'imię i nazwisko', 'name'=>'name', 'type'=>'text', 'readonly'=>!$admin),
 		array('description'=>'login', 'name'=>'login', 'type'=>'text', 'readonly'=>!$admin),
 		array('description'=>'email', 'name'=>'email', 'type'=>'text', 'readonly'=>!$admin),
+		array('description'=>'hasło', 'name'=>'password', 'type'=>'text', 'readonly'=>true, 'hidden'=>$admin),
 		array('name'=>'roles', 'description'=>'role', 'type'=>'checkboxgroup',
 			'options'=>array('admin'=>'Admin','tutor'=>'Tutor','kadra'=>'Kadra',
-				'uczestnik'=>'Uczestnik', 'akadra'=>'Aktywna kadra'),
+				'uczestnik'=>'Uczestnik', 'akadra'=>'Aktywna kadra',
+				'jadący'=>'Jadąc'. gender('y','a',$r['gender'])),
 			'default'=>$roles, 'readonly'=>!$admin),
 		array('szkoła/kierunek studiów', 'school', 'text'),
 		array('type'=>'select', 'name'=>'maturayear', 'description'=>'rocznik (rok zdania matury)', 
@@ -514,6 +513,7 @@ function actionAdminUsers()
 		'akadra' => array('AK','aktywna kadra (z zaakceptowanymi warsztatami)'),
 		'uczestnik' => array('u','uczestnik (nie kadra)'),
 		'tutor' => array('T','tutor'),
+		'jadący' => array('j','jadący')
 	);
 	
 	$where = '';
@@ -561,7 +561,8 @@ function actionAdminUsers()
 			echo "<tr class='$class'><td>${row['uid']}</td><td>${row['name']}</td>".
 				"<td>${row['email']}</td><td>$roles</td>".
 				"<td>". str_word_count(strip_tags($row['motivationletter'])) ."</td><td>". strlen($row['proponowanyreferat']) ."</td><td>".
-				"<a href='?action=editProfile&uid=${row['uid']}'>edytuj</a></td></tr>";
+				"<a href='?action=editProfile&uid=${row['uid']}'>edytuj</a> ".
+				"<a href='?action=editUserStatus&uid=${row['uid']}'>status</a></td></tr>";
 			$class = ($class=='even')?'odd':'even';
 		}
 	?></table>
@@ -607,7 +608,7 @@ function actionShowQualificationStatus()
 				echo getIcon('arrow-small.gif') .' Napisz list motywacyjny.';
 			else if ($words < getOption('motivationLetterWords'))
 				echo getIcon('arrow-small.gif') .' Napisz dłuższy list motywacyjny. ('.
-					'napisał'. gender('e') .'ś'.
+					'napisał'. gender('e') .'ś '.
 					$words .' < '. getOption('motivationLetterWords') .' słów)';
 			else
 				echo getIcon('checkmark.gif') .' List motywacyjny ok.';
@@ -653,6 +654,197 @@ function actionEditMotivationLetter()
 		showMessage('Pomyślnie zapisano list motywacyjny.', 'success');
 	}
 	actionShowQualificationStatus();
+}
+
+
+function actionEditUserStatus()
+{
+	if (!userCan('adminUsers'))  throw new PolicyException();
+	$uid = intval($_GET['uid']);
+	
+	handleEditUserStatusForm();
+	
+	$r = db_query('SELECT max(uid) AS uid FROM table_users WHERE uid<'. $uid .' 
+		AND motivationletter IS NOT NULL');
+	$r = db_fetch_assoc($r);
+	unset($prev);
+	if ($r !== false)  $prev = $r['uid'];
+	$r = db_query('SELECT min(uid) AS uid FROM table_users WHERE uid>'. $uid .'
+		AND motivationletter IS NOT NULL');
+	$r = db_fetch_assoc($r);
+	unset($next);
+	if ($r !== false)  $next = $r['uid'];
+	
+	$sqlQuery = 'SELECT * FROM table_users WHERE uid=' . $uid;
+	$r = db_query($sqlQuery, 'Nie udało się otrzymać profilu użytkownika.');
+	$r = db_fetch_assoc($r);
+	
+	global $PAGE;
+	$PAGE->title = 'Status użytkownika - '. $r['name'];
+	
+	$maturaOptions = array('3. gimnazjum ', '1. klasa liceum','2. klasa liceum ', '3. klasa liceum',
+		'I rok studiów', 'II  rok studiów', 'III rok studiów', 'IV rok studiów', 'V rok studiów');
+	$date = getdate();
+	$year = $date['year']+3;
+	if ($date['mon']>=9)  $year++;
+	$maturaYearOptions = array();
+	foreach ($maturaOptions as $i=>$opt)
+	{
+		$maturaYearOptions[strval($year)] = "$opt ($year)";
+		$year--;
+	}
+	$r['maturayeartext'] = '('. $r['maturayear'] .')';
+	if (array_key_exists(strval($r['maturayear']), $maturaYearOptions))
+		$r['maturayeartext'] = $maturaYearOptions[$r['maturayear']];	
+	
+	$result = db_query('SELECT role FROM table_user_roles WHERE uid='. $uid);
+	$roles = db_fetch_all_columns($result);	
+	
+	$r['workshops'] = '<table>';
+	$result = db_query('SELECT w.title, w.duration, wu.* FROM table_workshop_user wu, table_workshops w
+		WHERE w.wid=wu.wid AND uid='. $uid);
+	while ($row = db_fetch_assoc($result)) 
+	{	
+		$r['workshops'] .= '<tr><td><b>'. $row['title'] .'</b></td>';
+		if ($row['lecturer'])
+			$r['workshops'] .= '<td>prowadząc'. gender('y','a',$r['gender']) .'</td>';
+		else 
+		{
+			global $participantStatuses;
+			$r['workshops'] .= '<td>'. $participantStatuses[$row['participant']] .'</td>';
+			$r['workshops'] .= '<td>'. intval($row['points']) .'</td>';
+			if (!empty($row['admincomment']))
+				$r['workshops'] .= '<td><a '. getTipJS($row['admincomment']).'>(komentarz)</td>';
+		}
+		$r['workshops'] .= '</tr>';
+	}
+	$r['workshops'] .= '</table>';
+	
+	$r['jadący'] = (array_search('jadący', $roles) !== false);
+		
+	$inputs = array(
+		array('description'=>'imię i nazwisko', 'name'=>'name', 'type'=>'text', 'readonly'=>true),
+		array('description'=>'login', 'name'=>'login', 'type'=>'text', 'readonly'=>true),
+		array('description'=>'email', 'name'=>'email', 'type'=>'text', 'readonly'=>true),
+		array('description'=>'szkoła/kierunek studiów', 'name'=>'school', 'type'=>'text', 'readonly'=>true),
+		array('description'=>'rocznik (rok zdania matury)', 'name'=>'maturayeartext', 'type'=>'text', 'readonly'=>true),
+		array('description'=>'zainteresowania', 'name'=>'zainteresowania', 'type'=>'richtextarea', 'readonly'=>true),
+		array('description'=>'list motywacyjny', 'name'=>'motivationletter', 'type'=>'richtextarea', 'readonly'=>true),
+		array('description'=>'proponowany referat', 'name'=>'proponowanyreferat', 'type'=>'text', 'readonly'=>true),
+		array('description'=>'warsztaty', 'name'=>'workshops', 'type'=>'text', 'readonly'=>true),		
+		array('description'=>'jadąc'. gender('y','a',$r['gender']), 'name'=>'jadący', 'type'=>'checkbox', 'readonly'=>false),		
+	);	
+
+	
+	$template = new SimpleTemplate();
+	if (isset($next))  echo '<a class="back" href="?action=editUserStatus&amp;uid='. $next .'" title="następny">→</a>';
+	echo '<a class="back" href="?action=adminUsers">wróć do listy</a>';
+	if (isset($prev))  echo '<a class="back" href="?action=editUserStatus&amp;uid='. $prev .'" title="poprzedni">←</a>';
+	?>
+	<h2><?php echo $PAGE->title; ?></h2>
+	<form method="post" action="">
+		<table><tr><td width="22%"></td><td></td></tr><?php generateFormRows($inputs, $r); ?></table>
+		<input type="submit" name="submitted" value="zapisz" />
+	</form>
+	<?php
+	$PAGE->content .= $template->finish();
+}
+
+function handleEditUserStatusForm()
+{
+	if (!userCan('adminUsers'))  throw new PolicyException();
+	if (!isset($_POST['submitted']))  return;
+	$uid = intval($_GET['uid']);
+	
+	$r = db_query('SELECT * FROM table_user_roles WHERE uid='. $uid .' AND role=\'jadący\'');
+	$oldj = db_num_rows($r);
+	$newj = isset($_POST['jadący']);
+	if (!$oldj && $newj)
+		db_insert('user_roles', array('uid'=>$uid,'role'=>'jadący'));
+	else if ($oldj && !$newj)
+		db_query('DELETE FROM table_user_roles WHERE uid='. $uid .' AND role=\'jadący\'');
+	showMessage('Pomyślnie zmieniono status.');			
+}
+
+function actionEditAdditionalInfo()
+{
+	global $USER;
+	if (!userCan('editAdditionalInfo'))  throw new PolicyException();
+	$uid = intval($USER['uid']);
+	handleEditAdditionalInfoForm();
+	
+	
+	$sqlQuery = 'SELECT * FROM table_users WHERE uid=' . $uid;
+	$r = db_query($sqlQuery, 'Nie udało się otrzymać profilu użytkownika.');
+	$r = db_fetch_assoc($r);
+	
+	global $PAGE;
+	$PAGE->title = 'Dodatkowe dane';
+	
+	$tshirtsizes = array('XS','S','M','L','XL','XXL');
+	$tshirtsizes = array_combine($tshirtsizes,$tshirtsizes);
+	if (is_null($r['tshirtsize']))  $r['tshirtsize'] = 'L';
+	
+	$starttime = strtotime('2010/08/19 00:00');
+	$mealhours = array(9=>'śniadanie', 14=>'obiad', 19=>'kolacja');
+	$stayoptions = array();
+	// Warsztaty mają 11 dni [0..10].
+	// Dzień zero zaczyna się chyba od kolacji, dzień 10 kończy na śniadaniu.
+	$stayoptions[19] = strftime("%e. (%a)", $starttime+19*60*60);
+	for ($i=1; $i<10; $i++)
+		foreach ($mealhours as $h=>$meal)
+	{
+		$stayoptions[$i*24+$h] = strftime("%e. (%a) $meal",
+			$starttime+($i*24+$h)*60*60);
+	}
+	$stayoptions[10*24+9] = strftime("%e. (%a)", $starttime+(10*24+9)*60*60);
+	
+	$inputs = array(		
+		array('description'=>'PESEL', 'name'=>'pesel', 'type'=>'text'),
+		array('description'=>'adres <small>(do ubezpieczenia)</small>', 'name'=>'address', 'type'=>'textarea'),
+		array('description'=>'termin przyjazdu: <span class="right">od</span>', 'name'=>'staybegin',
+			'type'=>'select', 'options'=>$stayoptions, 'default'=>19),
+		array('description'=>'<span class="right">do</span>', 'name'=>'stayend', 'type'=>'select',
+			'options'=>$stayoptions, 'default'=>10*24+9),
+		array('description'=>'nocleg i wyżywienie', 'name'=>'isselfcatered',
+			'type'=>'checkbox', 'text'=>'we własnym zakresie <small '.
+				getTipJS('dotyczy np. mieszkańców Olsztyna') .'>[?]</small>'),
+		array('description'=>'preferowany rozmiar koszulki', 'name'=>'tshirtsize', 'type'=>'select',
+			'options'=>$tshirtsizes, 'other'=>'', 'default'=>'L'),
+		array('description'=>'uwagi dodatkowe (np. wegetarianie)', 'name'=>'comments', 'type'=>'textarea'),		
+	);	
+	
+	$template = new SimpleTemplate();
+	?>
+	<h2><?php echo $PAGE->title; ?></h2>
+	<form method="post" action="">
+		<table><tr><td width="25%"></td></tr><?php generateFormRows($inputs, $r); ?></table>
+		<input type="submit" value="zapisz" />
+	</form>
+	<?php
+	$PAGE->content .= $template->finish();
+}
+
+function handleEditAdditionalInfoForm()
+{
+	global $USER;
+	$uid = intval($USER['uid']);
+	
+	if (!isset($_POST['pesel'])) return;
+	
+	$values = array(					
+		'pesel' => $_POST['pesel'],
+		'address' => $_POST['address'],
+		'staybegin' => intval($_POST['staybegin']),
+		'stayend' => intval($_POST['stayend']),
+		'isselfcatered' => empty($_POST['isselfcatered'])?0:1,
+		'tshirtsize' => $_POST['tshirtsize']==VALUE_OTHER ? $_POST['tshirtsize_other'] : $_POST['tshirtsize'],
+		'comments' => $_POST['comments']
+	);
+	db_update('users', 'WHERE uid='. $uid, $values, 'Nie udało się zapisać profilu');
+	showMessage('Pomyślnie zapisano dane.', 'success');
+	logUser('user edit2', $uid);
+
 }
 
 function getName($uid, $default='')

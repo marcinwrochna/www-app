@@ -435,7 +435,7 @@ function actionEditWorkshop()
 		array('tytuł', 'title', 'text'),
 		array('opis'. $comment, 'description', 'richtextarea'),
 		array('type'=>'checkboxgroup', 'name'=>'domains', 'description'=>'Dziedzina', 
-			'default'=>$data['domains'], 'options' => $domainOptions),
+			'options' => $domainOptions),
 		array('type'=>'select', 'name'=>'type', 'description'=>'Rodzaj',
 			'options' => array('Luźny wykład', 'Warsztaty'),
 			'properties'=>'onChange="formTypeChange(this.selectedIndex)"'),

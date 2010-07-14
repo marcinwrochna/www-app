@@ -1,7 +1,9 @@
-admins see motivationLetter
+dane: pesel + adres (do ubezpieczenia), terminy przyjazdu (default - cale warsztaty), preferowany rozmiar koszulki, uwagi dodatkowe (np. wegetarianin)
+zapłacono
+show profile: CV + warsztaty, punkty
+
+tinymce <code> (task solution - at least tabs)
 checklista ("dodaj zadania kwalifikacyjne", "sprawdź rozwiązania od N uczestników", ...)
-role jadący = AK + uczestnicy z punktami za kwalifikację. ręcznie (afterselekcja, nielegalni)
-pesel, czas przyjazdu, zapłacono itd. 
 sprawdzać łączny czas trwania warsztatów 9*2*2+2 (+info, krótsze pobyty)?
 ==Zadania kwalifikacyjne==
 add to user todo checklists
@@ -27,3 +29,11 @@ change templates to 'endif' syntax
 co to jest id="theform"?
 when creating emails, change $email to $content or something, because it's misleading
 check perms in task solution forms
+merge participant-lecturer columns
+
+$DB
+	$DB['tablename']['primarykey']['field'] access
+	default last resource
+	enum
+forms:
+	if !empty POST and function_exists s/action/form/g

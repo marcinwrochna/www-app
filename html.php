@@ -25,7 +25,7 @@ function outputPage()
 	<!--<link rel="icon" type="image/png" href="%[/images/favicon.png]%" />-->
 	<!--<link rel="alternate" type="application/atom+xml" href="%[atom.php,lang=-]%" title="Atom feed" />-->
 	<link rel="stylesheet" type="text/css" href="css.css?20100621" />
-	<link rel="stylesheet" type="text/css" href="images/icons/icons_png.css?20100525b" />
+	<link rel="stylesheet" type="text/css" href="images/icons/icons_png.css?20100714" />
 	<title>WWW - %title%</title>
 
 	%head%

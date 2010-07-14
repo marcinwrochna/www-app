@@ -146,7 +146,7 @@ function generateFormRows($inputs, $previous=array())
 	{
 		if (isset($row['name']))  $arguments = $row;
 		else  $arguments = array('type'=>$row[2], 'name'=>$row[1], 'description'=>$row[0]);
-		if (isset($previous[$arguments['name']]) && !isset($arguments['default']))
+		if (isset($previous[$arguments['name']]) && !is_null($previous[$arguments['name']])) // && !isset($arguments['default']))
 			$arguments['default'] = $previous[$arguments['name']];
 		buildFormRow($arguments);
 	}
@@ -163,6 +163,9 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 	if (!isset($properties))  $properties = '';
 	if (!isset($readonly))    $readonly = false;
 	if (!isset($text))        $text = '';
+	if (!isset($hidden))      $hidden = false;
+	
+	if ($hidden)  return '';
 		
 	$rtype = $type;
 	if (isset($_POST[$name]) && !$ignorePOST)  $default = $_POST[$name];
@@ -177,6 +180,8 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 				foreach($default as $d)  $tmp[]= $options[$d];
 			$default = implode(', ', $tmp);
 		}
+		if ($type == 'textarea' || $type == 'richtextarea')
+			$default = '<div class="descriptionBox">'. parseUserHTML($default) .'</div>';
 		if ($type == 'timestamp')  $default = strftime('%Y-%m-%d %T', $default);
 		$row .= "<td><label>$description</label></td>";
 		$row .= "<td><span $properties>$default</span></td>";
@@ -319,7 +324,10 @@ function buildMenuBox($title, $items)
 			$count++;
 			echo '<li>';
 			if (isset($item['icon']))  echo getIcon($item['icon'], $item['title']);
-			echo ' <a href="?action='. $item['action'] .'">'. $item['title'] .'</a></li>';
+			$href = $item['action'];			
+			if (!strpos($item['action'], '://'))
+				$href = '?action='. $href;	
+			echo ' <a href="'. $href .'">'. $item['title'] .'</a></li>';
 			
 		}	
 	?>

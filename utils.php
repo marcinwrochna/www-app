@@ -9,6 +9,7 @@ function buildSiteBox()
 {
 	$menu = array(
 		array('title'=>'strona główna','action'=>'homepage','perm'=>true,'icon'=>'house.png'),
+		array('title'=>'wikidot','action'=>'http://warsztatywww.wikidot.com/','perm'=>true,'icon'=>'wikidot.gif'),
 		array('title'=>'zgłoś problem','action'=>'reportBug','perm'=>true,'icon'=>'bug.png'),
 	);
 	return buildMenuBox('Aplikacja WWW6', $menu);	
