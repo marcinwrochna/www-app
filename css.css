@@ -136,10 +136,15 @@ a:hover   { color: #765; }
 h2 {
 	border-bottom:1px solid #666666;
 	padding-bottom: 0.25em;
+	margin-bottom: 0.25em;
 	font-size: 220%;
 	font-weight: normal;
 	font-family:Georgia,"Times New Roman",times,serif;
 	color:#2C2217;
+}
+
+h3 {
+	margin-top: 0.7em;
 }
 
 p { margin-top: 0; text-align: justify; }

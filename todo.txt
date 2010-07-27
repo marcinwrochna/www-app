@@ -40,3 +40,4 @@ forms:
 	if !empty POST and function_exists s/action/form/g
 
 see why TinyMCE includes html-escaped comment tags with MS Word stuff.
+school autocomplete

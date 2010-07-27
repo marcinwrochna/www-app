@@ -694,7 +694,9 @@ function actionEditUserStatus()
 	$r = db_fetch_assoc($r);
 	
 	global $PAGE;
-	$PAGE->title = 'Status użytkownika - '. $r['name'];
+	$PAGE->title = 'Kwalifikacja - '. $r['name'];
+	
+	$r['badge'] = getUserBadge($r['uid']);
 	
 	$maturaOptions = array('3. gimnazjum ', '1. klasa liceum','2. klasa liceum ', '3. klasa liceum',
 		'I rok studiów', 'II  rok studiów', 'III rok studiów', 'IV rok studiów', 'V rok studiów');
@@ -715,50 +717,63 @@ function actionEditUserStatus()
 	$roles = db_fetch_all_columns($result);	
 	
 	$r['workshops'] = '<table>';
-	$result = db_query('SELECT w.title, w.duration, wu.* FROM table_workshop_user wu, table_workshops w
+	$result = db_query('SELECT w.wid, w.title, w.duration, wu.* FROM table_workshop_user wu, table_workshops w
 		WHERE w.wid=wu.wid AND uid='. $uid);
 	while ($row = db_fetch_assoc($result)) 
 	{	
-		$r['workshops'] .= '<tr><td><b>'. $row['title'] .'</b></td>';
+		global $participantStatuses;
 		if ($row['lecturer'])
-			$r['workshops'] .= '<td>prowadząc'. gender('y','a',$r['gender']) .'</td>';
+			$row['status'] = 'prowadząc'. gender('y','a',$r['gender']);
+		else
+			$row['status'] = $participantStatuses[intval($row['participant'])];
+		if (!empty($row['admincomment']))
+			$row['commenttipjs'] = getTipJS($row['admincomment']);
 		else 
-		{
-			global $participantStatuses;
-			$r['workshops'] .= '<td>'. $participantStatuses[intval($row['participant'])] .'</td>';
-			$r['workshops'] .= '<td>'. intval($row['points']) .'</td>';
-			if (!empty($row['admincomment']))
-				$r['workshops'] .= '<td><a '. getTipJS($row['admincomment']).'>(komentarz)</td>';
-		}
-		$r['workshops'] .= '</tr>';
+			$row['commenttipjs'] = 'style="display:none;"';
+		$template = new SimpleTemplate($row);
+		?>
+		<tr>
+			<td><b><a href="?action=showWorkshop&amp;wid=%wid%">%title%</a></b></td>
+			<td><a href="?action=showTaskSolutions&amp;wid=%wid%&amp;uid=%uid%" title="szczegóły">
+				%status%
+			</a></td>
+			<td>%points%</td>
+			<td><a %commenttipjs%>(komentarz)</a></td>
+		</tr>
+		<?php
+		$r['workshops'] .= $template->finish();
 	}
 	$r['workshops'] .= '</table>';
 	
-	$r['jadący'] = (array_search('jadący', $roles) !== false);
-		
-	$inputs = array(
-		array('description'=>'imię i nazwisko', 'name'=>'name', 'type'=>'text', 'readonly'=>true),
-		array('description'=>'login', 'name'=>'login', 'type'=>'text', 'readonly'=>true),
-		array('description'=>'email', 'name'=>'email', 'type'=>'text', 'readonly'=>true),
-		array('description'=>'szkoła/kierunek studiów', 'name'=>'school', 'type'=>'text', 'readonly'=>true),
-		array('description'=>'rocznik (rok zdania matury)', 'name'=>'maturayeartext', 'type'=>'text', 'readonly'=>true),
-		array('description'=>'zainteresowania', 'name'=>'zainteresowania', 'type'=>'richtextarea', 'readonly'=>true),
-		array('description'=>'list motywacyjny', 'name'=>'motivationletter', 'type'=>'richtextarea', 'readonly'=>true),
-		array('description'=>'proponowany referat', 'name'=>'proponowanyreferat', 'type'=>'text', 'readonly'=>true),
-		array('description'=>'warsztaty', 'name'=>'workshops', 'type'=>'text', 'readonly'=>true),		
-		array('description'=>'jadąc'. gender('y','a',$r['gender']), 'name'=>'jadący', 'type'=>'checkbox', 'readonly'=>false),		
-	);	
+	$r['jadący'] = (array_search('jadący', $roles) !== false) ? 'checked="checked"' : '';	
+	$r['gender'] = gender('y','a',$r['gender']);
 
 	
-	$template = new SimpleTemplate();
+	$template = new SimpleTemplate($r);
 	if (isset($next))  echo '<a class="back" href="?action=editUserStatus&amp;uid='. $next .'" title="następny">→</a>';
 	echo '<a class="back" href="?action=adminUsers">wróć do listy</a>';
 	if (isset($prev))  echo '<a class="back" href="?action=editUserStatus&amp;uid='. $prev .'" title="poprzedni">←</a>';
 	?>
 	<h2><?php echo $PAGE->title; ?></h2>
-	<form method="post" action="">
-		<table><tr><td width="22%"></td><td></td></tr><?php generateFormRows($inputs, $r); ?></table>
-		<input type="submit" name="submitted" value="zapisz" />
+		<span class="left">%badge% (%login%) &nbsp; %email%</span>
+		<span class="right">%school% - %maturayeartext%</span><br/>
+		
+		<h3 onclick='$("#zaint_sign").toggle(); $("#zaint").toggle("fast");'>			
+			 <span id='zaint_sign'>+</span> Zainteresowania</h3>
+		<div class="descriptionBox" id="zaint" style="display:none">%zainteresowania%</div>
+		<h3>List motywacyjny</h3>
+		<div class="descriptionBox">%motivationletter%</div>
+		<h3>Proponowany referat</h3>
+		%proponowanyreferat%
+		<h3>Warsztaty</h3>
+		%workshops%
+		<br/>
+		
+		<form method="post" action="">
+			<h3 style="display: inline">Jadąc%gender%</h3>
+			<input type="checkbox" name="jadący" value="1" %jadący%>
+			<input type="submit" name="submitted" value="zapisz" />
+		</form>
 	</form>
 	<?php
 	$PAGE->content .= $template->finish();
