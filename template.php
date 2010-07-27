@@ -118,6 +118,19 @@ function parseUserHTML($html) {
 		$img = "<img src='$url' alt='formuła latexa' align='absmiddle'/>";
 		$html = substr_replace($html, $img,$pos,$len);
 	}
+	
+	// TODO see why TinyMCE includes html-escaped comment tags with MS Word stuff.
+	$offset = 0;
+	while (($pos = strpos($html, '&lt;!--', $offset)) !== false)
+	{
+		$end = strpos($html, '--&gt;', $pos+2);		
+		if ($end === false)
+			showMessage('Nie znaleziono zamykającego elementu w wklejeniu z Worda.');
+		$end += strlen('--&gt;');
+		$html = substr_replace($html, '', $pos, $end-$pos);
+		$offset = $pos;
+	}
+	
 	return $html;
 }
 
