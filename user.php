@@ -412,7 +412,7 @@ function actionEditProfile($force=false)
 	}
 	
 	$result = db_query('SELECT role FROM table_user_roles WHERE uid='. $uid);
-	$roles = db_fetch_all_columns($result);
+	$r['roles'] = db_fetch_all_columns($result);
 	
 	$inputs = array();
 	
@@ -440,8 +440,7 @@ function actionEditProfile($force=false)
 		array('name'=>'roles', 'description'=>'role', 'type'=>'checkboxgroup',
 			'options'=>array('admin'=>'Admin','tutor'=>'Tutor','kadra'=>'Kadra',
 				'uczestnik'=>'Uczestnik', 'akadra'=>'Aktywna kadra',
-				'jadący'=>'Jadąc'. gender('y','a',$r['gender'])),
-			'default'=>$roles, 'readonly'=>!$admin),
+				'jadący'=>'Jadąc'. gender('y','a',$r['gender'])), 'readonly'=>!$admin),
 		array('szkoła/kierunek studiów', 'school', 'text'),
 		array('type'=>'select', 'name'=>'maturayear', 'description'=>'rocznik (rok zdania matury)', 
 		      'options'=>$maturaYearOptions, 'other'=>''),
