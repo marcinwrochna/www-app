@@ -4,10 +4,25 @@
 	Included in common.php
 	Defined:
 		initUser() - initialize global $USER
-		buildLoginBox()
-		buildUserBox()
-		handleActionRegister()
+		actionLogout, actionLogin
+		buildLoginBox(), buildUserBox(), buildAdminBox()		
+		actionRegister()
 		passHash()
+		
+		actionChangePassword, actionPasswordReset, actionPasswordResetForm
+		actionEditProfile, handleEditProfileForm
+		actionAdminUsers
+		
+		actionShowQualificationStatus
+		actionEditMotivationLetter		
+		actionEditUserStatus, handleEditUserStatusForm
+		actionEditAdditionalInfo, handleEditAdditionalInfoForm
+		
+		getName
+		userCan
+		assertProfileFilled
+		getUserBadge
+		gender
 	Security warning:
 		If user has cookies disabled, session_id, thus access,
 		can be sniffed through REFERER_URI.
@@ -249,7 +264,7 @@ function passHash($password)
 function actionChangePassword()
 {	
 	global $USER;
-	if (!assertUser())  return;
+	if (!in_array('registered', $USER['roles']))  return;
 	$submited = false;
 	if (isset($_POST['oldpassword']))
 	{
@@ -353,7 +368,7 @@ function actionPasswordResetForm()
 function actionEditProfile($force=false)
 {
 	global $USER;
-	if (!assertUser())  return;
+	if (!in_array('registered', $USER['roles']))  return;
 	$uid = intval($USER['uid']);
 	$admin = false;
 	if (isset($_GET['uid']) && (userCan('adminUsers')))
@@ -711,7 +726,7 @@ function actionEditUserStatus()
 		else 
 		{
 			global $participantStatuses;
-			$r['workshops'] .= '<td>'. $participantStatuses[$row['participant']] .'</td>';
+			$r['workshops'] .= '<td>'. $participantStatuses[intval($row['participant'])] .'</td>';
 			$r['workshops'] .= '<td>'. intval($row['points']) .'</td>';
 			if (!empty($row['admincomment']))
 				$r['workshops'] .= '<td><a '. getTipJS($row['admincomment']).'>(komentarz)</td>';
@@ -760,9 +775,15 @@ function handleEditUserStatusForm()
 	$oldj = db_num_rows($r);
 	$newj = isset($_POST['jadący']);
 	if (!$oldj && $newj)
+	{
 		db_insert('user_roles', array('uid'=>$uid,'role'=>'jadący'));
+		logUser('set jadący 1', $uid);
+	}
 	else if ($oldj && !$newj)
+	{
 		db_query('DELETE FROM table_user_roles WHERE uid='. $uid .' AND role=\'jadący\'');
+		logUser('set jadący 0', $uid);		
+	}
 	showMessage('Pomyślnie zmieniono status.');			
 }
 
@@ -802,6 +823,7 @@ function actionEditAdditionalInfo()
 	$inputs = array(		
 		array('description'=>'PESEL', 'name'=>'pesel', 'type'=>'text'),
 		array('description'=>'adres <small>(do ubezpieczenia)</small>', 'name'=>'address', 'type'=>'textarea'),
+		array('description'=>'telefon', 'name'=>'telephone', 'type'=>'text'),
 		array('description'=>'termin przyjazdu: <span class="right">od</span>', 'name'=>'staybegin',
 			'type'=>'select', 'options'=>$stayoptions, 'default'=>19),
 		array('description'=>'<span class="right">do</span>', 'name'=>'stayend', 'type'=>'select',
@@ -834,6 +856,7 @@ function handleEditAdditionalInfoForm()
 	
 	$values = array(					
 		'pesel' => $_POST['pesel'],
+		'telephone' => $_POST['telephone'],
 		'address' => $_POST['address'],
 		'staybegin' => intval($_POST['staybegin']),
 		'stayend' => intval($_POST['stayend']),
@@ -844,7 +867,6 @@ function handleEditAdditionalInfoForm()
 	db_update('users', 'WHERE uid='. $uid, $values, 'Nie udało się zapisać profilu');
 	showMessage('Pomyślnie zapisano dane.', 'success');
 	logUser('user edit2', $uid);
-
 }
 
 function getName($uid, $default='')
@@ -855,22 +877,6 @@ function getName($uid, $default='')
 	if (!db_num_rows($res))  return $default;
 	$res = db_fetch_assoc($res);
 	return $res['name'];
-}
-
-function assertUser($role=0, $quiet=false)
-{
-	global $USER;
-	if ($USER['anonymous'])
-	{
-		if (!$quiet)  showMessage('Brak uprawnień. Zaloguj się.', 'userError');
-		return false;
-	}
-	if ($role!==0 && !in_array($role,$USER['roles']))
-	{
-		if (!$quiet)  showMessage('Brak uprawnień.', 'userError');		
-		return false;
-	}
-	return true;
 }
 
 function userCan($action, $owner=false)

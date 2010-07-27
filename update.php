@@ -193,4 +193,7 @@ switch ($version)
 		db_query('ALTER TABLE table_users ADD COLUMN tshirtsize varchar(30)');
 		db_query('ALTER TABLE table_users ADD COLUMN comments varchar(255)');		
 		setVersion(19);
+	case(19):
+		db_query('ALTER TABLE table_users ADD COLUMN telephone varchar(255)');		
+		setVersion(20);
 }

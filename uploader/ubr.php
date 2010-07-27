@@ -25,7 +25,7 @@ function buildUberUploaderBody()
 
 			<!-- Progress Bar -->
 			<div id="progress_bar_container">
-				<div id="upload_stats_toggle">&nbsp;</div>
+				<div id="upload_stats_toggle" onclick="UberUpload.toggleUploadStats();">&nbsp;</div>
 				<div id="progress_bar_background">
 					<div id="progress_bar"></div>
 				</div>
@@ -138,7 +138,7 @@ function buildUberUploadHead($path_to_redirect)
 				JQ("#progress_bar_background").css("width", UberUpload.progress_bar_width);
 
 				if(UberUpload.show_files_uploaded || UberUpload.show_current_position || UberUpload.show_elapsed_time || UberUpload.show_est_time_left || UberUpload.show_est_speed){
-					JQ("#upload_stats_toggle").bind("click", function(e){ UberUpload.toggleUploadStats(); });
+					//JQ("#upload_stats_toggle").bind("click", function(e){ UberUpload.toggleUploadStats(); });
 					JQ("#upload_stats_toggle").html(" ");
 					JQ("#upload_stats_toggle").attr("title", "Pokaż statystyki");
 				}
@@ -150,7 +150,7 @@ function buildUberUploadHead($path_to_redirect)
 
 function getUploadInfo()
 {
-	global $TEMP_DIR, $USER;
+	global $TEMP_DIR, $USER, $_INI;
 	if (!isset($_GET['upload_id']) || !preg_match("/^[a-zA-Z0-9]{32}$/", $_GET['upload_id']))
 		return false;
 	$UPLOAD_ID = $_GET['upload_id'];

@@ -47,7 +47,7 @@ $_INI['embedded_upload_results']     = 0;                            // Display 
 $_INI['block_ui_enabled']            = 0;                            // Enable/Disable block UI
 $_INI['multi_configs_enabled']       = 0;                            // Enable/Disable multi config files
 $_INI['cgi_upload_hook']             = 0;                            // Use the CGI hook file to get upload status. Requires CGI.pm >= 3.15
-$_INI['get_progress_speed']          = 2000;                         // CAUTION ! How frequent the web server is poled for upload status. 5000=5 seconds, 1000=1 second, 500=0.5 seconds, 250=0.25 seconds. etc.
+$_INI['get_progress_speed']          = 1000;                         // CAUTION ! How frequent the web server is poled for upload status. 5000=5 seconds, 1000=1 second, 500=0.5 seconds, 250=0.25 seconds. etc.
 $_INI['progress_bar_width']          = 400;                          // Width of the progress bar in pixels (This value is also used in calculations)
 $_INI['delete_link_file']            = 1;                            // Enable/Disable delete link file
 $_INI['delete_redirect_file']        = 1;                            // Enable/Disable delete redirect file

@@ -59,8 +59,8 @@ cssTemplate = '''.%s{background-position:0 %dpx;width:%dpx;height:%dpx;}
 
 for format in ['png','gif']:
 	print 'saving icons_%s.css...' % format,
-	iconCssFile.write('''.icon{background-image:url(master.%s);}'''%(format))
 	iconCssFile = open('icons_%s.css' % format ,'w')
+	iconCssFile.write('''.icon{background-image:url(master.%s);}'''%(format))
 	for count, pair in enumerate(iconMap):
 		cssClass, filename = pair
 		w,h=images[count].size 

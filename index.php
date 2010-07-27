@@ -23,10 +23,10 @@ try
 	else throw new KnownException('Nieznana akcja.');
 	
 	$PAGE->menu .= buildSiteBox();
-	if (!assertUser(0,true))
-		$PAGE->menu .= buildLoginBox();
+	if (in_array('registered', $USER['roles']))
+		$PAGE->menu .= buildUserBox();
 	else
-		$PAGE->menu .= buildUserBox();		
+		$PAGE->menu .= buildLoginBox();
 	$PAGE->menu .= buildWarsztatyBox();
 	//$PAGE->menu .= buildTutoringBox();
 	$PAGE->menu .= buildAdminBox();		

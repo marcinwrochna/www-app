@@ -11,6 +11,7 @@ green checkmark on list
 email notifications
 feedback latex?
 zmiana zadań kwalifikacyjnych, warning?
+add some logs and log filtering
 
 
 --bugs

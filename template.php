@@ -146,7 +146,9 @@ function generateFormRows($inputs, $previous=array())
 	{
 		if (isset($row['name']))  $arguments = $row;
 		else  $arguments = array('type'=>$row[2], 'name'=>$row[1], 'description'=>$row[0]);
-		if (isset($previous[$arguments['name']]) && !is_null($previous[$arguments['name']])) // && !isset($arguments['default']))
+		if (isset($arguments['readonly']) && $arguments['readonly'] && isset($arguments['default']))
+			; // w starych formularzach czasami pola informujące ustawione mają zawartość w 'default' zamiast w previous
+		else if (isset($previous[$arguments['name']]) && !is_null($previous[$arguments['name']]))
 			$arguments['default'] = $previous[$arguments['name']];
 		buildFormRow($arguments);
 	}

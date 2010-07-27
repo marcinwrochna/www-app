@@ -154,11 +154,22 @@ function actionListWorkshops($which, $where, $columns)
 			
 			$row['participants'] = '';
 			if (userCan('showWorkshopParticipants', $lecturers))
-				$row['participants'] .= $row['count'];
-			$tip = 'Jesteś zapisan'. gender() .
-				' (wstępnie; pamiętaj o zadaniach kwalifikacyjnych).';
-			if ($row['participant']>0)
+				$row['participants'] .= $row['count'];			
+			if ($row['participant'] == 1)
+			{
+				$tip = 'Jesteś zapisan'. gender() .
+					' (wstępnie; pamiętaj o zadaniach kwalifikacyjnych).';
 				$row['participants'] .= ' '. getIcon('tick-yellow.png', $tip, null);
+			}
+			else if ($row['participant'] == 2)
+			{
+				$tip = 'Nie spełnił'. gender('e','a') .'ś wymagań.';
+				$row['participants'] .= ' '. getIcon('cross.png', $tip, null);				
+			}
+			else if ($row['participant'] == 3) {
+				$tip = 'Zakwalifikował'. gender('e','a'). 'ś się.';
+				$row['participants'] .= ' '. getIcon('tick.png', $tip, null);				
+			}
 			
 			
 			echo "<tr class='$class'>";

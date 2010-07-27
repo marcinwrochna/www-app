@@ -132,7 +132,8 @@ function handleManageOptionsForm()
 
 function actionDatabase()
 {	
-	if (!assertUser('admin'))  return;
+	global $USER;
+	if (!in_array('admin', $USER['roles']))  throw new PolicyException();
 	
 	if (isset($_POST['query']))
 	{

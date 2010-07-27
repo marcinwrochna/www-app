@@ -4,7 +4,7 @@
 	Included in warsztaty.php
 */
 $participantStatuses = array(
-	//0 => 'niezapisany',
+	0 => 'niezapisany',
 	1 => 'wstępnie zapisany',
 	2 => 'uczestnik nie spełnia wymagań',
 	3 => 'zakwalifikowany'
@@ -487,7 +487,7 @@ function actionShowTaskSolutions()
 		{
 			$sol = array_shift($sols);
 			$inputs = array(
-				array('type'=>'readonly', 'name'=>'submitted', 'description'=>'nadesłane',
+				array('type'=>'text', 'name'=>'submitted', 'description'=>'nadesłane', 'readonly'=>true,
 					'default'=>strftime("%F %T", $sol['submitted'])),
 				array('type'=>'select', 'name'=>'status', 'description'=>'status',
 					'options'=>$solutionStatuses),

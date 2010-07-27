@@ -51,6 +51,7 @@ require_once('template.php');
 require_once('user.php');
 include_once('log.php');
 require_once('warsztaty.php');
+require_once('plan.php');
 initDB();
 if (!defined('STANDALONE'))
 {

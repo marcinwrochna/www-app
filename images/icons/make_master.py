@@ -9,6 +9,7 @@
 import os
 import Image
 import re
+import time
 
 iconMap=[]
 for filename in os.listdir('.'):
@@ -60,7 +61,7 @@ cssTemplate = '''.%s{background-position:0 %dpx;width:%dpx;height:%dpx;}
 for format in ['png','gif']:
 	print 'saving icons_%s.css...' % format,
 	iconCssFile = open('icons_%s.css' % format ,'w')
-	iconCssFile.write('''.icon{background-image:url(master.%s);}'''%(format))
+	iconCssFile.write('''.icon{background-image:url(master.%s?%f);}'''%(format,time.time()))
 	for count, pair in enumerate(iconMap):
 		cssClass, filename = pair
 		w,h=images[count].size 

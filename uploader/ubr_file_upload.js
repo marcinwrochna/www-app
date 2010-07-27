@@ -616,8 +616,8 @@ var UberUpload={
 	toggleUploadStats:function(){
 		if(UberUpload.toggle_upload_stats){
 			if(UberUpload.show_files_uploaded || UberUpload.show_current_position || UberUpload.show_elapsed_time || UberUpload.show_est_time_left || UberUpload.show_est_speed){
-				JQ("#upload_stats_toggle").html("[+]");
-				//JQ("#upload_stats_toggle").css({ backgroundImage : "url(./images/toggle.png)" });
+				//JQ("#upload_stats_toggle").html("[+]");
+				JQ("#upload_stats_toggle").css({ backgroundImage : "url(../../../uploader/images/toggle.png)" });
 			}
 
 			JQ("#upload_stats_container").slideUp("fast");
@@ -625,8 +625,8 @@ var UberUpload={
 		}
 		else{
 			if(UberUpload.show_files_uploaded || UberUpload.show_current_position || UberUpload.show_elapsed_time || UberUpload.show_est_time_left || UberUpload.show_est_speed){
-				JQ("#upload_stats_toggle").html("[-]");
-				//JQ("#upload_stats_toggle").css({ backgroundImage : "url(./images/toggle_collapse.png)" });
+				//JQ("#upload_stats_toggle").html("[-]");
+				JQ("#upload_stats_toggle").css({ backgroundImage : "url(../../../uploader/images/toggle_collapse.png)" });
 			}
 
 			JQ("#upload_stats_container").slideDown("fast");
