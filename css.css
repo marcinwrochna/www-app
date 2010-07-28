@@ -99,6 +99,7 @@ body {
 	color: white;
 }
 
+.menuBox h3 { margin: 0; }
 .menuBox a , .menuBox a:link, .menuBox a:active, .menuBox a:visited { color: white; }
 .menuBox a:hover { color: white; background-color: #706050; }
 .menuBox li { margin-bottom: 1px; }

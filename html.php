@@ -1,5 +1,10 @@
 <?php
 
+function writeMTime($f)
+{
+	echo $f .'?'. filemtime($f);
+}
+
 function outputPage()
 {	
 	global $PAGE;
@@ -13,24 +18,23 @@ function outputPage()
 	if (DEBUG>=2) $PAGE->content .= dumpSuperGlobals();
 	$PAGE->latexPath = 'http://'. $_SERVER['HTTP_HOST'] . '/cgi-bin/mimetex.cgi';
 	$PAGE->uploadGetter = 'http://'. $_SERVER['HTTP_HOST'] . '/uploader/getfile.php';
+	$PAGE->faviconmtime = filemtime('images/favicon.png');
+	$PAGE->cssmtime = filemtime('css.css');
+	$PAGE->iconsmtime = filemtime('images/icons/icons_png.css');
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl" dir="ltr">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<!--<meta name="keywords" content="" />
-	<meta name="description" content="" />
-	<meta name="author" content="" />-->
-	
-	<!--<link rel="icon" type="image/png" href="%[/images/favicon.png]%" />-->
-	<!--<link rel="alternate" type="application/atom+xml" href="%[atom.php,lang=-]%" title="Atom feed" />-->
-	<link rel="stylesheet" type="text/css" href="css.css?20100621" />
-	<link rel="stylesheet" type="text/css" href="images/icons/icons_png.css?20100726c" />
-	<title>WWW - %title%</title>
+
+	<link rel="icon" type="image/png" href="<?php writeMTime('images/favicon.png'); ?>" />
+	<link rel="stylesheet" type="text/css" href="<?php writeMTime('css.css'); ?>" />
+	<link rel="stylesheet" type="text/css" href="<?php writeMTime('images/icons/icons_png.css'); ?>" />
+	<title>%title% - WWW</title>
 
 	%head%
-	<script type="text/javascript" src="common.js?20100517"></script>
-	<script type="text/javascript" src="tinymce/tiny_mce_gzip.js"></script>
+	<script type="text/javascript" src="<?php writeMTime('common.js'); ?>"></script>
+	<script type="text/javascript" src="<?php writeMTime('tinymce/tiny_mce_gzip.js'); ?>"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script type="text/javascript">
 		tinyMCE_GZ.init({
