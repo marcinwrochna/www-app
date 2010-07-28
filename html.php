@@ -35,7 +35,7 @@ function outputPage()
 	%head%
 	<script type="text/javascript" src="<?php writeMTime('common.js'); ?>"></script>
 	<script type="text/javascript" src="<?php writeMTime('tinymce/tiny_mce_gzip.js'); ?>"></script>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js?2"></script>
 	<script type="text/javascript">
 		tinyMCE_GZ.init({
 		plugins : 'nonbreaking,latex,paste,ubrupload',

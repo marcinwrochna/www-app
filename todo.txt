@@ -12,6 +12,7 @@ email notifications
 feedback latex?
 zmiana zadań kwalifikacyjnych, warning?
 add some logs and log filtering
+add role instead of lack of 'uczestnik' role (e.g. rights to autoQualifyForWorkshop).
 
 
 --bugs

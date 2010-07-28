@@ -139,9 +139,12 @@ function buildUserBox()
 
 function buildAdminBox()
 {
+	global $USER;
+	$admin = in_array('admin',$USER['roles']);
 	$menu = array(
 		array('title'=>'zarządzaj użytkownikami','action'=>'adminUsers','icon'=>'group.png'),
 		array('title'=>'wszystkie warsztaty','action'=>'listAllWorkshops','icon'=>'bricks.png'),
+		array('title'=>'korelacje','action'=>'showCorrelation','icon'=>'table.png','perm'=>$admin),
 		array('title'=>'ustawienia','action'=>'editOptions','icon'=>'wrench.png'),
 		array('title'=>'log','action'=>'showLog','icon'=>'time.png'),
 	);
@@ -834,14 +837,19 @@ function actionEditAdditionalInfo()
 	}
 	$stayoptions[10*24+9] = strftime("%e. (%a)", $starttime+(10*24+9)*60*60);
 	
+	$gatherPlaceOptions = array('warszawa'=>'Warszawa','olsztyn'=>'Olsztyn','none'=>'we własnym zakresie');
+	
 	$inputs = array(		
 		array('description'=>'PESEL', 'name'=>'pesel', 'type'=>'text'),
 		array('description'=>'adres <small>(do ubezpieczenia)</small>', 'name'=>'address', 'type'=>'textarea'),
 		array('description'=>'telefon', 'name'=>'telephone', 'type'=>'text'),
+		array('description'=>'telefon do rodziców/opiekunów', 'name'=>'parenttelephone', 'type'=>'text'),
 		array('description'=>'termin przyjazdu: <span class="right">od</span>', 'name'=>'staybegin',
 			'type'=>'select', 'options'=>$stayoptions, 'default'=>19),
 		array('description'=>'<span class="right">do</span>', 'name'=>'stayend', 'type'=>'select',
 			'options'=>$stayoptions, 'default'=>10*24+9),
+		array('description'=>'miejsce zbiórki', 'name'=>'gatherplace','type'=>'select',
+			'options'=>$gatherPlaceOptions, 'default'=>'none'),
 		array('description'=>'nocleg i wyżywienie', 'name'=>'isselfcatered',
 			'type'=>'checkbox', 'text'=>'we własnym zakresie <small '.
 				getTipJS('dotyczy np. mieszkańców Olsztyna') .'>[?]</small>'),
@@ -871,12 +879,14 @@ function handleEditAdditionalInfoForm()
 	$values = array(					
 		'pesel' => $_POST['pesel'],
 		'telephone' => $_POST['telephone'],
+		'parenttelephone' => $_POST['parenttelephone'],
 		'address' => $_POST['address'],
 		'staybegin' => intval($_POST['staybegin']),
 		'stayend' => intval($_POST['stayend']),
+		'gatherplace' => $_POST['gatherplace'],
 		'isselfcatered' => empty($_POST['isselfcatered'])?0:1,
 		'tshirtsize' => $_POST['tshirtsize']==VALUE_OTHER ? $_POST['tshirtsize_other'] : $_POST['tshirtsize'],
-		'comments' => $_POST['comments']
+		'comments' => $_POST['comments'],		
 	);
 	db_update('users', 'WHERE uid='. $uid, $values, 'Nie udało się zapisać profilu');
 	showMessage('Pomyślnie zapisano dane.', 'success');

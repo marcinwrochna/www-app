@@ -229,9 +229,14 @@ a.button:active { background-color: #A98; }
 	margin-right: 2px;
 }
 
-tr.even {
-	background-color: #EEE;
-}
+tr.even { background-color: #EAEAEA; }
+td.even { background-color: #F0F0F0; }
+tr.even td.even { background-color: #DEDEDE; }
+td.selected { background-color: #EECEA0 !important;}
+tr.selected td { background-color: #EECEA0 !important;}
+tr.selected td.selected { background-color: #654 !important; color: white;}
+td .diagonal { border:1px #BBBBBB solid; margin: -3px; padding: 2px; }
+
 
 .icon {
 	display: inline-block;

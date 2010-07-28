@@ -196,4 +196,19 @@ switch ($version)
 	case(19):
 		db_query('ALTER TABLE table_users ADD COLUMN telephone varchar(255)');		
 		setVersion(20);
+	case(20):
+		db_query('UPDATE table_workshop_user SET participant=4 WHERE participant=1
+			AND EXISTS(SELECT * FROM table_user_roles ur WHERE uid=ur.uid AND role=\'kadra\')');
+		setVersion(21);
+	case(21):
+		db_query('UPDATE table_workshop_user SET participant=1 WHERE participant=4
+			AND EXISTS(SELECT * FROM table_user_roles ur WHERE uid=ur.uid AND role=\'kadra\')');
+		// Urgh, should have been: (manually fixed)
+		//	UPDATE w1_workshop_user SET participant=4 WHERE participant=1
+		//	AND EXISTS(SELECT * FROM w1_user_roles ur WHERE w1_workshop_user.uid=ur.uid AND role='kadra')
+		setVersion(22);	
+	case(22):
+		db_query('ALTER TABLE table_users ADD COLUMN parenttelephone varchar(255)');
+		db_query('ALTER TABLE table_users ADD COLUMN gatherplace varchar(255)');
+		setVersion(23);
 }

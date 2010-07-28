@@ -7,7 +7,8 @@ $participantStatuses = array(
 	0 => 'niezapisany',
 	1 => 'wstępnie zapisany',
 	2 => 'uczestnik nie spełnia wymagań',
-	3 => 'zakwalifikowany'
+	3 => 'zakwalifikowany',
+	4 => 'zapisany (kadra)'
 );
 $solutionStatuses = array(
 	1 => 'czeka na sprawdzenie',
@@ -365,9 +366,9 @@ function buildParticipantList($wid)
 	foreach ($participants as $p=>$status)
 	{
 		$r = db_query("SELECT count(*) FROM table_user_roles
-			WHERE uid=$p AND role='uczestnik'");
-		$isUczestnik = db_fetch($r);
-		if (!$isUczestnik)
+			WHERE uid=$p AND role='kadra'");
+		$isKadra = db_fetch($r);
+		if ($isKadra)
 			$kadra[$p]= getUserBadge($p);
 		else
 		{

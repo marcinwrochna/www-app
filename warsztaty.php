@@ -170,6 +170,10 @@ function actionListWorkshops($which, $where, $columns)
 				$tip = 'Zakwalifikował'. gender('e','a'). 'ś się.';
 				$row['participants'] .= ' '. getIcon('tick.png', $tip, null);				
 			}
+			else if ($row['participant'] == 4) {
+				$tip = 'Jesteś zapisan'. gender('y','a'). ' (zakwalifikowany jako kadra)';
+				$row['participants'] .= ' '. getIcon('tick.png', $tip, null);				
+			}			
 			
 			
 			echo "<tr class='$class'>";
@@ -558,14 +562,17 @@ function actionSignUpForWorkshop()
 	$wid = intval($_GET['wid']);
 	if (!userCan('signUpForWorkshop'))  throw new PolicyException();
 	
+	$participant = 1;
+	if (in_array('kadra', $USER['roles']))  $participant = 4;
+	
 	$result = db_query('SELECT participant FROM table_workshop_user '.
 		'WHERE wid='. $wid .' AND uid='. $USER['uid']);
 	$result = db_fetch_assoc($result);
 	if ($result === false)
-		db_insert('workshop_user', array('wid'=>$wid, 'uid'=>$USER['uid'], 'participant'=>1));
+		db_insert('workshop_user', array('wid'=>$wid, 'uid'=>$USER['uid'], 'participant'=>$participant));
 	else
 		db_update('workshop_user', 'WHERE wid='. $wid .' AND uid=' .$USER['uid'],
-			array('participant'=>1));
+			array('participant'=>$participant));
 	
 	showMessage("Pomyślnie zapisano na warsztaty #$wid.", 'success');
 	actionShowWorkshop();
