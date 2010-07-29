@@ -1,8 +1,7 @@
-dane: pesel + adres (do ubezpieczenia), terminy przyjazdu (default - cale warsztaty), preferowany rozmiar koszulki, uwagi dodatkowe (np. wegetarianin)
 zapłacono
 show profile: CV + warsztaty, punkty
 
-tinymce <code> (task solution - at least tabs)
+tinymce <code> (task solution - at least indentation)
 checklista ("dodaj zadania kwalifikacyjne", "sprawdź rozwiązania od N uczestników", ...)
 sprawdzać łączny czas trwania warsztatów 9*2*2+2 (+info, krótsze pobyty)?
 ==Zadania kwalifikacyjne==

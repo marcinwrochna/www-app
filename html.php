@@ -75,11 +75,15 @@ function outputPage()
 			%jsOnLoad%			
 		});
 	--></script>
-	<!--[if lt IE 7]>
-		<script src="http://ie7-js.googlecode.com/svn/version/2.0(beta3)/IE7.js" type="text/javascript"></script>
-		<style type="text/css">
-			body { behavior: url("iecsshover3.htc"); }
+	<!--[if lt IE 9]>
+		<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+	<![endif]--> 	
+	<!--[if lt IE 8]>
+		<style type="text/css">			
+			body { font-size: 100.00%; }
+			/* .contentBox.article { zoom:1; } */
 		</style>
+		<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7-squish.js" type="text/javascript"></script>
 	<![endif]-->
 
 </head>
