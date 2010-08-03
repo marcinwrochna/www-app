@@ -1,6 +1,4 @@
 <?php
-
-define('STANDALONE', true);
 include_once('common.php');
 
 /* For each workshop with tasks, for each participant,
@@ -46,7 +44,6 @@ while (($row = db_fetch_assoc($result)) !== false)
 	db_update('task_solutions', "WHERE wid=$wid AND uid=$uid AND notified<1", array('notified'=>1));
 	
 	sendMail($title, $email, $address);
-	sendMail($title .' [debug]', $email, 'mwrochna@gmail.com'); // Debuguję.
 	$address = json_encode($address);
 	echo "Sent email to $address<br/>\n";
 }

@@ -33,13 +33,12 @@ define('USER_ANONYMOUS', -2);
 
 
 function initUser()
-{	
+{			
 	unset($GLOBALS['USER']);
 	global $USER;
 	if (isset($_SESSION['user_id']))
 	{
-		$sqlQuery = 'SELECT * FROM table_users
-			WHERE uid=$1 AND confirm=0';
+		$sqlQuery = 'SELECT * FROM table_users WHERE uid=$1 AND confirm=0';
 		$params = array($_SESSION['user_id']);
 		$result = db_query_params($sqlQuery, $params, 'Błąd przy sprawdzaniu informacji o użytkowniku.');
 		if (db_num_rows($result) === 1)  {

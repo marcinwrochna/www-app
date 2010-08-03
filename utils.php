@@ -3,7 +3,10 @@
 	utils.php
 	Included in common.php
 */
-
+function nvl($value, $default)
+{
+	return is_null($value)?$default:$value;
+}
 
 function buildSiteBox()
 {
@@ -50,7 +53,7 @@ function actionReportBugForm()
 	$mail .= "\n\n";
 	$mail .= strftime('%F %T (%s)');
 	$mail .= "\n\n";
-	sendMail('Zgłoszono problem', $mail, 'mwrochna@gmail.com');
+	sendMail('Zgłoszono problem', $mail, BUGREPORT_EMAIL_ADDRESS);
 	showMessage('Wysłane. Dzięki!', 'success');
 }
 
@@ -109,13 +112,22 @@ function actionEditOptions()
 
 function getOption($name)
 {
-	$sqlQuery = 'SELECT value, type FROM table_options WHERE name=$1';
-	$result = db_query_params($sqlQuery, array($name), 'Błąd wczytywaniu ustawienia.');
-	if (!db_num_rows($result))  throw new KnownException('Nie odnaleziono ustawienia.');
-	$result = db_fetch_assoc($result);
+	global $DB;
+	$DB->query('SELECT value, type FROM table_options WHERE name=$1', $name);
+	if (!$DB->num_rows())  throw new KnownException('Nie odnaleziono ustawienia.');
+	$result = $DB->fetch_assoc();
 	if ($result['type'] == 'int')  return intval($result['value']);
 	return $result['value'];
 }
+
+/*function getOption($name)
+{
+	global $DB;
+	$result = $DB->options[$name]['value,type'];// $DB->fetch_assoc();
+	if ($result['type'] == 'int')  return intval($result['value']);
+	return $result['value'];
+}*/
+
 
 function handleManageOptionsForm()
 {
@@ -153,32 +165,6 @@ function actionDatabase()
 	</form>
 	<?php
 	$PAGE->content .= $template->finish();
-}
-
-
-function sendMail($subject, $content, $to)
-{
-	$from = 'noreply@warsztatywww.nstrefa.pl';
-	$content .= "\n__\nEmail automatycznie wysłany z ". $_SERVER['HTTP_HOST'];
-	//mail($to, "[WWW][app] $subject", $content , "From: $from", "-f$from");
-	require_once('phpmailer/class.phpmailer.php');
-	$mail = new PHPMailer();
-	$mail->IsSMTP();
-	$mail->SMTPAuth = true;
-	$mail->Username = "mwrochna@gmail.com";
-	$mail->Password = "xx23ssw";
-	$mail->From = "noreply@warsztatywww.nstrefa.pl";
-	$mail->FromName = "Aplikacja WWW";
-	if (is_array($to))
-		foreach ($to as $t)
-			$mail->addAddress($t[1],$t[0]);
-	else  $mail->addAddress($to);
-	$mail->addReplyTo("noreply@warsztatywww.nstrefa.pl", "noreply");
-	$mail->Subject = "[WWW][app] $subject";
-	$mail->Body = $content;
-	$mail->CharSet = 'utf-8';
-	if(!$mail->Send())
-		throw new KnownException('Błąd przy wysyłaniu maila: '. $mail->ErrorInfo);
 }
 
 // by Douglas Lovell

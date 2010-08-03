@@ -12,6 +12,7 @@ feedback latex?
 zmiana zadań kwalifikacyjnych, warning?
 add some logs and log filtering
 add role instead of lack of 'uczestnik' role (e.g. rights to autoQualifyForWorkshop).
+ustalić normalizację punktów (jest 0..20, 0..6, 0..400. Proponuję więc 0..100 :P)
 
 
 --bugs
@@ -31,13 +32,18 @@ co to jest id="theform"?
 when creating emails, change $email to $content or something, because it's misleading
 check perms in task solution forms
 merge participant-lecturer columns
+make email X-Sender tag (or lack of it) explicit in config.php:sendMail
 
 $DB
 	$DB['tablename']['primarykey']['field'] access
 	default last resource
 	enum
+	query($q, a,b,c) in addition to query($q, array(a,b,c))
 forms:
 	if !empty POST and function_exists s/action/form/g
+templates:
+	remember about endforeach;
+	alternate('even','odd')
 
 see why TinyMCE includes html-escaped comment tags with MS Word stuff.
 school autocomplete

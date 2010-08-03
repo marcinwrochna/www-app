@@ -5,12 +5,23 @@
 */
 
 require_once('common.php');
-include_once('update.php');
+require_once('utils.php');
+include_once('log.php');
+include_once('update.php'); // apply updates
+require_once('template.php'); 
+require_once('user.php');
+initPage();
+initUser();
+
+require_once('warsztaty.php');
+require_once('plan.php');
 include_once('tutoring.php');
+
+	
 
 function actionHomepage()
 {
-	global $PAGE;
+	global $PAGE, $DB;
 	$PAGE->title = 'Strona główna';	
 	$PAGE->content .= getOption('homepage');
 }

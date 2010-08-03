@@ -607,3 +607,16 @@ function domainOrder($domains)
 	if (in_array('astronomia', $domains))               $r+=16;
 	return $r;
 }
+
+function actionRecountDomainOrder()
+{
+	$r = db_query('SELECT wid FROM table_workshops');
+	$wids = db_fetch_all_columns($r);
+	foreach ($wids as $wid)
+	{
+		$r = db_query('SELECT domain FROM table_workshop_domain WHERE wid='. $wid);
+		$domains = db_fetch_all_columns($r);
+		$order = domainOrder($domains);
+		db_update('workshops', 'WHERE wid='.$wid, array('domain_order'=>$order));
+	}
+}

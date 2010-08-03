@@ -1,6 +1,7 @@
 <?php
 /*
 	latex.php
+	Actually replaced by cgi-bin mime-tex.
 	Used in <img src="latex.php?codetobeparsed" />
 */
 require_once('latex/class.latexrender.php');

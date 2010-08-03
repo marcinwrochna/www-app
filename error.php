@@ -6,8 +6,10 @@
 		constant DEBUG - 0 for nothing, 1 for E_STRICT, 2 for superglobal dump
 		class KnownException - for explicitely called exceptions.
 		class DbException - the same, with db_last_error() appended
+		class PolicyException - throwed at privilege escalation attempts 
 		errorHandler(), errorParse() - passed to set_exception_handler()
 			and set_error_handler(), will send errors to my email.
+		dumpSuperGlobals() - returns a description of $_GET,$_POST,$_SESSION,$_SERVER
 */
 
 function initErrors()
@@ -163,8 +165,7 @@ function errorHandler($errno, $errstr='', $errfile='', $errline='')
 			$parsed = @errorParse($errno,$errstr,$errfile,$errline,$logMessage);
 			echo "<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"><body>$parsed</body></html>";
 			$mail ="token@token.homelinux.com";
-			/*ini_set ("sendmail_from",$mail);*/
-			if (!defined('LOCAL'))  sendMail('warsztatyWWW error', $logMessage, 'mwrochna@gmail.com');
+			if (ERROR_EMAIL)  sendMail('warsztatyWWW error', $logMessage, ERROR_EMAIL_ADDRESS);
 		}
 	}
 	catch (Exception $e)

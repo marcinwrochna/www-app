@@ -1,13 +1,4 @@
 <?php
-	
-function initDB() 
-{
-	define('TABLE_PREFIX', 'w1_');
-	if (defined('LOCAL'))  $connectionString = 'host=localhost user=token dbname=www';
-	else $connectionString = 'host=localhost user=kuzniami_www password=PymhpdV5cP7z dbname=kuzniami_www1';
-	$connection = db_connect($connectionString);
-	if (!$connection)  throw new DbException('Cannot connect with database ('.$connectionString.')');
-}
 
 function db_query($query, $errorString='')
 {

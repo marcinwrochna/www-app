@@ -1,9 +1,7 @@
 <?php
 	/* update.php
 	*/
-require_once('common.php');
 	
-$version = intval(getOption('version'));
 function setVersion($v)
 {
 	db_update('options', 'WHERE name=\'version\'', array('value' => $v), 'Nie udało się zmienić wersji.');
@@ -16,19 +14,7 @@ function insertPermission($role, $action)
 	db_query("INSERT INTO table_role_permissions VALUES('$role','$action')");
 }
 
-function recountDomainOrder()
-{
-	$r = db_query('SELECT wid FROM table_workshops');
-	$wids = db_fetch_all_columns($r);
-	foreach ($wids as $wid)
-	{
-		$r = db_query('SELECT domain FROM table_workshop_domain WHERE wid='. $wid);
-		$domains = db_fetch_all_columns($r);
-		$order = domainOrder($domains);
-		db_update('workshops', 'WHERE wid='.$wid, array('domain_order'=>$order));
-	}
-}
-
+$version = intval(getOption('version'));
 switch ($version)
 {
 	case(0):
@@ -118,7 +104,7 @@ switch ($version)
 		setVersion(8);
 	case(8):
 		db_query('ALTER TABLE table_workshops ADD COLUMN domain_order int');
-		recountDomainOrder();
+		//recountDomainOrder();
 		setVersion(9);
 	case(9):
 		db_query('CREATE TABLE table_uploads(
@@ -131,7 +117,7 @@ switch ($version)
 		)');
 		setVersion(10);
 	case(10):
-		recountDomainOrder();
+		//recountDomainOrder();
 		insertPermission('registered', 'showWorkshop');
 		insertPermission('registered', 'listPublicWorkshops');
 		insertPermission('registered', 'signUpForWorkshop');
@@ -203,7 +189,7 @@ switch ($version)
 	case(21):
 		db_query('UPDATE table_workshop_user SET participant=1 WHERE participant=4
 			AND EXISTS(SELECT * FROM table_user_roles ur WHERE uid=ur.uid AND role=\'kadra\')');
-		// Urgh, should have been: (manually fixed)
+		// Urgh, uid should have been: (manually fixed)
 		//	UPDATE w1_workshop_user SET participant=4 WHERE participant=1
 		//	AND EXISTS(SELECT * FROM w1_user_roles ur WHERE w1_workshop_user.uid=ur.uid AND role='kadra')
 		setVersion(22);	
@@ -211,4 +197,16 @@ switch ($version)
 		db_query('ALTER TABLE table_users ADD COLUMN parenttelephone varchar(255)');
 		db_query('ALTER TABLE table_users ADD COLUMN gatherplace varchar(255)');
 		setVersion(23);
+	case(23):
+		//db_query('ALTER TABLE table_options ADD PRIMARY KEY (name)');
+		//db_query('ALTER TABLE table_role_permissions ADD PRIMARY KEY (role,action)');
+		/*db_query('ALTER TABLE table_task_solutions ADD PRIMARY KEY (wid,tid,uid,submitted)');
+		db_query('ALTER TABLE table_tasks ADD PRIMARY KEY (wid,tid)');
+		db_query('ALTER TABLE table_user_roles ADD PRIMARY KEY (uid,role)');
+		db_query('ALTER TABLE table_users ADD PRIMARY KEY (uid)');
+		db_query('ALTER TABLE table_workshop_domain ADD PRIMARY KEY (wid,domain)');
+		db_query('ALTER TABLE table_workshops ADD PRIMARY KEY (wid)');*/
+		//db_query('ALTER TABLE table_workshop_user ADD PRIMARY KEY (wid,uid)');		
+		//db_query('ALTER TABLE table_test ADD PRIMARY KEY (id)');		
+		setVersion(24);		
 }

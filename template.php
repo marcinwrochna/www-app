@@ -1,7 +1,7 @@
 <?php
 /*
 	template.php
-	Included in common.php
+	Included in common.php, uploader/ubr.php
 	Defines:
 		initPage() - initializes global $PAGE SimeplTemplate
 			$PAGE->head - stuff to be placed in <head>, usually <script>s
@@ -338,7 +338,7 @@ function buildMenuBox($title, $items)
 		{
 			$count++;
 			echo '<li>';
-			if (isset($item['icon']))  echo getIcon($item['icon'], $item['title']);
+			if (isset($item['icon']))  echo getIcon($item['icon']);
 			$href = $item['action'];			
 			if (!strpos($item['action'], '://'))
 				$href = '?action='. $href;	

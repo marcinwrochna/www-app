@@ -38,13 +38,13 @@ function outputPage()
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js?2"></script>
 	<script type="text/javascript">
 		tinyMCE_GZ.init({
-		plugins : 'nonbreaking,latex,paste,ubrupload',
-		themes : 'advanced',
-		languages : 'en,pl',
-		disk_cache : true,
-		debug : false,
-		suffix : '_src'
-	});
+			plugins : 'nonbreaking,latex,paste,ubrupload',
+			themes : 'advanced',
+			languages : 'en,pl',
+			disk_cache : true,
+			debug : false,
+			suffix : '_src'
+		});
 	</script>
 	<script type="text/javascript"><!--	
 		%js% 
