@@ -381,24 +381,12 @@ function actionEditProfile($force=false)
 	
 	handleEditProfileForm();
 	
-	if (userCan('adminUsers'))
-	{
-		$r = db_query('SELECT max(uid) AS uid FROM table_users WHERE uid<'. $uid, 'Nie udało się sprawdzić poprzedniego użytkownika.');
-		$r = db_fetch_assoc($r);
-		unset($prev);
-		if ($r !== false)  $prev = $r['uid'];
-		$r = db_query('SELECT min(uid) AS uid FROM table_users WHERE uid>'. $uid, 'Nie udało się sprawdzić następnego użytkownika.');
-		$r = db_fetch_assoc($r);
-		unset($next);
-		if ($r !== false)  $next = $r['uid'];
-	}
-	
 	$sqlQuery = 'SELECT * FROM table_users WHERE uid=' . $uid;
 	$r = db_query($sqlQuery, 'Nie udało się otrzymać profilu użytkownika.');
 	$r = db_fetch_assoc($r);
 	
 	global $PAGE;
-	if ($admin)  $PAGE->title = 'Zarządzanie profilem';
+	if ($admin)  $PAGE->title = $r['name']. ' - profil';
 	else $PAGE->title = 'Twój profil';
 	
 	$maturaOptions = array('3. gimnazjum ', '1. klasa liceum','2. klasa liceum ', '3. klasa liceum',
@@ -454,19 +442,20 @@ function actionEditProfile($force=false)
 	));	
 	
 	if ($admin) {
-		$inputs[]= array('description'=>'list motywacyjny', 'name'=>'motivationletter', 'type'=>'text',
+		/*$inputs[]= array('description'=>'list motywacyjny', 'name'=>'motivationletter', 'type'=>'text',
 			'readonly'=>true, 'default'=>$r['motivationletter']);
 		$inputs[]= array('description'=>'proponowany referat', 'name'=>'proponowanyreferat', 'type'=>'text',
-			'readonly'=>true, 'default'=>$r['proponowanyreferat']);
+			'readonly'=>true, 'default'=>$r['proponowanyreferat']); */	
 	}				
 	
-	$template = new SimpleTemplate();
-	if (userCan('adminUsers')) {
-		if (isset($next))  echo '<a class="back" href="?action=editProfile&amp;uid='. $next .'" title="następny">→</a>';
-		echo '<a class="back" href="?action=adminUsers">wróć do listy</a>';
-		if (isset($prev))  echo '<a class="back" href="?action=editProfile&amp;uid='. $prev .'" title="poprzedni">←</a>';
-	 } ?>
+	$template = new SimpleTemplate(array('uid'=>$uid));
+	if (userCan('adminUsers'))  echo getUserListArrows('editProfile', $uid);
+	?>
 	<h2><?php echo $PAGE->title; ?></h2>
+	<?php if (userCan('adminUsers')) { ?>
+		<a href='?action=editUserStatus&amp;uid=%uid%'>status kwalifikacji</a> &nbsp;
+		<a href='?action=editAdditionalInfo&amp;uid=%uid%'>dodatkowe dane</a>
+	<?php } ?>
 	<form method="post" action="<?php if ($force)  echo '?action=editProfile'; ?>">
 		<table><?php generateFormRows($inputs, $r); ?></table>
 		<input type="submit" value="zapisz" />
@@ -578,7 +567,9 @@ function actionAdminUsers()
 				"<td>${row['email']}</td><td>$roles</td>".
 				"<td>". str_word_count(strip_tags($row['motivationletter'])) ."</td><td>". strlen($row['proponowanyreferat']) ."</td><td>".
 				"<a href='?action=editProfile&uid=${row['uid']}'>edytuj</a> ".
-				"<a href='?action=editUserStatus&uid=${row['uid']}'>status</a></td></tr>";
+				"<a href='?action=editUserStatus&uid=${row['uid']}'>status</a> ".
+				"<a href='?action=editAdditionalInfo&uid=${row['uid']}'>dane</a></td></tr>";
+				
 			$class = ($class=='even')?'odd':'even';
 		}
 	?></table>
@@ -696,7 +687,7 @@ function actionEditUserStatus()
 	$r = db_fetch_assoc($r);
 	
 	global $PAGE;
-	$PAGE->title = 'Kwalifikacja - '. $r['name'];
+	$PAGE->title = $r['name'] . ' - kwalifikacja';
 	
 	$r['badge'] = getUserBadge($r['uid']);
 	
@@ -752,11 +743,13 @@ function actionEditUserStatus()
 
 	
 	$template = new SimpleTemplate($r);
-	if (isset($next))  echo '<a class="back" href="?action=editUserStatus&amp;uid='. $next .'" title="następny">→</a>';
-	echo '<a class="back" href="?action=adminUsers">wróć do listy</a>';
-	if (isset($prev))  echo '<a class="back" href="?action=editUserStatus&amp;uid='. $prev .'" title="poprzedni">←</a>';
+	if (userCan('adminUsers'))  echo getUserListArrows('editUserStatus', $uid); 
 	?>
 	<h2><?php echo $PAGE->title; ?></h2>
+	<?php if (userCan('adminUsers')) { ?>
+		<a href='?action=editProfile&amp;uid=%uid%'>profil</a> &nbsp; 
+		<a href='?action=editAdditionalInfo&amp;uid=%uid%'>dodatkowe dane</a>
+	<?php } ?><br/>
 		<span class="left">%badge% (%login%) &nbsp; %email%</span>
 		<span class="right">%school% - %maturayeartext%</span><br/>
 		
@@ -807,8 +800,17 @@ function actionEditAdditionalInfo()
 {
 	global $USER;
 	if (!userCan('editAdditionalInfo'))  throw new PolicyException();
-	$uid = intval($USER['uid']);
-	handleEditAdditionalInfoForm();
+	if (isset($_GET['uid'])) 
+	{
+		$admin = true;
+		$uid = intval($_GET['uid']);
+	}
+	else
+	{
+		$uid = intval($USER['uid']);
+		$admin = false;
+	}
+	if (!$admin)  handleEditAdditionalInfoForm();
 	
 	
 	$sqlQuery = 'SELECT * FROM table_users WHERE uid=' . $uid;
@@ -817,6 +819,7 @@ function actionEditAdditionalInfo()
 	
 	global $PAGE;
 	$PAGE->title = 'Dodatkowe dane';
+	if ($admin)  $PAGE->title = $r['name'] .' - dodatkowe dane';
 	
 	$tshirtsizes = array('XS','S','M','L','XL','XXL');
 	$tshirtsizes = array_combine($tshirtsizes,$tshirtsizes);
@@ -857,12 +860,17 @@ function actionEditAdditionalInfo()
 		array('description'=>'uwagi dodatkowe (np. wegetarianie)', 'name'=>'comments', 'type'=>'textarea'),		
 	);	
 	
-	$template = new SimpleTemplate();
+	$template = new SimpleTemplate(array('uid'=>$uid));
+	if (userCan('adminUsers'))  echo getUserListArrows('editAdditionalInfo', $uid); 
 	?>
 	<h2><?php echo $PAGE->title; ?></h2>
+	<?php if (userCan('adminUsers')) { ?>
+		<a href='?action=editProfile&amp;uid=%uid%'>profil</a> &nbsp;		
+		<a href='?action=editUserStatus&amp;uid=%uid%'>status kwalifikacji</a>
+	<?php } ?>
 	<form method="post" action="">
 		<table><tr><td width="25%"></td></tr><?php generateFormRows($inputs, $r); ?></table>
-		<input type="submit" value="zapisz" />
+		<?php if (!$admin) { ?><input type="submit" value="zapisz" /><?php } ?>
 	</form>
 	<?php
 	$PAGE->content .= $template->finish();
@@ -955,4 +963,21 @@ function gender($m='y', $f='a', $gender=null)
 	global $USER;
 	if (is_null($gender))  $gender = $USER['gender'];
 	return ($gender==='f'?$f:$m);
+}
+
+function getUserListArrows($action, $uid)
+{
+	//if (userCan('adminUsers'))
+	$r = db_query('SELECT max(uid) AS uid FROM table_users WHERE uid<'. $uid, 'Nie udało się sprawdzić poprzedniego użytkownika.');
+	$r = db_fetch_assoc($r);
+	unset($prev);
+	if ($r !== false)  $prev = $r['uid'];
+	$r = db_query('SELECT min(uid) AS uid FROM table_users WHERE uid>'. $uid, 'Nie udało się sprawdzić następnego użytkownika.');
+	$r = db_fetch_assoc($r);
+	unset($next);
+	if ($r !== false)  $next = $r['uid'];
+
+	if (isset($next))  echo '<a class="back" href="?action='. $action .'&amp;uid='. $next .'" title="następny">→</a>';
+	echo '<a class="back" href="?action=adminUsers">wróć do listy</a>';
+	if (isset($prev))  echo '<a class="back" href="?action='. $action .'&amp;uid='. $prev .'" title="poprzedni">←</a>';
 }

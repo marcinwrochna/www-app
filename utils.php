@@ -110,7 +110,18 @@ function actionEditOptions()
 	$PAGE->content .= $template->finish();
 }
 
+
 function getOption($name)
+{
+        $sqlQuery = 'SELECT value, type FROM table_options WHERE name=$1';
+        $result = db_query_params($sqlQuery, array($name), 'Błąd wczytywaniu ustawienia.');
+        if (!db_num_rows($result))  throw new KnownException('Nie odnaleziono ustawienia.');
+        $result = db_fetch_assoc($result);
+        if ($result['type'] == 'int')  return intval($result['value']);
+        return $result['value'];
+}
+
+/*function getOption($name)
 {
 	global $DB;
 	$DB->query('SELECT value, type FROM table_options WHERE name=$1', $name);
@@ -118,7 +129,7 @@ function getOption($name)
 	$result = $DB->fetch_assoc();
 	if ($result['type'] == 'int')  return intval($result['value']);
 	return $result['value'];
-}
+}*/
 
 /*function getOption($name)
 {

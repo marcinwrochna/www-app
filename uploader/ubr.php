@@ -5,7 +5,8 @@
 		buildUberUploadBody() - return the form and divs used by UberUploader
 		buildUberUploadHead() - return <script> and other tags to be placed in <head>
 */
-include_once(dirname(__FILE__).'/../template.php');
+require_once(dirname(__FILE__).'/../common.php');
+require_once(dirname(__FILE__).'/../template.php');
 global $_INI, $_CONFIG;
 require_once dirname(__FILE__).'/ubr_ini.php';
 require_once dirname(__FILE__).'/ubr_lib.php';
