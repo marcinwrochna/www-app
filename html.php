@@ -1,27 +1,19 @@
 <?php
+/*
+ * html.php
+ * Included in page.php Page::finish()
+ * What is output in order:
+ * - http headers (content encoding and standards, cache)
+ * - html head (paths to non-php files, javascript configs, IE fixes)
+ * - html body (content boxes: header, footer, menu)
+ * - google analytics javascript.
+ */
 
 function writeMTime($f)
 {
 	echo $f .'?'. filemtime($f);
 }
-
-function outputPage()
-{	
-	global $PAGE;
-	header('Content-Language: pl');
-	header('Content-Type: text/html; charset=UTF-8'); 
 	
-	// Too frequent version changes make things incompatible. Must-revalidate.
-	header('Cache-Control: private, s-maxage=0, max-age=0, must-revalidate');
-	header('Last-Modified: '. gmdate("D, d M Y H:i:s", time()) .' GMT');
-
-	if (DEBUG>=2) $PAGE->content .= dumpSuperGlobals();
-	$PAGE->latexPath = 'http://'. $_SERVER['HTTP_HOST'] . '/cgi-bin/mimetex.cgi';
-	$PAGE->uploadGetter = 'http://'. $_SERVER['HTTP_HOST'] . '/uploader/getfile.php';
-	$PAGE->faviconmtime = filemtime('images/favicon.png');
-	$PAGE->cssmtime = filemtime('css.css');
-	$PAGE->iconsmtime = filemtime('images/icons/icons_png.css');
-
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl" dir="ltr">
 <head>
@@ -35,46 +27,20 @@ function outputPage()
 	%head%
 	<script type="text/javascript" src="<?php writeMTime('common.js'); ?>"></script>
 	<script type="text/javascript" src="<?php writeMTime('tinymce/tiny_mce_gzip.js'); ?>"></script>
+	<script type="text/javascript" src="<?php writeMTime('tinymce/config.js'); ?>"></script>	
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js?2"></script>
+	<script type="text/javascript">tinyMCE_GZ.init(tinyMCE_GZ_config);</script>
 	<script type="text/javascript">
-		tinyMCE_GZ.init({
-			plugins : 'nonbreaking,latex,paste,ubrupload',
-			themes : 'advanced',
-			languages : 'en,pl',
-			disk_cache : true,
-			debug : false,
-			suffix : '_src'
-		});
-	</script>
-	<script type="text/javascript"><!--	
 		%js% 
 		
-		tinyMCE.init({
-			language: "pl",
-			mode : "specific_textareas",
-			editor_selector : "mceEditor",
-			plugins: "nonbreaking,latex,ubrupload",
-			nonbreaking_force_tab : "true",
-			entity_encoding : "raw",
-			theme: "advanced",
-			theme_advanced_toolbar_location: "top",
-			theme_advanced_buttons1 :
-				 "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,bullist,numlist,separator,undo,redo,|,link,unlink,image,ubrupload,hr", 
-			theme_advanced_buttons2 : "formatselect,fontsizeselect,|,latex,charmap,sub,sup,outdent,indent,|,removeformat,code,|,forecolor,backcolor,", 
-			theme_advanced_buttons3 : "",
-			theme_advanced_blockformats : "p,h3,h4,h5,h6,pre,div", //blockquote,address,samp,dd,dt
-			indentation: "20px",
-			theme_advanced_path : true,
-			theme_advanced_path_location : "bottom",
-			latex_renderUrl : "%latexPath%",
-			ubrupload_getter : "%uploadGetter%",
-			button_tile_map : true
-		 });
-				
-		$(document).ready(function(){   
+		tinyMCE.init(tinyMCE_config);
+					
+		$(document).ready(function(){  
+			$('#tooltip').mouseenter(function(){$(this).stop(true,true).show();});
+			$('#tooltip').mouseleave(function(){$(this).stop(true,true).fadeOut('fast');}); 
 			%jsOnLoad%			
 		});
-	--></script>
+	</script>
 	<!--[if lt IE 9]>
 		<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
 	<![endif]--> 	
@@ -88,15 +54,16 @@ function outputPage()
 
 </head>
 <body>
-	<div id="tooltip" onmouseover="tiptipon()" onmouseout="tipoff()"></div>
+	<div id="tooltip"></div>
 	<div id="globalContainer">
-		<div id="headerBox"><h1><a href="index.php">
+		<div id="headerBox"><h1><a href="homepage">
 			<img src="images/logo.gif" alt="Wakacyjne Warsztaty Wielodyscyplinarne" />
 		</a></h1></div>
 
 		<div id="middleContainer">
 			<div id="contentBoxMargin"><div id="contentBox">
 				%topContent%
+				%headerTitle%
 				%content%
 			</div></div>
 
@@ -108,7 +75,7 @@ function outputPage()
 		
 		<div id="footerBox" >
 			<span class="left">
-				<a href="?action=about">credits</a>
+				<a href="about">credits</a>
 			</span>
 			<span class="right">
 				&copy; <?php echo strftime("%Y"); ?> Wakacyjne Warsztaty Wielodyscyplinarne
@@ -130,6 +97,3 @@ function outputPage()
 	<!-- php time: <?php echo time()-$_SERVER['REQUEST_TIME']; ?>s -->
 </body>
 </html>
-	<?php
-	echo $PAGE->finish();
-}

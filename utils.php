@@ -1,111 +1,94 @@
 <?php
 /*
-	utils.php
-	Included in common.php
-*/
+ * utils.php
+ * Included in common.php
+ */
 function nvl($value, $default)
 {
 	return is_null($value)?$default:$value;
 }
 
-function buildSiteBox()
+function is_assoc(&$array) {
+	$next = 0;
+	foreach ($array as $k=>$v) {
+		if ($k !== $next)
+			return true;
+		$next++;
+	}
+	return false;
+}
+
+function addSiteMenuBox()
 {
-	$menu = array(
-		array('title'=>'strona główna','action'=>'homepage','perm'=>true,'icon'=>'house.png'),
-		array('title'=>'wikidot','action'=>'http://warsztatywww.wikidot.com/','perm'=>true,'icon'=>'wikidot.gif'),
-		array('title'=>'zgłoś problem','action'=>'reportBug','perm'=>true,'icon'=>'bug.png'),
-	);
-	return buildMenuBox('Aplikacja WWW6', $menu);	
+	global $PAGE;
+	$PAGE->addMenuBox('Aplikacja WWW6', array(
+		array('strona główna', 'homepage',                         'house.png',   true),
+		array('wikidot',       'http://warsztatywww.wikidot.com/', 'wikidot.gif', true),
+		array('zgłoś problem', 'reportBug',                        'bug.png',     true)
+	));
+}
+
+function actionHomepage()
+{
+	global $PAGE, $DB;
+	$PAGE->title = 'Strona główna';	
+	$PAGE->headerTitle = '';	
+	$PAGE->content .= getOption('homepage');
 }
 
 function actionReportBug()
 {
 	global $PAGE, $USER;
-	
+	$PAGE->title = 'Zgłoś problem';
 	$desc = 'Coś nie działa tak jak powinno? Coś jest niejasne, niepotrzebnie skomplikowane,
 		brzydkie, niewygodne? Zgłoś to koniecznie.<br/>';
 	if ($USER['anonymous'])
 		$desc .= '<small>Napisz jakiś kontakt, jeśli chcesz dostać odpowiedź.</small>';
 	else 
 		$desc .= '<small>Domyślnie odpowiem Ci na maila ('. $USER['email'] .').</small>';
-	$inputs = array( array('type'=>'textarea', 'name'=>'problem', 'description'=>$desc) );	
-	$PAGE->title = 'Zgłoś problem';	
-	$template = new SimpleTemplate();
-	?>
-	<h2><?php echo $PAGE->title; ?></h2>
-	<form method="post" action="?action=reportBugForm" name="form" id="theform">
-		<table><?php generateFormRows($inputs);	?></table>
-		<input type="submit" value="Wyślij" />
-	</form>
-	<?php
-	$PAGE->content .= $template->finish();
+		
+	$form = new Form();
+	$form->action = 'reportBugForm';
+	$form->addRow('textarea', 'problem', $desc);
+	$PAGE->content .= $form->getHTML();
 }
 
 function actionReportBugForm()
 {
-	logUser('bugreport');
 	global $USER, $PAGE;
 	$PAGE->title = 'Zgłoszono problem';	
-	$mail = "Zgłoszono problem na ". $_SERVER['HTTP_HOST'] ."\n\"\"\"\n";
-	$mail .= $_POST['problem'];
-	$mail .= "\n\"\"\"\n";
-	$mail .= json_encode($USER);
-	$mail .= "\n\n";
-	$mail .= strftime('%F %T (%s)');
-	$mail .= "\n\n";
-	sendMail('Zgłoszono problem', $mail, BUGREPORT_EMAIL_ADDRESS);
+	$template = new SimpleTemplate($_SERVER);
+	?><html><body>
+	Zgłoszono problem na <i>%HTTP_HOST%</i>:<br/>
+	<pre><?php echo htmlspecialchars($_POST['problem']); ?></pre><hr/><br/>
+	<b>Czas:</b> <?php echo strftime('%F %T (%s)'); ?><br/>
+	<b>HTTP_USER_AGENT:</b> %HTTP_USER_AGENT%<br/>
+	<b>HTTP_REFERER:</b> %HTTP_REFERER%<br/>
+	<b>USER:</b><br/>
+	<pre><?php print_r($USER) ?></pre>
+	</body></html><?php
+	
+	logUser('bugreport'); // Log first, in case of email failure.
+	sendMail('Zgłoszono problem', $template->finish(), BUGREPORT_EMAIL_ADDRESS, true);
 	showMessage('Wysłane. Dzięki!', 'success');
 }
 
 
 function actionAbout()
 {
-	global $PAGE;
-	
+	global $PAGE;	
 	$PAGE->title = 'Credits';	
 	$template = new SimpleTemplate();
 	?>
-	Za wszystko co działa i nie działa należy obarczać winą Marcina Wrochnę.<br/>
-	Ikonki:<br/>
-		<a href="http://www.fatcow.com/free-icons/">FatCow</a> (Creative Commons Attribution 3.0 License),<br/>
-		<a href="http://code.google.com/p/twotiny/">twotiny</a> (Artistic License/GPL, support the <a href="http://mojavemusic.ca/">Mojave</a> band)<br/>
-	Edytor WYSIWIG: <a href="http://tinymce.moxiecode.com/">TinyMCE</a> (LGPL)<br/>
-	<?php
-	$PAGE->content .= $template->finish();
-}
-
-
-function actionEditOptions()
-{
-	if (!userCan('editOptions'))  throw new PolicyException();
-	handleManageOptionsForm();
-	
-	$sqlQuery = 'SELECT * FROM table_options ORDER BY name';
-	$result = db_query($sqlQuery, 'Błąd przy wczytywaniu ustawień.');
-	
-	global $PAGE;
-	$PAGE->title = 'Ustawienia';
-	$template = new SimpleTemplate();
-	?>
-		<div class="contentBox panel panelManageOptions">
-			<h3>Ustawienia</h3>
-			<br/>
-			<form method="post" action="">
-			<table>
-			<?php
-				$rows = array();
-				$values = array();
-				while ($r = db_fetch_assoc($result))
-				{
-					$rows []= array($r['description'], $r['name'], $r['type']);
-					$values[$r['name']] = $r['value'];
-				}
-				echo generateFormRows($rows, $values);
-			?>
-			</table>
-				<input type="submit" name="sent" value="Zapisz" />
-			</form>
-		</div>
+		Koderzy: Marcin Wrochna<br/>
+		Ikonki
+		<ul>
+			<li><a href="http://www.fatcow.com/free-icons/">FatCow</a>
+				(Creative Commons Attribution 3.0 License),</li>
+			<li><a href="http://code.google.com/p/twotiny/">twotiny</a> (Artistic License/GPL,
+				support the <a href="http://mojavemusic.ca/">Mojave</a> band)</li>
+		</ul>
+		Edytor WYSIWIG: <a href="http://tinymce.moxiecode.com/">TinyMCE</a> (LGPL)<br/>
 	<?php
 	$PAGE->content .= $template->finish();
 }
@@ -113,69 +96,63 @@ function actionEditOptions()
 
 function getOption($name)
 {
-        $sqlQuery = 'SELECT value, type FROM table_options WHERE name=$1';
-        $result = db_query_params($sqlQuery, array($name), 'Błąd wczytywaniu ustawienia.');
-        if (!db_num_rows($result))  throw new KnownException('Nie odnaleziono ustawienia.');
-        $result = db_fetch_assoc($result);
-        if ($result['type'] == 'int')  return intval($result['value']);
-        return $result['value'];
+	global $DB;
+	$option = $DB->options[$name]->assoc('value, type');
+	if ($option['type'] == 'int')  return intval($option['value']);
+	return $option['value'];
 }
 
-/*function getOption($name)
+function actionEditOptions()
 {
-	global $DB;
-	$DB->query('SELECT value, type FROM table_options WHERE name=$1', $name);
-	if (!$DB->num_rows())  throw new KnownException('Nie odnaleziono ustawienia.');
-	$result = $DB->fetch_assoc();
-	if ($result['type'] == 'int')  return intval($result['value']);
-	return $result['value'];
-}*/
-
-/*function getOption($name)
-{
-	global $DB;
-	$result = $DB->options[$name]['value,type'];// $DB->fetch_assoc();
-	if ($result['type'] == 'int')  return intval($result['value']);
-	return $result['value'];
-}*/
-
-
-function handleManageOptionsForm()
-{
-	if (!isset($_POST['sent']))  return;
 	if (!userCan('editOptions'))  throw new PolicyException();
-	foreach ($_POST as $name=>$value)
+	actionEditOptionsForm();
+	
+	$form = new Form();
+	
+	global $DB;
+	$options = $DB->query('SELECT * FROM table_options ORDER BY name');	
+	foreach ($options as $r)
 	{
-		$sqlQuery = 'UPDATE table_options SET value=$1 WHERE name=$2';
-		db_query_params($sqlQuery, array($value,$name), 'Błąd zapisywaniu ustawień.');
-	}
-	showMessage('Pomyślnie zapisano ustawienia.');
+		$form->addRow($r['type'], $r['name'], $r['description']);
+		$form->values[$r['name']] = $r['value'];
+	}	
+	
+	global $PAGE;
+	$PAGE->title = 'Ustawienia';
+	$form->submitValue = 'Zapisz';
+	$PAGE->content .= $form->getHTML();
+}
+
+function actionEditOptionsForm()
+{
+	global $DB, $PAGE;
+	if (!isset($_POST['submitted']))  return;
+	foreach ($_POST as $name=>$value)
+		$DB->options[$name] = array('value' => $value);
+	$PAGE->addMessage('Pomyślnie zapisano ustawienia.', 'success');
 	logUser('admin setting');
 }
 
-function actionDatabase()
+function actionDatabaseRaw()
 {	
-	global $USER;
+	global $DB, $USER, $PAGE;
 	if (!in_array('admin', $USER['roles']))  throw new PolicyException();
 	
 	if (isset($_POST['query']))
 	{
-		$result = db_query($_POST['query'], 'Nie udało się.');
-		showMessage('Rows affected: '. pg_affected_rows($result), 'success');
-		showMessage('Wynik selecta: '.json_encode(@db_fetch_all($result)));
+		$result = $DB->query($_POST['query']);
+		$PAGE->addMessage('Rows affected: '. $result->affected_rows(), 'success');
+		$PAGE->content .= '<b>Wynik selecta:</b><table>';
+		foreach ($result as $i=>$row)
+			$PAGE->content .= '<tr><td>'. $i .'</td><td>'. implode('</td><td>',$row) .'</td></tr>';
+		$PAGE->content .= '</table>';
 	}
 	
 	global $PAGE;	
 	$PAGE->title = 'Baza danych';
-	$template = new SimpleTemplate();
-	?>
-	<h2>Surowy dostęp do bazy danych</h2>
-	<form method="post" action="">
-	<table><?php generateFormRows(array(array('zapytanie', 'query', 'textarea'))); ?></table>
-		<input type="submit" value="wyślij" />
-	</form>
-	<?php
-	$PAGE->content .= $template->finish();
+	$form = new Form();
+	$form->addRow('textarea', 'query', '<b>zapytanie</b>');
+	$PAGE->content .= $form->getHTML();
 }
 
 // by Douglas Lovell

@@ -208,5 +208,8 @@ switch ($version)
 		db_query('ALTER TABLE table_workshops ADD PRIMARY KEY (wid)');*/
 		//db_query('ALTER TABLE table_workshop_user ADD PRIMARY KEY (wid,uid)');		
 		//db_query('ALTER TABLE table_test ADD PRIMARY KEY (id)');		
-		setVersion(24);		
+		setVersion(24);	
+	case (24):
+		insertPermission('admin', 'showCorrelation');	
+		setVersion(25);	
 }

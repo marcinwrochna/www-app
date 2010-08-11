@@ -50,18 +50,10 @@ function tipon(parent,tip,width,y)
 	
 	tooltip.style.left = x+"px";
 	tooltip.innerHTML = tip;
-	tooltip.style.display = "block";
+	$('#tooltip').stop(true,true).show();
 }
 
 function tipoff()
 {
-	var tooltip = document.getElementById("tooltip");
-	tooltip.closing = true;
-	setTimeout('var tooltip = document.getElementById("tooltip"); if (tooltip.closing) { tooltip.style.display="none"; }', 50);
-}
-
-function tiptipon()
-{
-	var tooltip = document.getElementById("tooltip");
-	tooltip.closing = false;
+	$("#tooltip").fadeOut('slow');
 }

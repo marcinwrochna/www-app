@@ -8,23 +8,17 @@ require_once('common.php');
 require_once('utils.php');
 include_once('log.php');
 include_once('update.php'); // apply updates
-require_once('template.php'); 
+require_once('template.php');
+require_once('form.php');
 require_once('user.php');
-initPage();
+require_once('page.php');
+$PAGE = new Page();
+
 initUser();
 
 require_once('warsztaty.php');
 require_once('plan.php');
 include_once('tutoring.php');
-
-	
-
-function actionHomepage()
-{
-	global $PAGE, $DB;
-	$PAGE->title = 'Strona główna';	
-	$PAGE->content .= getOption('homepage');
-}
 
 try
 {
@@ -33,14 +27,14 @@ try
 	if (is_callable($action)) call_user_func($action);
 	else throw new KnownException('Nieznana akcja.');
 	
-	$PAGE->menu .= buildSiteBox();
+	$PAGE->menu .= addSiteMenuBox();
 	if (in_array('registered', $USER['roles']))
-		$PAGE->menu .= buildUserBox();
+		$PAGE->menu .= addUserMenuBox();
 	else
-		$PAGE->menu .= buildLoginBox();
-	$PAGE->menu .= buildWarsztatyBox();
+		$PAGE->menu .= addLoginMenuBox();
+	$PAGE->menu .= addWarsztatyMenuBox();
 	//$PAGE->menu .= buildTutoringBox();
-	$PAGE->menu .= buildAdminBox();		
+	$PAGE->menu .= addAdminMenuBox();		
 }
 catch (PolicyException $e)
 {
@@ -49,7 +43,6 @@ catch (PolicyException $e)
 	showMessage($e->getMessage(), 'exception');
 }
 	
-outputPage();
-
+echo $PAGE->finish();
 
 //logVisitor('index', $fid);

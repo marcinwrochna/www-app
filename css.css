@@ -90,7 +90,8 @@ body {
 
 .menuBox {
 	padding: 10px;
-	width: 180px; /* menuBoxWidth */
+	padding-right: 5px;
+	width: 185px; /* menuBoxWidth */
 	margin-top: 2em;
 	margin-bottom: 2em;
 	border-top: 1px black solid;
@@ -102,7 +103,8 @@ body {
 .menuBox h3 { margin: 0; }
 .menuBox a , .menuBox a:link, .menuBox a:active, .menuBox a:visited { color: white; }
 .menuBox a:hover { color: white; background-color: #706050; }
-.menuBox li { margin-bottom: 1px; }
+.menuBox ul { list-style: none; }
+.menuBox li { margin-left: 0; margin-bottom: 1px; }
 .menuBox .icon { vertical-align: text-bottom; }
 
 
@@ -135,7 +137,7 @@ a:hover   { color: #765; }
 #middleContainer { margin-left: 20px;  }
 
 h2 {
-	border-bottom:1px solid #666666;
+	border-bottom: 1px solid #666666;
 	padding-bottom: 0.25em;
 	margin-bottom: 0.25em;
 	font-size: 220%;
@@ -259,3 +261,31 @@ table.tasks td {
 	vertical-align: top;
 	padding: 1px 2px;
 }
+
+.tabs {
+	clear:left;
+	margin-top: 5px;
+	margin-bottom: -8px;
+}
+.tabs a { 
+	border: 1px #D0CFCC solid;
+	padding: 0 2px;
+	text-decoration: none;
+	background-color: #F5F2EE;
+	color: #2C2217;
+	font-size: small;
+	margin: 0 2px;
+}
+.tabs a:hover {
+	border: 1px #DDD solid;
+	background-color: white;
+}
+.tabs a.selected {
+	font-weight: bold;
+	border: 0;
+	margin: 1px;
+	background: transparent;
+}
+
+ul { list-style-position: inside; }
+li { margin-left: 1em; }

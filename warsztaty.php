@@ -5,15 +5,14 @@
 */
 require_once('tasks.php');
 
-function buildWarsztatyBox()
+function addWarsztatyMenuBox()
 {
-	global $USER;
-	$menu = array(
-		array('title'=>'lista warsztatów','action'=>'listPublicWorkshops','icon'=>'brick.png'),
-		array('title'=>'twoje warsztaty','action'=>'listOwnWorkshops','icon'=>'brick-green.png'),
-		array('title'=>'zaproponuj warsztaty','action'=>'editWorkshop', 'perm'=>userCan('createWorkshop'), 'icon'=>'brick-add.png')
-	);
-	return buildMenuBox('Warsztaty', $menu);	
+	global $PAGE;
+	$PAGE->addMenuBox('Warsztaty', array(
+		array('lista warsztatów',     'listPublicWorkshops', 'brick.png'      ),
+		array('twoje warsztaty',      'listOwnWorkshops',    'brick-green.png'),
+		array('zaproponuj warsztaty', 'createWorkshop',      'brick-add.png'  )
+	));
 }
 
 function actionListPublicWorkshops()
@@ -342,6 +341,11 @@ function describeWorkshopStatus($status)
 			default: return 'nieznany';
 		}
 	}
+}
+
+function actionCreateWorkshop()
+{
+	actionEditWorkshop();
 }
 
 function actionEditWorkshop()

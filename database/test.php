@@ -20,8 +20,10 @@ function actionDatabaseTest()
 			showMessage('ok '. json_encode($is), 'success');
 	}
 	
-	global $connectionParams;
-	$DB = DB::create(DB_DRIVER, $connectionParams);
+	//global $connectionParams;
+	//$DB = DB::create(DB_DRIVER, $connectionParams);
+	global $DB;
+	
 	// query, affected rows
 	$r = $DB->query('DELETE FROM table_test');
 	$a = $r->affected_rows();

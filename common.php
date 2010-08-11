@@ -21,7 +21,7 @@ initErrors();
 
 require_once('database.php'); //deprecated
 require_once('database/db.php');
-//$DB = DB::create(DB_DRIVER, $connectionParams);
+$DB = DB::create(DB_DRIVER, $connectionParams);
 
 // Unquote if someone turned magic_quotes on by accident.
 if(  (function_exists("get_magic_quotes_gpc") && get_magic_quotes_gpc())  ||

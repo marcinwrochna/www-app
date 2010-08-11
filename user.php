@@ -107,8 +107,9 @@ function actionLogin()
 	actionHomepage();
 }
 
-function buildLoginBox()
+function addLoginMenuBox()
 {
+	global $PAGE;
 	$template = new SimpleTemplate();
 	?>
 	<div class="menuBox" id="loginBox">
@@ -121,33 +122,32 @@ function buildLoginBox()
 		</form>
 	</div>
 	<?php
-	return $template->finish();
+	$PAGE->menu .= $template->finish();
 }
 
-function buildUserBox()
+function addUserMenuBox()
 {
-	global $USER;
-	$menu = array(
-		array('title'=>'profil','action'=>'editProfile','perm'=>userCan('editProfile',$USER['uid']),'icon'=>'user-green.png'),
-		array('title'=>'wyloguj','action'=>'logout','perm'=>true,'icon'=>'door-open.png'),
-		array('title'=>'kwalifikacja','action'=>'showQualificationStatus','icon'=>'qual.png'),
-		array('title'=>'dodatkowe dane','action'=>'editAdditionalInfo','icon'=>'page-white-edit.png')
+	global $USER, $PAGE;
+	$items = array(
+		array('profil',         'editProfile',             'user-green.png', userCan('editProfile',$USER['uid'])),
+		array('kwalifikacja',   'showQualificationStatus', 'qual.png'           ),
+		array('dodatkowe dane', 'editAdditionalInfo',      'page-white-edit.png')
 	);
-	return buildMenuBox($USER['name'], $menu);	
+	$logout = getIcon('poweroff.png');
+	$logout = '<a class="right" href="logout" '. getTipJS('wyloguj') .'>'. $logout .'</a>';
+	$PAGE->addMenuBox($USER['name'] .'&nbsp;', $items, $logout);	
 }
 
-function buildAdminBox()
+function addAdminMenuBox()
 {
-	global $USER;
-	$admin = in_array('admin',$USER['roles']);
-	$menu = array(
-		array('title'=>'zarządzaj użytkownikami','action'=>'adminUsers','icon'=>'group.png'),
-		array('title'=>'wszystkie warsztaty','action'=>'listAllWorkshops','icon'=>'bricks.png'),
-		array('title'=>'korelacje','action'=>'showCorrelation','icon'=>'table.png','perm'=>$admin),
-		array('title'=>'ustawienia','action'=>'editOptions','icon'=>'wrench.png'),
-		array('title'=>'log','action'=>'showLog','icon'=>'time.png'),
-	);
-	return buildMenuBox('Administracja', $menu);
+	global $PAGE;
+	$PAGE->addMenuBox('Administracja', array(
+		array('zarządzaj użytkownikami', 'adminUsers',       'group.png' ),
+		array('wszystkie warsztaty',     'listAllWorkshops', 'bricks.png'),
+		array('korelacje',               'showCorrelation',  'table.png' ),
+		array('ustawienia',              'editOptions',      'wrench.png'),
+		array('log',                     'showLog',          'time.png'  ),
+	));
 }
 
 
@@ -246,7 +246,6 @@ function actionRegister()
 		$PAGE->title = 'Zarejestruj się';
 		$template = new SimpleTemplate();
 		?>
-		<h2>Zarejestruj się</h2>
 		<form method="post" action="?action=register">
 			<table><?php generateFormRows($inputs); ?></table>
 			Wszystkie pola są obowiązkowe. Email będzie widoczny tylko dla zarejestrowanych.<br/>
@@ -307,7 +306,6 @@ function actionChangePassword()
 		$PAGE->title = 'Zmień hasło';
 		$template = new SimpleTemplate();
 		?>
-		<h2>Zmień hasło</h2>
 		<form method="post" action="?action=changePassword">
 			<table><?php generateFormRows($inputs); ?></table>
 			<input type="submit" value="zmień" />
@@ -329,7 +327,6 @@ function actionPasswordReset()
 	$PAGE->title = 'Resetuj hasło';
 	$template = new SimpleTemplate();
 	?>
-	<h2>Resetuj hasło</h2>
 	Wpisz swój login lub email - dostaniesz wiadomość z nowym hasłem.
 	<form method="post" action="?action=passwordResetForm">
 		<table><?php generateFormRows($inputs); ?></table>
@@ -448,14 +445,10 @@ function actionEditProfile($force=false)
 			'readonly'=>true, 'default'=>$r['proponowanyreferat']); */	
 	}				
 	
-	$template = new SimpleTemplate(array('uid'=>$uid));
-	if (userCan('adminUsers'))  echo getUserListArrows('editProfile', $uid);
+	$template = new SimpleTemplate();
+	if (userCan('adminUsers'))
+		$PAGE->headerTitle = getUserHeader($uid, $r['name'], 'editProfile'); 
 	?>
-	<h2><?php echo $PAGE->title; ?></h2>
-	<?php if (userCan('adminUsers')) { ?>
-		<a href='?action=editUserStatus&amp;uid=%uid%'>status kwalifikacji</a> &nbsp;
-		<a href='?action=editAdditionalInfo&amp;uid=%uid%'>dodatkowe dane</a>
-	<?php } ?>
 	<form method="post" action="<?php if ($force)  echo '?action=editProfile'; ?>">
 		<table><?php generateFormRows($inputs, $r); ?></table>
 		<input type="submit" value="zapisz" />
@@ -537,7 +530,6 @@ function actionAdminUsers()
 	global $PAGE;
 	$PAGE->title = 'Zarządzanie użytkownikami';
 	$template = new SimpleTemplate();
-	echo '<h2>Zarządzanie użytkownikami</h2>';
 	$tip = htmlspecialchars(htmlspecialchars(implode(', ', $mails), ENT_QUOTES));
 	$js = "onmouseout='tipoff()' onmouseover='tipon(this,\"$tip\")'";
 	echo '<a href="mailto:'. htmlspecialchars(implode(', ', $mails)) .'" '.
@@ -603,8 +595,6 @@ function actionShowQualificationStatus()
 	
 	$template = new SimpleTemplate();
 	?>
-		<h2>Kwalifikacja</h2>
-		<br/>
 		<h3>Status</h3>
 		<p>
 		<?php
@@ -741,15 +731,10 @@ function actionEditUserStatus()
 	$r['jadący'] = (array_search('jadący', $roles) !== false) ? 'checked="checked"' : '';	
 	$r['gender'] = gender('y','a',$r['gender']);
 
-	
-	$template = new SimpleTemplate($r);
-	if (userCan('adminUsers'))  echo getUserListArrows('editUserStatus', $uid); 
-	?>
-	<h2><?php echo $PAGE->title; ?></h2>
-	<?php if (userCan('adminUsers')) { ?>
-		<a href='?action=editProfile&amp;uid=%uid%'>profil</a> &nbsp; 
-		<a href='?action=editAdditionalInfo&amp;uid=%uid%'>dodatkowe dane</a>
-	<?php } ?><br/>
+	if (userCan('adminUsers'))
+		$PAGE->headerTitle = getUserHeader($uid, $r['name'], 'editUserStatus'); 
+	$template = new SimpleTemplate($r);	
+	 ?>
 		<span class="left">%badge% (%login%) &nbsp; %email%</span>
 		<span class="right">%school% - %maturayeartext%</span><br/>
 		
@@ -860,17 +845,13 @@ function actionEditAdditionalInfo()
 		array('description'=>'uwagi dodatkowe (np. wegetarianie)', 'name'=>'comments', 'type'=>'textarea'),		
 	);	
 	
-	$template = new SimpleTemplate(array('uid'=>$uid));
-	if (userCan('adminUsers'))  echo getUserListArrows('editAdditionalInfo', $uid); 
+	if (userCan('adminUsers'))
+		$PAGE->headerTitle = getUserHeader($uid, $r['name'], 'editAdditionalInfo'); 
+	$template = new SimpleTemplate();
 	?>
-	<h2><?php echo $PAGE->title; ?></h2>
-	<?php if (userCan('adminUsers')) { ?>
-		<a href='?action=editProfile&amp;uid=%uid%'>profil</a> &nbsp;		
-		<a href='?action=editUserStatus&amp;uid=%uid%'>status kwalifikacji</a>
-	<?php } ?>
 	<form method="post" action="">
 		<table><tr><td width="25%"></td></tr><?php generateFormRows($inputs, $r); ?></table>
-		<?php if (!$admin) { ?><input type="submit" value="zapisz" /><?php } ?>
+		<?php if (!$admin) : ?><input type="submit" value="zapisz" /><?php endif; ?>
 	</form>
 	<?php
 	$PAGE->content .= $template->finish();
@@ -965,8 +946,9 @@ function gender($m='y', $f='a', $gender=null)
 	return ($gender==='f'?$f:$m);
 }
 
-function getUserListArrows($action, $uid)
+function getUserHeader($uid, $name, $action)
 {
+
 	//if (userCan('adminUsers'))
 	$r = db_query('SELECT max(uid) AS uid FROM table_users WHERE uid<'. $uid, 'Nie udało się sprawdzić poprzedniego użytkownika.');
 	$r = db_fetch_assoc($r);
@@ -976,8 +958,26 @@ function getUserListArrows($action, $uid)
 	$r = db_fetch_assoc($r);
 	unset($next);
 	if ($r !== false)  $next = $r['uid'];
-
-	if (isset($next))  echo '<a class="back" href="?action='. $action .'&amp;uid='. $next .'" title="następny">→</a>';
-	echo '<a class="back" href="?action=adminUsers">wróć do listy</a>';
-	if (isset($prev))  echo '<a class="back" href="?action='. $action .'&amp;uid='. $prev .'" title="poprzedni">←</a>';
+	
+	$template = new SimpleTemplate();
+	if (isset($next))
+		echo "<a class='back' href='?action=$action&amp;uid=$next' title='następny'>→</a>";
+	echo "<a class='back' href='?action=adminUsers'>wróć do listy</a>";
+	if (isset($prev))
+		echo "<a class='back' href='?action=$action&amp;uid=$prev' title='poprzedni'>←</a>";
+	echo '<h2>'. $name .'<div class="tabs">';
+	$actions = array(
+		'editProfile' => 'profil',
+		'editAdditionalInfo' => 'dodatkowe dane',
+		'editUserStatus' => 'status kwalifikacji'
+	);
+	foreach ($actions as $a=>$aname)
+	{
+		echo '<a href="?action='. $a .'&amp;uid='. $uid .'"';
+		if ($a == $action)
+			echo ' class="selected"';
+		echo '>'. $aname .'</a>';
+	}
+	echo '</div></h2>';
+	return $template->finish();	
 }

@@ -1,4 +1,5 @@
 <?php
+// call_user_func_array('pg_connect', $connectionParams);
 
 function db_query($query, $errorString='')
 {
@@ -89,5 +90,3 @@ function db_fetch_all($r)  {
 function db_fetch_all_columns($r, $c=0) { return pg_fetch_all_columns($r,$c); }
 function db_fetch_assoc($r)  { return pg_fetch_assoc($r); }
 function db_last_error()  { return pg_last_error(); }
-
-call_user_func_array('pg_connect', $connectionParams);

@@ -208,7 +208,8 @@ class DbException extends KnownException
 {
 	function __construct($s, $n=E_USER_ERROR)
 	{
-		$s .= ' <h4>Baza danych</h4><pre>'. db_last_error() .'</pre>';
+		global $DB;
+		$s .= ' <h4>Baza danych</h4><pre>'. $DB->last_error() .'</pre>';
 		parent::__construct($s,$n);
 	}
 }
@@ -255,5 +256,3 @@ function dumpSuperGlobals()
 	
 	return $result;
 }
-
-?>

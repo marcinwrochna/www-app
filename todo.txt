@@ -33,6 +33,7 @@ when creating emails, change $email to $content or something, because it's misle
 check perms in task solution forms
 merge participant-lecturer columns
 make email X-Sender tag (or lack of it) explicit in config.php:sendMail
+pg_prepare some statements?
 
 $DB
 	$DB['tablename']['primarykey']['field'] access
@@ -47,3 +48,6 @@ templates:
 
 see why TinyMCE includes html-escaped comment tags with MS Word stuff.
 school autocomplete
+
+maybes:
+buildMenuBox perm=true redundant?
