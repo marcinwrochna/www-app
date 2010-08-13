@@ -78,6 +78,10 @@ body {
 	color: white;
 }
 
+#middleContainer {
+	margin-left: 0.9em;
+}
+
 #menuPanel {
 	width: 200px; /* menuBoxWidth */
 	float: left;
@@ -85,15 +89,14 @@ body {
 	/*font-size: 0.9em;*/
 	line-height: 1.5em; 
 	text-align: left;
-	background-color: white;
+	margin: 0.5em 0;
 }
 
 .menuBox {
 	padding: 10px;
 	padding-right: 5px;
 	width: 185px; /* menuBoxWidth */
-	margin-top: 2em;
-	margin-bottom: 2em;
+	margin: 0.5em 0;
 	border-top: 1px black solid;
 	border-bottom: 1px black solid;
 	background-color: #66554E;
@@ -133,8 +136,6 @@ a         { color: #663400; }
 a:active  { color: #663400; }
 a:visited { color: #6a3600; }
 a:hover   { color: #765; }
-
-#middleContainer { margin-left: 20px;  }
 
 h2 {
 	border-bottom: 1px solid #666666;

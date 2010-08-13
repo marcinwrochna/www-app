@@ -5,7 +5,7 @@
  */
 function nvl($value, $default)
 {
-	return is_null($value)?$default:$value;
+	return is_null($value) ? $default : $value;
 }
 
 function is_assoc(&$array) {
@@ -42,7 +42,7 @@ function actionReportBug()
 	$PAGE->title = 'Zgłoś problem';
 	$desc = 'Coś nie działa tak jak powinno? Coś jest niejasne, niepotrzebnie skomplikowane,
 		brzydkie, niewygodne? Zgłoś to koniecznie.<br/>';
-	if ($USER['anonymous'])
+	if (!in_array('registered', $USER['roles']))
 		$desc .= '<small>Napisz jakiś kontakt, jeśli chcesz dostać odpowiedź.</small>';
 	else 
 		$desc .= '<small>Domyślnie odpowiem Ci na maila ('. $USER['email'] .').</small>';
@@ -153,6 +153,29 @@ function actionDatabaseRaw()
 	$form = new Form();
 	$form->addRow('textarea', 'query', '<b>zapytanie</b>');
 	$PAGE->content .= $form->getHTML();
+}
+
+function assertOrFail($bool, $message, &$correct)
+{
+	if (!$bool)
+	{
+		$correct = false;
+		global $PAGE;
+		if (!empty($message))			
+			$PAGE->addMessage($message, 'userError');
+	}
+}
+
+function applyDefaultKeys(&$array, $keys)
+{
+	$i = 0;
+	while (array_key_exists($i, $array))
+	{
+		$array[$keys[$i]] = $array[$i];
+		unset($array[$i]);
+		$i++;
+	}		
+	return $array;
 }
 
 // by Douglas Lovell

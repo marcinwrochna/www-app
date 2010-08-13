@@ -13,6 +13,7 @@ zmiana zadań kwalifikacyjnych, warning?
 add some logs and log filtering
 add role instead of lack of 'uczestnik' role (e.g. rights to autoQualifyForWorkshop).
 ustalić normalizację punktów (jest 0..20, 0..6, 0..400. Proponuję więc 0..100 :P)
+nocleg i wyżywienie we własnym zakresie kind of makes no sense in profile
 
 
 --bugs

@@ -24,8 +24,11 @@ try
 {
 	$action = isset($_GET['action']) ? $_GET['action'] : 'homepage';
 	$action = 'action'. ucfirst($action);
-	if (is_callable($action)) call_user_func($action);
-	else throw new KnownException('Nieznana akcja.');
+	$args = isset($_GET['args']) ? explode(';', $_GET['args']) : array();
+	if (is_callable($action))
+		call_user_func_array($action, $args);
+	else
+		throw new KnownException('Nieznana akcja.');
 	
 	$PAGE->menu .= addSiteMenuBox();
 	if (in_array('registered', $USER['roles']))

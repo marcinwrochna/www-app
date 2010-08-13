@@ -110,6 +110,12 @@ class DBResult_Postgresql extends DBResult_SQL
 		else  return pg_fetch_assoc($this->resultResource, $n);
 	}
 	
+	public function fetch_vector($n = null) 
+	{
+		if (is_null($n))  return pg_fetch_row($this->resultResource);
+		else  return pg_fetch_row($this->resultResource, $n);
+	}	
+	
 	public function fetch_all()
 	{
 		$result = pg_fetch_all($this->resultResource);
@@ -118,6 +124,13 @@ class DBResult_Postgresql extends DBResult_SQL
 		return $result;
 	}
 	
+	public function fetch_column($column = null)
+	{
+		if (is_null($column))
+			return pg_fetch_all_columns($this->resultResource);
+		else
+			return parent::fetch_column($column);
+	}	
 }
 
 

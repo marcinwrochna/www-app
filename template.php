@@ -115,10 +115,11 @@ function parseUserHTML($html) {
 	return $html;
 }
 
+// $tip is interpreted as HTML
 function getTipJS($tip)
 {
 	if (strlen(trim($tip))==0)  return ' ';
-	$tip = addcslashes($tip, "\n\r");
+	$tip = htmlspecialchars(addcslashes($tip, "\\\"\n\r"), ENT_QUOTES);	// Tested.
 	return " onmouseout='tipoff()' onmouseover='tipon(this,\"$tip\")' ";
 }
 

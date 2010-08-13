@@ -17,25 +17,24 @@ function addWarsztatyMenuBox()
 
 function actionListPublicWorkshops()
 {
-	global $PAGE, $USER;
+	global $PAGE, $USER, $DB;
 	if (!userCan('listPublicWorkshops'))  throw new PolicyException();
 	$PAGE->title = 'Lista warsztatów';
 	if (!assertProfileFilled())  return;
 	
 	// Wypisz liczbę godzin, na jakie się zapisał.
-	$result = db_query('SELECT SUM(w.duration)
+	$sum = $DB->query('SELECT SUM(w.duration)
 		FROM table_workshops w, table_workshop_user wu
-		WHERE w.status=4 AND wu.wid=w.wid AND wu.uid='. $USER['uid']);
-	$sum = db_fetch($result);
+		WHERE w.status=4 AND wu.wid=w.wid AND wu.uid=$1', $USER['uid'])->fetch();
 	if ($sum)
 	{
 		$msg = "Zapisał". gender('e') ."ś się na $sum × 1,5 godzin warsztatów.";
 		if ($sum>30)  $msg .= "<br/>Pamiętaj, że w sumie WWW ma około 36 × 1,5 godzin.";
-		showMessage($msg, 'info');
+		$PAGE->addMessage($msg, 'info');
 	}
 	
 	// Listuj 'warsztaty' (a nie 'luźne') 'świetne' (a nie np. 'ujdzie').
-	actionListWorkshops('Public', '(type=1 AND status=4)',
+	listWorkshops('Public', '(type=1 AND status=4)',
 		array('wid','lecturers','title','domains','duration','participants'));
 }
 
@@ -46,7 +45,7 @@ function actionListOwnWorkshops()
 	$PAGE->title = 'Twoje warsztaty';
 	$where = 'EXISTS (SELECT wu.uid FROM table_workshop_user wu WHERE wu.uid='. $USER['uid'].'
 		AND wu.wid = w.wid AND wu.lecturer>0)';
-	actionListWorkshops('Own', $where,
+	listWorkshops('Own', $where,
 		array('wid','lecturers','title','type','domains','duration','status','participants'));
 }
 
@@ -55,40 +54,17 @@ function actionListAllWorkshops()
 	global $PAGE;
 	if (!userCan('listAllWorkshops'))  throw new PolicyException();
 	$PAGE->title = 'Wszystkie warsztaty';
-	actionListWorkshops('All', '',
+	listWorkshops('All', '',
 		array('wid','lecturers','title','type','domains','duration','status','participants'));
 }
 
-function actionListWorkshops($which, $where, $columns)
+function listWorkshops($which, $where, $columns)
 {
-	global $USER;
+	global $USER, $DB;
 	
-	$orderby = 'w.wid';
-	$allowed = array(
-		'w.wid','u.name','w.title','w.type','w.status','w.duration DESC','count DESC','w.domain_order'
-	);
-	if (isset($_SESSION['oldestorder']) && in_array($_SESSION['oldestorder'], $allowed, true))
-		$orderby = $_SESSION['oldestorder'] .', '. $orderby;
-	if (isset($_SESSION['oldorder']) && in_array($_SESSION['oldorder'], $allowed, true))
-		$orderby = $_SESSION['oldorder'] .', '. $orderby;
-	if (isset($_GET['order']) && in_array($_GET['order'], $allowed, true))
-	{
-			$orderby = $_GET['order'] .', '. $orderby;
-			if (isset($_SESSION['oldorder']))
-				$_SESSION['oldestorder'] = $_SESSION['oldorder'];
-			$_SESSION['oldorder'] = $_GET['order'];
-	}
-	
-	if (!empty($where))  $where = "AND $where";
-	
-	if (isset($_GET['domain']) && in_array($_GET['domain'], explode(',', getOption('domains'))))
-		$where .= ' AND EXISTS (SELECT * FROM table_workshop_domain wd
-			WHERE wd.wid=w.wid AND wd.domain=\''. $_GET['domain'] .'\')';
-		
 	$cols = array(
 		'wid'           => array('th'=>'#',          'order'=>'w.wid'),
-		'proposer_name' => array('th'=>'zgłosił(a)', 'order'=>'u.name'),
-		'lecturers'     => array('th'=>'prowadzący', 'order'=>'u.name'),
+		'lecturers'     => array('th'=>'prowadzący', 'order'=>'regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')'),
 		'title'         => array('th'=>'tytuł',      'order'=>'w.title'),
 		'type'          => array('th'=>'rodzaj',     'order'=>'w.type'),
 		'domains'       => array('th'=>'dziedziny',  'order'=>'w.domain_order'),
@@ -97,84 +73,96 @@ function actionListWorkshops($which, $where, $columns)
 		'participants'  => array('th'=>'zapisy',     'order'=>'count DESC'),
 	);
 	
-	$result = db_query("SELECT w.wid, w.proposer_uid, w.title, w.status, w.type, w.duration, w.link,
-		(SELECT COUNT(*) FROM table_workshop_user wu WHERE wu.wid=w.wid AND participant>0) AS count,
-		(SELECT participant FROM table_workshop_user wu WHERE wu.wid=w.wid AND
-			wu.uid=". $USER['uid'] .") AS participant
+	// ORDER BY
+	$allowed = array();
+	foreach ($cols as $col)  $allowed[]= $col['order'];	
+	if (!isset($_SESSION['workshopOrder']))  $_SESSION['workshopOrder'] = array();
+	if (isset($_GET['order']))  $_SESSION['workshopOrder'][]= $_GET['order'];
+	while (count($_SESSION['workshopOrder'])>3)
+		array_shift($_SESSION['workshopOrder']);
+	$orderby = 'w.title';
+	foreach ($_SESSION['workshopOrder'] as $o)
+		if (in_array($o, $allowed, true))
+			$orderby = "$o,$orderby";
+	
+	// WHERE
+	if (!empty($where))  $where = "AND $where";	
+	if (isset($_GET['domain']) && in_array($_GET['domain'], explode(',', getOption('domains'))))
+		$where .= ' AND EXISTS (SELECT * FROM table_workshop_domain wd
+			WHERE wd.wid=w.wid AND wd.domain=\''. $_GET['domain'] .'\')';
+	
+	$workshops = $DB->query('
+		SELECT w.wid, w.proposer_uid, w.title, w.status, w.type, w.duration, w.link,
+			(SELECT COUNT(*) FROM table_workshop_user wu
+			 WHERE wu.wid=w.wid AND participant>0) AS count,
+			(SELECT participant FROM table_workshop_user wu
+			 WHERE wu.wid=w.wid AND wu.uid=$1) AS participant
 		FROM table_workshops w, table_users u
-		WHERE u.uid=w.proposer_uid $where
-		ORDER BY $orderby");
+		WHERE u.uid=w.proposer_uid '. $where .'
+		ORDER BY '. $orderby, $USER['uid']);
 	
 	global $PAGE;
 	$template = new SimpleTemplate();
-		echo "<h2>". $PAGE->title  ."</h2>";
 		echo "<table class='workshopList'>";
 		echo "<thead>";
 		foreach ($columns as $c)
 		{
 			$th = $cols[$c]['th'];
-			$order = $cols[$c]['order'];			
-			echo "<th><a href='?action=list${which}Workshops&amp;order=$order'>$th</a></th>";
+			$order = htmlspecialchars(urlencode($cols[$c]['order']), ENT_QUOTES);
+			echo "<th><a href='list${which}Workshops?order=$order'>$th</a></th>";
 		}
 		echo "</thead>";
 		$class = 'even';
-		while ($row = db_fetch_assoc($result))
+		foreach ($workshops as $row)
 		{
 			$row['status'] = describeWorkshopStatus($row['status']);
 			$row['status'] = str_replace(' ','&nbsp;', $row['status']);
 			
-			$result2 = db_query("SELECT uid
+			$lecturers = $DB->query('
+				SELECT uid
 				FROM table_workshop_user
-				WHERE lecturer>0 AND wid=". $row['wid']);
-			$lecturers = db_fetch_all_columns($result2);
+				WHERE lecturer>0 AND wid=$1', $row['wid']);
 			$row['lecturers'] = array();
 			foreach ($lecturers as $lecturer)		
-				$row['lecturers'][]= getUserBadge($lecturer);
+				$row['lecturers'][]= getUserBadge($lecturer['uid']);
 			$row['lecturers'] = implode(',<br/>', $row['lecturers']);
 			
 			$row['type'] = workshopTypeToString($row['type']);
-			$r = db_query('SELECT domain FROM table_workshop_domain WHERE wid='. $row['wid'] .' ORDER BY domain');
-			$domains = db_fetch_all_columns($r);
+			$domains = $DB->query('
+				SELECT domain FROM table_workshop_domain
+				WHERE wid=$1 ORDER BY domain', $row['wid'])->fetch_column();
 			$row['domains'] = '';
 			$icon = array('matematyka' => 'm', 'fizyka' => 'f', 'astronomia' => 'a',
 				'informatyka teoretyczna' => 'it', 'informatyka praktyczna' => 'ip');
-			$href = "?action=list${which}Workshops&domain=";
+			$href = "list${which}Workshops?domain=";
 			foreach ($domains as $d)
 				$row['domains'] .= getIcon('subject-'. $icon[$d] .'.png', $d, $href . $d);
 			
-			$href = '?action=showWorkshop&amp;wid='. $row['wid'];
-			/*$title = $row['title'];			
-			$title = getIcon('notepad.gif', 'opis propozycji', $href) .' '. $title;
-			$href = $row['link'];
-			if (empty($href))  $href = 'http://warsztatywww.wikidot.com/'. urlencode($row['title']);
-			$title = getIcon('document.gif', 'opis na wikidot', $href) .' '. $title;
-			$row['title'] = $title;*/
-			$row['title'] = "<a href='$href'>${row['title']}</a>";
+			$row['title'] = "<a href='showWorkshop(${row['wid']})'>${row['title']}</a>";
 			
 			$row['participants'] = '';
 			if (userCan('showWorkshopParticipants', $lecturers))
 				$row['participants'] .= $row['count'];			
-			if ($row['participant'] == 1)
+			switch ($row['participant'])
 			{
-				$tip = 'Jesteś zapisan'. gender() .
-					' (wstępnie; pamiętaj o zadaniach kwalifikacyjnych).';
-				$row['participants'] .= ' '. getIcon('tick-yellow.png', $tip, null);
-			}
-			else if ($row['participant'] == 2)
-			{
-				$tip = 'Nie spełnił'. gender('e','a') .'ś wymagań.';
-				$row['participants'] .= ' '. getIcon('cross.png', $tip, null);				
-			}
-			else if ($row['participant'] == 3) {
-				$tip = 'Zakwalifikował'. gender('e','a'). 'ś się.';
-				$row['participants'] .= ' '. getIcon('tick.png', $tip, null);				
-			}
-			else if ($row['participant'] == 4) {
-				$tip = 'Jesteś zapisan'. gender('y','a'). ' (zakwalifikowany jako kadra)';
-				$row['participants'] .= ' '. getIcon('tick.png', $tip, null);				
+				case 1:
+					$tip = 'Jesteś zapisan'. gender() .' (wstępnie; pamiętaj o zadaniach kwalifikacyjnych).';
+					$row['participants'] .= ' '. getIcon('tick-yellow.png', $tip, null);
+					break;
+				case 2:
+					$tip = 'Nie spełnił'. gender('e','a') .'ś wymagań.';
+					$row['participants'] .= ' '. getIcon('cross.png', $tip, null);				
+					break;
+				case 3:
+					$tip = 'Zakwalifikował'. gender('e','a'). 'ś się.';
+					$row['participants'] .= ' '. getIcon('tick.png', $tip, null);				
+					break;
+				case 4:
+					$tip = 'Jesteś zapisan'. gender('y','a'). ' (zakwalifikowany jako kadra)';
+					$row['participants'] .= ' '. getIcon('tick.png', $tip, null);				
+					break;
 			}			
-			
-			
+						
 			echo "<tr class='$class'>";
 			$class = ($class=='even')?'odd':'even';
 			foreach ($columns as $c)
@@ -195,35 +183,26 @@ function workshopTypeToString($type)
 	}
 }
 
-function actionShowWorkshop()
+function actionShowWorkshop($wid = null)
 {
-	global $USER;
-	if (!isset($_GET['wid']))  throw new KnownException('Nie podano numeru bloku warsztatowego.');
-	$wid = intval($_GET['wid']);
-	$result = db_query('SELECT * FROM table_workshops WHERE wid='. $wid);
-	$data = db_fetch_assoc($result);
-	if ($data === false)
-	{
-		showMessage("Brak warsztatów o takim numerku ($wid).", 'userError');
-		return;
-	}
-		
+	global $USER, $DB, $PAGE;
+	if (is_null($wid))  throw new KnownException('Nie podano numeru bloku warsztatowego.');
+	$wid = intval($wid);
+	
+	$data = $DB->workshops[$wid]->assoc('*');
 	$data['title'] = htmlspecialchars($data['title']);
 	$data['type'] = workshopTypeToString($data['type']);
 	$data['description'] = parseUserHTML($data['description']);	
 	$data['proposer'] = getUserBadge($data['proposer_uid']);
 	
-	$result = db_query('SELECT participant FROM table_workshop_user '.
-		'WHERE wid='. $wid .' AND uid='. $USER['uid']);
-	$participant = db_fetch($result);
+	$participant = $DB->workshop_user[array('wid'=>$wid, 'uid'=>$USER['uid'])]->get('participant');
 	
-	$result = db_query("SELECT uid
-				FROM table_workshop_user
-				WHERE lecturer>0 AND wid=". $wid);
-	$data['by'] = array();
-	$lecturers = db_fetch_all_columns($result);
+	$lecturers = $DB->query('SELECT uid FROM table_workshop_user WHERE lecturer>0 AND wid=$1', $wid);
+	$lecturers = $lecturers->fetch_column();
+	$data['by'] = array();		
+	$displayEmail = $participant || userCan('editWorkshop', $lecturers);
 	foreach ($lecturers as $lecturer)
-		$data['by'][]= getUserBadge($lecturer, $participant || userCan('editWorkshop', $lecturers));
+		$data['by'][]= getUserBadge($lecturer, $displayEmail);	
 	$data['by'] =  implode(', ', $data['by']);
 	
 	if (!userCan('showWorkshop', $lecturers))  throw new PolicyException();	
@@ -231,12 +210,11 @@ function actionShowWorkshop()
 	if (empty($data['link']))
 		$data['link'] = 'http://warsztatywww.wikidot.com/www6:'. urlencode($data['title']);
 		
-	$result = db_query('SELECT domain FROM table_workshop_domain WHERE wid='. $wid);
-	$data['domains'] = implode(', ', db_fetch_all_columns($result));
-		
-	
-	global $PAGE;
-	$PAGE->title = 'Blok warsztatowy - '. $data['title'];
+	$domains = $DB->query('SELECT domain FROM table_workshop_domain WHERE wid=$1', $wid);
+	$data['domains'] = implode(', ', $domains->fetch_column());
+			
+	$PAGE->title = $data['title'] .' - opis';
+	$PAGE->headerTitle = '';
 	$template = new SimpleTemplate($data);
 	?>		
 		<span class='left'>%wid%.&nbsp;</span><h2>%title%</h2>
@@ -248,26 +226,13 @@ function actionShowWorkshop()
 	<?php
 	
 	// Lista zapisanych uczestników.
-	if (userCan('showWorkshopParticipants', $lecturers))
-	{		
+	if (userCan('showWorkshopParticipants', $lecturers))	
 		echo buildParticipantList($wid);
-		/*
-		echo '<h3>Zapisani</h3>';
-		$result = db_query('SELECT uid FROM table_workshop_user '.
-			'WHERE wid='. $wid .' AND participant>0');
-		$participants = db_fetch_all_columns($result);
-		$p = array();
-		foreach ($participants as $par)
-			$p[]= getUserBadge($par);
-		
-		echo 'W sumie: '. count($p) .'<br/>';
-		echo implode(', ', $p) . '<br/>';*/
-	}
 	// Przycisk zapisz/wypisz się.
-	if (userCan('signUpForWorkshop', $lecturers) && !$participant)
-		echo getButton('zapisz się', '?action=signUpForWorkshop&wid='. $wid, 'cart-put.png') .'<br/>';
-	else if ($participant)
+	if ($participant)
 		echo getButton('wypisz się', '?action=resignFromWorkshop&wid='. $wid, 'cart-remove.png')  .'<br/>';
+	else if (userCan('signUpForWorkshop', $lecturers))
+		echo getButton('zapisz się', '?action=signUpForWorkshop&wid='. $wid, 'cart-put.png') .'<br/>';
 	echo '<br/><br/>';
 		
 	// Lista zadań kwalifikacyjnych.
@@ -614,13 +579,12 @@ function domainOrder($domains)
 
 function actionRecountDomainOrder()
 {
-	$r = db_query('SELECT wid FROM table_workshops');
-	$wids = db_fetch_all_columns($r);
+	global $DB;
+	$wids = $DB->query('SELECT wid FROM table_workshops')->fetch_column();
 	foreach ($wids as $wid)
 	{
-		$r = db_query('SELECT domain FROM table_workshop_domain WHERE wid='. $wid);
-		$domains = db_fetch_all_columns($r);
-		$order = domainOrder($domains);
-		db_update('workshops', 'WHERE wid='.$wid, array('domain_order'=>$order));
+		$domains = $DB->query('SELECT domain FROM table_workshop_domain WHERE wid=$1', $wid);
+		$order = domainOrder($domains->fetch_column());
+		$DB->workshops[$wid]->update(array('domain_order'=>$order));
 	}
 }

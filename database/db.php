@@ -83,6 +83,12 @@ abstract class DBRow
 		$this->pkey = $pkey;
 	}
 	
+	public function get($column)
+	{
+		$tmp = $this->assoc($column);
+		return $tmp[$column];
+	}
+	
 	abstract public function assoc($columns='*');
 	abstract public function update($values);
 	abstract public function count();
@@ -103,5 +109,21 @@ abstract class DBResult implements Iterator, Countable
 	
 	abstract public function fetch($n = null);
 	abstract public function fetch_assoc($n = null);
+	abstract public function fetch_vector($n = null);
 	abstract public function fetch_all();
+	public function fetch_column($column = null)
+	{
+		$all = $this->fetch_all();
+		$result = array();
+		if (empty($all))
+			return $result;
+		if (is_null($column))
+		{
+			$column = array_keys($all[0]);
+			$column = $column[0];			
+		}
+		foreach ($all as $row)
+			$result[]= $row[$column];
+		return $result;
+	}
 }

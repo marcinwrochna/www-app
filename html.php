@@ -28,13 +28,11 @@ function writeMTime($f)
 	<script type="text/javascript" src="<?php writeMTime('common.js'); ?>"></script>
 	<script type="text/javascript" src="<?php writeMTime('tinymce/tiny_mce_gzip.js'); ?>"></script>
 	<script type="text/javascript" src="<?php writeMTime('tinymce/config.js'); ?>"></script>	
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js?2"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script type="text/javascript">tinyMCE_GZ.init(tinyMCE_GZ_config);</script>
 	<script type="text/javascript">
-		%js% 
-		
-		tinyMCE.init(tinyMCE_config);
-					
+		tinyMCE.init(tinyMCE_config);		
+		%js% 				
 		$(document).ready(function(){  
 			$('#tooltip').mouseenter(function(){$(this).stop(true,true).show();});
 			$('#tooltip').mouseleave(function(){$(this).stop(true,true).fadeOut('fast');}); 
@@ -45,10 +43,7 @@ function writeMTime($f)
 		<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
 	<![endif]--> 	
 	<!--[if lt IE 8]>
-		<style type="text/css">			
-			body { font-size: 100.00%; }
-			/* .contentBox.article { zoom:1; } */
-		</style>
+		<style type="text/css">body { font-size: 100.00%; } /* .contentBox.article { zoom:1; } */</style>
 		<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7-squish.js" type="text/javascript"></script>
 	<![endif]-->
 
@@ -83,17 +78,21 @@ function writeMTime($f)
 		</div>
 	</div>
 	
-	<script type="text/javascript">
-		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-		document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-	</script>
-	<script type="text/javascript">
-		try
-		{
-			var pageTracker = _gat._getTracker("UA-12926426-2");
-			pageTracker._trackPageview();
-		} catch(err) {}
-	</script>
+	<?php if (USE_GOOGLE_ANALYTICS): ?>
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost +
+				"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			try
+			{
+				var pageTracker = _gat._getTracker("UA-12926426-2");
+				pageTracker._trackPageview();
+			} catch(err) {}
+		</script>
+	<?php endif; ?>
+	
 	<!-- php time: <?php echo time()-$_SERVER['REQUEST_TIME']; ?>s -->
 </body>
 </html>

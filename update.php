@@ -14,6 +14,7 @@ function insertPermission($role, $action)
 	db_query("INSERT INTO table_role_permissions VALUES('$role','$action')");
 }
 
+global $DB;
 $version = intval(getOption('version'));
 switch ($version)
 {
@@ -212,4 +213,7 @@ switch ($version)
 	case (24):
 		insertPermission('admin', 'showCorrelation');	
 		setVersion(25);	
+	case(25):
+		$DB->query('ALTER TABLE table_users ADD UNIQUE(login)');
+		//$DB->query('ALTER TABLE table_users ADD UNIQUE(email)');
 }

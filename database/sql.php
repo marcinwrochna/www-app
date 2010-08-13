@@ -10,6 +10,11 @@ abstract class DB_SQL extends DB
 	public function query($query, $params=null)
 	{
 		$query = str_replace('table_', TABLE_PREFIX, $query);
+		if (func_num_args()>2)
+		{
+			$params = func_get_args();
+			array_shift($params);
+		}
 		if (is_null($params))
 			$result = $this->query_noparams($query);
 		else if (is_array($params))
@@ -80,25 +85,25 @@ abstract class DBRow_SQL extends DBRow
 			$query  = 'UPDATE "'. $this->table->name .'" ';
 			
 			$updates = array();
-			$i = 1;
+			$i = count($this->table->pkeyColumns)+1;
 			foreach ($values as $k=>$v)
 				$updates[]= '"'. $k .'"=$'. ($i++);			
 			$query .= 'SET '. implode($updates,',') .' ';
 			
 			$query .= $this->where;
-			return $this->DB->query($query, array_values($values));
+			return $this->DB->query($query, array_merge($this->pkey, array_values($values)));
 	}
 	
 	public function count()
 	{
 		$query  = 'SELECT COUNT(*) FROM "'. $this->table->name .'" ';
 		$query .= $this->where;
-		return $this->DB->query($query, $this->pkey);
+		return $this->DB->query($query, $this->pkey)->fetch();
 	}
 	
 	public function delete()
 	{
-		$query  = 'DELETE "'. $this->table->name .'" ';
+		$query  = 'DELETE FROM "'. $this->table->name .'" ';
 		$query .= $this->where;
 		return $this->DB->query($query, $this->pkey);
 	}
