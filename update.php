@@ -4,9 +4,10 @@
 	
 function setVersion($v)
 {
-	db_update('options', 'WHERE name=\'version\'', array('value' => $v), 'Nie udało się zmienić wersji.');
+	global $PAGE, $DB;
+	$DB->options['version']->update(array('value' => $v));
 	logUser('auto update', $v);
-	showMessage('Aplikacja właśnie została z\'update\'owana do wersji '. $v);
+	$PAGE->addMessage('Aplikacja właśnie została z\'update\'owana do wersji '. $v);
 }
 
 function insertPermission($role, $action)
@@ -214,6 +215,17 @@ switch ($version)
 		insertPermission('admin', 'showCorrelation');	
 		setVersion(25);	
 	case(25):
-		$DB->query('ALTER TABLE table_users ADD UNIQUE(login)');
+		//$DB->query('ALTER TABLE table_users ADD UNIQUE(login)');
 		//$DB->query('ALTER TABLE table_users ADD UNIQUE(email)');
+	case(26):
+		$DB->query('UPDATE table_workshop_user SET participant=$1 WHERE lecturer>0',
+			enumParticipantStatus('lecturer')->id);
+		foreach (enumSubject() as $subjectId => $subjectItem)
+			$DB->query('UPDATE table_workshop_domain SET domain=$2 WHERE domain=$1',
+				$subjectItem->description, $subjectId);			
+		setVersion(27);	
+	case(27):
+		insertPermission('admin', 'autoQualifyForWorkshop');
+		insertPermission('kadra', 'autoQualifyForWorkshop');
+		setVersion(28);
 }

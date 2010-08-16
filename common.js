@@ -38,18 +38,24 @@ function getAbsY(obj)
 
 function tipon(parent,tip,width,y)
 {
-	var y = typeof(y) != 'undefined' ? y : 18;
+	// TODO Check if parameters width,y are used at all (remove them)
+	var y = typeof(y) != 'undefined' ? y : 10;
 	var tooltip = document.getElementById("tooltip");
 	tooltip.closing = false;
 	tooltip.style.width = width+"px";
 	tooltip.style.top = getAbsY(parent)+y+"px";
-	var x = getAbsX(parent);
-	var clientWidth = document.body.clientWidth;
-	if (x > (clientWidth-(width+30)))
-		x = x - width;
 	
-	tooltip.style.left = x+"px";
 	tooltip.innerHTML = tip;
+	
+	var width = typeof(width) != 'undefined' ? width : $('#tooltip').width();
+	
+	var x = getAbsX(parent) + 10;
+	var clientWidth = document.body.clientWidth;
+	if ((x+width+30) > clientWidth)
+		x = clientWidth - width - 30;	
+	tooltip.style.left = x+"px";
+	// TODO: we could fix y too
+
 	$('#tooltip').stop(true,true).show();
 }
 

@@ -1,3 +1,7 @@
+Zlecalne:
+do parseUserHTML() dodać HTMLPurifier'a
+common.js: tipon() - wyczyścić i sprawdzić y
+
 zapłacono
 show profile: CV + warsztaty, punkty
 
@@ -6,49 +10,49 @@ checklista ("dodaj zadania kwalifikacyjne", "sprawdź rozwiązania od N uczestni
 sprawdzać łączny czas trwania warsztatów 9*2*2+2 (+info, krótsze pobyty)?
 ==Zadania kwalifikacyjne==
 add to user todo checklists
-green checkmark on list
 email notifications
 feedback latex?
 zmiana zadań kwalifikacyjnych, warning?
 add some logs and log filtering
 add role instead of lack of 'uczestnik' role (e.g. rights to autoQualifyForWorkshop).
 ustalić normalizację punktów (jest 0..20, 0..6, 0..400. Proponuję więc 0..100 :P)
-nocleg i wyżywienie we własnym zakresie kind of makes no sense in profile
-
+'nocleg i wyżywienie we własnym zakresie' kind of makes no sense in profile,
+	maybe 'zamierzam = poprowadzić warsztaty | robić zadania kwalifikacyjne | przychodzić z Olsztyna'
 
 --bugs
-ie6 fixed height?!?
+ie6 fixed height?!? // May have been fixed after google IE fix scripts change. If not, try css:zoom:1 (compare szykujpieluchy.pl)
+see why TinyMCE includes html-escaped comment tags with MS Word stuff.
 
 ---Technical
-.htaccess
-separate form handling functions
-cleanup cleanup cleanup
-parseUserHTML
-database sql aaaargh
-remove the meaningless error strings in every db_query
-autoversion .css, .js
-fix <tr>-less <thead>s
-change templates to 'endif' syntax
+---- Ongoing (mostly done, except for tasks.php and tutoring)
+worshops.php: cleanup the js field, change handleEditWorkshopForm to actionEditWorkshopForm (unless $form->getValues())
+.htaccess - href="?action=abc&amp;param=x" should be href="abc(x)". Test IE6.
+transfer lists of constants to enum.php
+change db_() to $DB->
+change showMessage() to $PAGE->addMessage()
+change <form> to new Form()
+move lecturer db-column to participant=enumParticiapntStatus('lecturer')
+
+change templates to '<?php if (): ?>\n something \n<?php endif;?>' syntax where applicable.
+change to $class = alternate('even','odd');
+
+--- Waiting
+fix <tr>-less <thead>s (they're not w3c-compliant, I thought the syntax was <table><thead><th></th></thead><tr><td></td></tr></table>, it's not)
 co to jest id="theform"?
-when creating emails, change $email to $content or something, because it's misleading
+when creating emails, change $email to either $content or $address or something, because it's misleading
 check perms in task solution forms
-merge participant-lecturer columns
 make email X-Sender tag (or lack of it) explicit in config.php:sendMail
 pg_prepare some statements?
+escape some fields (actually any user can set his school to an XSS attack-script), test with (at least) 'Abćđœ\\n+Plus%25 '. "\n" .'"DQuoted" O\'Brian &&amp; <Company>';
+change roles to sth more natural
+change to only one subject?
 
-$DB
-	$DB['tablename']['primarykey']['field'] access
-	default last resource
-	enum
-	query($q, a,b,c) in addition to query($q, array(a,b,c))
-forms:
-	if !empty POST and function_exists s/action/form/g
-templates:
-	remember about endforeach;
-	alternate('even','odd')
-
-see why TinyMCE includes html-escaped comment tags with MS Word stuff.
-school autocomplete
-
-maybes:
+-- Ideas
+if(Form::submitted() and function_exists($action .'Form'))?
+http://code.google.com/apis/analytics/docs/tracking/asyncTracking.html (zlecalne?)
+http://code.google.com/apis/analytics/docs/tracking/gaTrackingCustomVariables.html	
+school/univ autocomplete (zlecalne?)
+add lecturers when creating workshop
 buildMenuBox perm=true redundant?
+give kadra possibility to impersonate Tester (zlecalne?)
+better SELECT, DB_Slice?

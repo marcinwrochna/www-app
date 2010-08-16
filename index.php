@@ -6,13 +6,14 @@
 
 require_once('common.php');
 require_once('utils.php');
+require_once('enum.php');
 include_once('log.php');
-include_once('update.php'); // apply updates
 require_once('template.php');
+require_once('page.php');
 require_once('form.php');
 require_once('user.php');
-require_once('page.php');
 $PAGE = new Page();
+include_once('update.php'); // apply updates
 
 initUser();
 

@@ -115,7 +115,7 @@ function parseUserHTML($html) {
 	return $html;
 }
 
-// $tip is interpreted as HTML
+// Argument $tip is interpreted as HTML
 function getTipJS($tip)
 {
 	if (strlen(trim($tip))==0)  return ' ';
@@ -142,6 +142,7 @@ function getButton($title, $href, $icon=false)
 	return "<a class='button' href='$href'>$button</a>";
 }
 
+// Typical usage: formatAssoc('Name: %name%, ...', $DB->fetch_assoc())
 function formatAssoc($string, $assoc)
 {
 	$names = array();
@@ -152,4 +153,17 @@ function formatAssoc($string, $assoc)
 		$values[]= $value;
 	}
 	return str_replace($names, $values, $string);
+}
+
+// Typical usage: '<tr class="'. alternate('even', 'odd') .'">';
+function alternate()
+{
+	static $memory = array();
+	$args = func_get_args();
+	$array = &$memory[serialize($args)];
+	if (!isset($array))
+		$array = $args;
+	while(!(list($key,$val) = each($array)))
+		reset($array);
+	return $val;
 }

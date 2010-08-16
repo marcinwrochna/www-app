@@ -1,8 +1,9 @@
 <?php
 /*
  * utils.php
- * Included in common.php
+ * Included in index.php
  */
+ 
 function nvl($value, $default)
 {
 	return is_null($value) ? $default : $value;
@@ -166,6 +167,7 @@ function assertOrFail($bool, $message, &$correct)
 	}
 }
 
+// TODO: change to ($keys, &$arrays)
 function applyDefaultKeys(&$array, $keys)
 {
 	$i = 0;
@@ -176,6 +178,17 @@ function applyDefaultKeys(&$array, $keys)
 		$i++;
 	}		
 	return $array;
+}
+
+function applyDefaultHeaders($keys, $rows)
+{
+	$result = $rows; // $rows can't be a reference, so we copy.
+	foreach($result as $key => &$row)
+	{
+		applyDefaultKeys($row, $keys);
+		$row['key'] = $key;
+	}
+	return $result;		
 }
 
 // by Douglas Lovell

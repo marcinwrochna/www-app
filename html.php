@@ -31,6 +31,8 @@ function writeMTime($f)
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script type="text/javascript">tinyMCE_GZ.init(tinyMCE_GZ_config);</script>
 	<script type="text/javascript">
+		tinyMCE_config.latex_renderUrl = "%latexPath%";
+		tinyMCE_config.ubrupload_getter = "%uploadGetter%";
 		tinyMCE.init(tinyMCE_config);		
 		%js% 				
 		$(document).ready(function(){  
