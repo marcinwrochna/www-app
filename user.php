@@ -316,7 +316,7 @@ function actionEditAdditionalInfo($uid = null)
 	
 	$inputs = array(		
 		array('description'=>'PESEL', 'name'=>'pesel', 'type'=>'text'),
-		array('description'=>'adres <small>(do ubezpieczenia)</small>', 'name'=>'address', 'type'=>'textarea'),
+		array('description'=>'adres zameldowania <small>(do ubezpieczenia)</small>', 'name'=>'address', 'type'=>'textarea'),
 		array('description'=>'telefon', 'name'=>'telephone', 'type'=>'text'),
 		array('description'=>'telefon do rodziców/opiekunów', 'name'=>'parenttelephone', 'type'=>'text'),
 		array('description'=>'termin przyjazdu: <span class="right">od</span>', 'name'=>'staybegin',

@@ -7,13 +7,7 @@
  * - html head (paths to non-php files, javascript configs, IE fixes)
  * - html body (content boxes: header, footer, menu)
  * - google analytics javascript.
- */
-
-function writeMTime($f)
-{
-	echo $f .'?'. filemtime($f);
-}
-	
+ */	
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl" dir="ltr">
 <head>
@@ -80,7 +74,7 @@ function writeMTime($f)
 		</div>
 	</div>
 	
-	<?php if (USE_GOOGLE_ANALYTICS): ?>
+	<?php if (false): ?>
 		<script type="text/javascript">
 			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 			document.write(unescape("%3Cscript src='" + gaJsHost +

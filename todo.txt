@@ -1,3 +1,11 @@
+Top priority:
+events - make the app support WWW7 as soon as possible
+restore tutoring
+http://code.google.com/apis/analytics/docs/tracking/asyncTracking.html (zlecalne?)
+http://code.google.com/apis/analytics/docs/tracking/gaTrackingCustomVariables.html	
+Signup/Resign button rights are incosistent.
+There's a sick amount of w1_users_login_key indexes in local pgdb
+
 Zlecalne:
 do parseUserHTML() dodać HTMLPurifier'a
 common.js: tipon() - wyczyścić i sprawdzić y
@@ -35,6 +43,11 @@ move lecturer db-column to participant=enumParticiapntStatus('lecturer')
 
 change templates to '<?php if (): ?>\n something \n<?php endif;?>' syntax where applicable.
 change to $class = alternate('even','odd');
+-- Cleanup after the big changes
+ALTER TABLE table_workshop_user DROP COLUMN lecturer;
+$DB->options['domains']->delete();
+grep -i deprecated 
+remove form.php backwards compatibility
 
 --- Waiting
 fix <tr>-less <thead>s (they're not w3c-compliant, I thought the syntax was <table><thead><th></th></thead><tr><td></td></tr></table>, it's not)
@@ -46,11 +59,10 @@ pg_prepare some statements?
 escape some fields (actually any user can set his school to an XSS attack-script), test with (at least) 'Abćđœ\\n+Plus%25 '. "\n" .'"DQuoted" O\'Brian &&amp; <Company>';
 change roles to sth more natural
 change to only one subject?
+Split showWorkshop into tabs (propsition, zapisani [i|,] kwalifikacja, edit), split warsztaty.php,tasks.php
 
 -- Ideas
 if(Form::submitted() and function_exists($action .'Form'))?
-http://code.google.com/apis/analytics/docs/tracking/asyncTracking.html (zlecalne?)
-http://code.google.com/apis/analytics/docs/tracking/gaTrackingCustomVariables.html	
 school/univ autocomplete (zlecalne?)
 add lecturers when creating workshop
 buildMenuBox perm=true redundant?

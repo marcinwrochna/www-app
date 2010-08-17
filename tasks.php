@@ -369,7 +369,10 @@ function buildParticipantList($wid)
 			WHERE uid=$p AND role='kadra'");
 		$isKadra = db_fetch($r);
 		if ($isKadra)
-			$kadra[$p]= getUserBadge($p);
+		{
+			if ($status != enumParticipantStatus('lecturer')->id)
+				$kadra[$p]= getUserBadge($p);
+		}
 		else
 		{
 			echo "<tr class='$class'>";

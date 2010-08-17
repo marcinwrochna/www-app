@@ -1,5 +1,10 @@
 <?php
 
+function writeMTime($f)
+{
+	echo $f .'?'. filemtime($f);
+}
+
 class Page extends SimpleTemplate
 {
 	function __construct()
@@ -31,7 +36,10 @@ class Page extends SimpleTemplate
 		if (!isset($this->headerTitle))
 			$this->headerTitle = '<h2>'. $this->title .'</h2>';
 			
-		include('html.php'); 			
+		if (!isset($_GET['print']))
+			include('html.php'); 			
+		else
+			$this->printableHTML();
 		return parent::finish();
 	}
 	
@@ -86,6 +94,26 @@ class Page extends SimpleTemplate
 			</div>
 		<?php
 		$this->menu .= $template->finish();
+	}
+	
+	function printableHTML()
+	{
+		?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+			<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl" dir="ltr">
+			<head>
+				<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+				<link rel="stylesheet" type="text/css" href="<?php writeMTime('css.css'); ?>" />
+				<title>%title% - WWW</title>
+			</head>
+			<body class="printable">
+				<div>
+					%topContent%
+					%headerTitle%
+					%content%
+				</div>
+			</body>
+			</html>
+		<?php
 	}
 }
 

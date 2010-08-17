@@ -5,13 +5,17 @@
  
 function addAdminMenuBox()
 {
-	global $PAGE;
+	global $PAGE, $USER;
+	$admin = in_array('admin', $USER['roles']);
 	$PAGE->addMenuBox('Administracja', array(
-		array('zarządzaj użytkownikami', 'adminUsers',       'group.png' ),
-		array('wszystkie warsztaty',     'listAllWorkshops', 'bricks.png'),
-		array('korelacje',               'showCorrelation',  'table.png' ),
-		array('ustawienia',              'editOptions',      'wrench.png'),
-		array('log',                     'showLog',          'time.png'  )
+		array('zarządzaj użytkownikami',   'adminUsers',       'group.png' ),
+		array('wszystkie warsztaty',       'listAllWorkshops', 'bricks.png'),
+		array('korelacje',                 'showCorrelation',  'table.png' ),
+		array('ustawienia',                'editOptions',      'wrench.png'),
+		array('log',                       'showLog',          'time.png'  ),
+		array('lista danych personalnych', 'listPersonalData', null, $admin),
+		array('lista dot. dojazdów',       'listArrivalData',  null, $admin),
+		array('lista dot. posiłków',       'listDailyCounts',  null, $admin),
 	));
 }
 
@@ -210,4 +214,136 @@ function getUserHeader($uid, $name, $action)
 		$s .= "<a href='$a($uid)'". (($a == $action)?" class='selected'":"") .">$aname</a>";
 	$s .= "</div></h2>";
 	return $s;	
+}
+
+
+function actionListPersonalData()
+{
+	global $USER, $DB, $PAGE;
+	if (!userCan('adminUsers'))  throw new PolicyException();
+	$PAGE->title = 'Lista danych personalnych';
+	if (!isset($_GET['print']))
+	{
+		$PAGE->content .= '<a class="right" href="?print">wersja do druku</a><br/>';	
+		$users = $DB->query('
+			SELECT u.name, u.email FROM table_users u
+			WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
+				AND u.pesel IS NULL
+			ORDER BY regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')
+		');
+		$PAGE->content .= 'Osoby, które nie wypełniły dodatkowych danych: ';
+		$emails = array();
+		foreach ($users as $user)
+			$emails[]= $user['name'] .' &lt;'. $user['email']. '&gt;';
+		$PAGE->content .= implode(', ',$emails) .'.';
+	}
+	$users = $DB->query('
+		SELECT u.uid, u.name, u.telephone, u.parenttelephone, u.pesel, u.address
+		FROM table_users u
+		WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
+		ORDER BY regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')	
+	');	
+	$PAGE->content .= '<table class="bordered"><thead><tr><th>imię i nazwisko</th><th>komórka</th>'.
+		'<th>telefon do rodziców</th><th>PESEL</th><th>adres zameldowania</th></tr></thead>';
+	foreach ($users as $user)
+		$PAGE->content .= formatAssoc(
+			'<tr class="'. alternate('even','odd') .'"><td>%name%</td><td>%telephone%</td>'.
+			'<td>%parenttelephone%</td><td>%pesel%</td><td>%address%</td></tr>',
+			$user
+		);
+	$PAGE->content .= '</table>';
+}
+
+function actionListArrivalData($comments = true)
+{
+	//tabelkę: imię, nazwisko, komórka, data przyjazdu, data wyjazdu, gdzie zbiórka
+	global $USER, $DB, $PAGE;
+	if (!userCan('adminUsers'))  throw new PolicyException();
+	$PAGE->title = 'Lista danych dot. dojazdu';
+	if (!isset($_GET['print']))
+	{
+		$PAGE->content .= '<a class="right" href="?print">wersja do druku</a>';	
+		if ($comments)
+			$PAGE->content .= '<a href="listArrivalData(0)">bez uwag</a>';
+		else
+			$PAGE->content .= '<a href="listArrivalData(1)">z uwagami</a>';
+	}
+	$users = $DB->query('
+		SELECT u.uid, u.name, u.telephone, u.parenttelephone, u.staybegin, u.stayend, u.gatherplace, u.comments
+		FROM table_users u
+		WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
+		ORDER BY u.gatherplace DESC, u.staybegin, regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')	
+	');	
+		
+	$PAGE->content .= '<table class="bordered"><thead><tr><th>imię i nazwisko</th><th>komórka</th>'.
+		'<th>przyjazd</th><th>wyjazd</th><th>zbiórka</th>'. ($comments?'<th>uwagi</th>':'') .
+		'</tr></thead>';
+	foreach ($users as $user)
+	{
+		$starttime = strtotime('2010/08/19 00:00');
+		if (!is_null($user['staybegin']))
+			$user['staybegin'] = strftime('%a %d. %H:00', $starttime + 3600*$user['staybegin']);
+		if (!is_null($user['stayend']))
+			$user['stayend'  ] = strftime('%a %d. %H:00', $starttime + 3600*$user['stayend'  ]);
+		if ($user['gatherplace'] == 'none')
+			$user['gatherplace'] = ' - ';
+		$PAGE->content .= formatAssoc(
+			'<tr class="'. alternate('even','odd') .'"><td>%name%</td><td>%telephone%</td>'.
+			'<td>%staybegin%</td><td>%stayend%</td><td>%gatherplace%</td>'.
+			($comments?'<td>%comments%</td>':'').
+			'</tr>',
+			$user
+		);
+	}
+	$PAGE->content .= '</table>';
+}
+
+function actionListDailyCounts()
+{
+	global $DB,$PAGE;
+	if (!userCan('adminUsers'))  throw new PolicyException();
+	$PAGE->title = 'Lista danych dot. posiłków';
+	
+	if (!isset($_GET['print']))
+		$PAGE->content .= '<a class="right" href="?print">wersja do druku</a>';
+	
+	$DB->query('SELECT COUNT(*) FROM w1_users u
+		WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
+			AND u.staybegin IS NULL');				
+	$PAGE->content .= 'Jadących, którzy nie określili czasu pobytu: '. $DB->fetch();
+	$PAGE->content .= ' (patrz <a href="listPersonalData">lista danych personalnych</a>)<br/>';
+	$PAGE->content .= '<i>nocleg</i> := wlicza tych, którzy przyjechali na kolację,<br/>
+		&nbsp; &nbsp; ale nie tych, którzy odjeżdżają po kolacji<br/>
+		&nbsp; &nbsp; (jeżeli jednak zakładamy, że odjeżdzają tuż przed śniadaniem, <br/>
+		&nbsp; &nbsp; a nie tuż po kolacji, to należy patrzeć na kolumnę <i>kolacja</i>)';
+	$PAGE->content .= '<table class="bordered" style="width:auto">';
+	$PAGE->content .= '<thead><tr><th>dzień</th>';
+	$starttime = strtotime('2010/08/19 00:00');
+	$mealhours = array(9=>'śniadanie', 14=>'obiad', 19=>'kolacja');	
+	foreach ($mealhours as $meal)
+		$PAGE->content .= '<th>'. $meal .'</th>';
+	$PAGE->content .= '<th>nocleg</th></tr></thead>';
+	for ($i=0; $i<=10; $i++) // Warsztaty mają 11 dni [0..10].
+	{
+		$PAGE->content .= '<tr class="'. alternate('even', 'odd') .'">';
+		$PAGE->content .= '<td>'. strftime("%a %e.", $starttime+($i*24+9)*3600) .'</td>';
+		foreach ($mealhours as $h=>$meal)
+		{
+			$DB->query('SELECT COUNT(*) FROM w1_users u
+				WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
+					AND u.staybegin<=$1 AND u.stayend>=$1
+					AND u.isselfcatered=0',
+					$i*24+$h);				
+			$PAGE->content .= '<td>'. $DB->fetch() .'</td>';
+		}
+		$DB->query('SELECT COUNT(*) FROM w1_users u
+			WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
+				AND u.staybegin<=$1 AND u.stayend>$1
+				AND u.isselfcatered=0',
+				$i*24+19);				
+		$PAGE->content .= '<td>'. $DB->fetch() .'</td>';				
+
+		$PAGE->content .= '</tr>';
+	}
+	$PAGE->content .= '</table>';
 }

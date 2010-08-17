@@ -26,7 +26,10 @@ class Form
 		if (is_array($row))
 			$this->rows[]= applyDefaultKeys($row, array('type','name','description','readonly'));
 		else 
-			$this->rows[]= array_combine(array('type','name','description'), func_get_args());
+		{
+			$row = func_get_args();
+			$this->rows[]= applyDefaultKeys($row, array('type','name','description', 'readonly'));
+		}
 	}
 	
 	public function getHTML()

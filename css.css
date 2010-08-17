@@ -292,3 +292,13 @@ table.tasks td {
 
 ul { list-style-position: inside; }
 li { margin-left: 1em; }
+
+table.bordered { border-collapse: collapse; }
+table.bordered td, table.bordered th { border: 1px black solid; }
+table.bordered td { padding: 0 3px; }
+table.bordered tr.even { background-color: white; }
+table.bordered tr.even td { border-bottom: 1px #AAA solid; }
+table.bordered tr.odd  td { border-top:    1px #AAA solid; }
+table.bordered td { color: black; }
+
+.printable table { width: auto; }
