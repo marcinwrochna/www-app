@@ -228,4 +228,19 @@ switch ($version)
 		insertPermission('admin', 'autoQualifyForWorkshop');
 		insertPermission('kadra', 'autoQualifyForWorkshop');
 		setVersion(28);
+	case(28):
+		$DB->options[]= array(
+			'name' => 'gmailOAuthEmail',
+			'description' => 'konto gmail używane do mailingu',
+			'value' => 'mwrochna@gmail.com',
+			'type' => 'text'
+		);
+		$DB->options[]= array(
+			'name' => 'gmailOAuthAccessToken',
+			'description' => 'accessToken konta gmail '.
+				'<small><a href="fetchGmailOAuthAccessToken">[reautoryzuj]</a></small>',
+			'value' => null,
+			'type' =>'readonly'
+		);
+		setVersion(29);
 }

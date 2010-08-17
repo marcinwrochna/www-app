@@ -1,8 +1,6 @@
 Top priority:
 events - make the app support WWW7 as soon as possible
 restore tutoring
-http://code.google.com/apis/analytics/docs/tracking/asyncTracking.html (zlecalne?)
-http://code.google.com/apis/analytics/docs/tracking/gaTrackingCustomVariables.html	
 Signup/Resign button rights are incosistent.
 There's a sick amount of w1_users_login_key indexes in local pgdb
 

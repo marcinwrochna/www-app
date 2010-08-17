@@ -42,7 +42,20 @@
 		<style type="text/css">body { font-size: 100.00%; } /* .contentBox.article { zoom:1; } */</style>
 		<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7-squish.js" type="text/javascript"></script>
 	<![endif]-->
-
+	<?php if (USE_GOOGLE_ANALYTICS): ?>
+		<script type="text/javascript">
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-12926426-2']);
+			_gaq.push(['_setCustomVar', 1, 'uid', '<?php global $USER; echo $USER['uid']; ?>', 1]);
+			_gaq.push(['_trackPageview']);			
+			
+			(function() {
+				var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			})();
+		</script>
+	<?php endif; ?>
 </head>
 <body>
 	<div id="tooltip"></div>
@@ -72,23 +85,7 @@
 				&copy; <?php echo strftime("%Y"); ?> Wakacyjne Warsztaty Wielodyscyplinarne
 			</span>
 		</div>
-	</div>
-	
-	<?php if (false): ?>
-		<script type="text/javascript">
-			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-			document.write(unescape("%3Cscript src='" + gaJsHost +
-				"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-		</script>
-		<script type="text/javascript">
-			try
-			{
-				var pageTracker = _gat._getTracker("UA-12926426-2");
-				pageTracker._trackPageview();
-			} catch(err) {}
-		</script>
-	<?php endif; ?>
-	
+	</div>	
 	<!-- php time: <?php echo time()-$_SERVER['REQUEST_TIME']; ?>s -->
 </body>
 </html>
