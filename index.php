@@ -37,7 +37,7 @@ try
 	else
 		$PAGE->menu .= addLoginMenuBox();
 	$PAGE->menu .= addWarsztatyMenuBox();
-	//$PAGE->menu .= buildTutoringBox();
+	$PAGE->menu .= addTutoringMenuBox();
 	$PAGE->menu .= addAdminMenuBox();		
 }
 catch (PolicyException $e)
