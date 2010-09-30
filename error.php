@@ -256,3 +256,8 @@ function dumpSuperGlobals()
 	
 	return $result;
 }
+
+function debug($s)
+{
+	throw new KnownException("Debug:<br/>\n". json_encode($s));
+}
