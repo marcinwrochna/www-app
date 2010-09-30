@@ -243,4 +243,10 @@ switch ($version)
 			'type' =>'readonly'
 		);
 		setVersion(29);
+	case(29):
+		//insertPermission('admin', 'impersonate');
+		insertPermission('admin', 'viewTutoringApplications');
+		insertPermission('tutor', 'viewTutoringApplications');
+		//insertPermission('registered', 'editTutoringApplication');
+		setVersion(30);
 }

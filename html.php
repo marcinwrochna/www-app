@@ -61,7 +61,7 @@
 	<div id="tooltip"></div>
 	<div id="globalContainer">
 		<div id="headerBox"><h1><a href="homepage">
-			<img src="images/logo.gif" alt="Wakacyjne Warsztaty Wielodyscyplinarne" />
+			<img src="<?php writeMTime('images/logo.gif') ?>" alt="Wakacyjne Warsztaty Wielodyscyplinarne" />
 		</a></h1></div>
 
 		<div id="middleContainer">

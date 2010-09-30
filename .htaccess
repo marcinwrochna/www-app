@@ -4,5 +4,8 @@ RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^(.*)$           -                                                [last,L,NE]
 
 # Warning: actions can't have the same name as a directory.
-RewriteRule ^(.+)\((.*)\)$            index.php?action=$1&args=$2&%{QUERY_STRING} [last,L,NE]
-RewriteRule ^(.+)$                 index.php?action=$1&%{QUERY_STRING}         [last,L,NE]
+RewriteRule ^impersonate\((.+)\)/(.+)\((.*)\)$            index.php?impersonate=$1&action=$2&args=$3&%{QUERY_STRING} [last,L,NE]
+RewriteRule ^impersonate\((.+)\)/(.+)$                    index.php?impersonate=$1&action=$2&%{QUERY_STRING}         [last,L,NE]
+RewriteRule ^impersonate\((.+)\)/?$                       index.php?impersonate=$1&%{QUERY_STRING}                   [last,L,NE]
+RewriteRule ^(.+)\((.*)\)$                                index.php?action=$1&args=$2&%{QUERY_STRING}                [last,L,NE]
+RewriteRule ^(.+)$                                        index.php?action=$1&%{QUERY_STRING}                        [last,L,NE]

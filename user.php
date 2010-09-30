@@ -26,19 +26,17 @@ require_once('user/profile.php');
 require_once('user/admin.php');
 require_once('user/utils.php');
 
-function initUser()
+function initUser($impersonating = false)
 {			
 	unset($GLOBALS['USER']);
 	global $USER, $DB, $PAGE;
-	if (isset($_SESSION['user_id']))
-	{
-		$USER = $DB->users[$_SESSION['user_id']]->assoc('uid,name,login,logged,gender,email');
-		$roles = $DB->query('SELECT role FROM table_user_roles WHERE uid=$1', $USER['uid']);
-		$USER['roles'] = $roles->fetch_column();
-		$USER['roles'][] = 'registered';
-		$USER['roles'][] = 'public';
-	}
+	
+	if ($impersonating === false)
+		$uid = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : USER_ANONYMOUS;
 	else
+		$uid = $impersonating;
+	
+	if ($uid == USER_ANONYMOUS)
 		$USER = array(
 			'uid' => USER_ANONYMOUS,
 			'name' => 'Anonim',
@@ -46,6 +44,22 @@ function initUser()
 			'roles' => array('public'),	
 			'gender' => 'm'
 		);
+	else	
+	{
+		$USER = $DB->users[$uid]->assoc('uid,name,login,logged,gender,email');
+		$roles = $DB->query('SELECT role FROM table_user_roles WHERE uid=$1', $uid);
+		$USER['roles'] = $roles->fetch_column();
+		$USER['roles'][] = 'registered';
+		$USER['roles'][] = 'public';
+	}
+	
+	if ($impersonating === false && isset($_GET['impersonate']))
+	{
+		if (!userCan('impersonate'))  throw new PolicyException();
+		initUser(intval($_GET['impersonate']));
+		global $USER;
+		$USER['impersonatedBy'] = $uid;
+	}
 }
 
 function actionLogout()
@@ -107,25 +121,30 @@ function addLoginMenuBox()
 
 function addUserMenuBox()
 {
-	global $USER, $PAGE;
+	global $USER, $PAGE, $DB;
 	$items = array(
 		array('profil',         'editProfile',             'user-green.png', userCan('editProfile',$USER['uid'])),
 		array('kwalifikacja',   'showQualificationStatus', 'qual.png'           ),
 		array('dodatkowe dane', 'editAdditionalInfo',      'page-white-edit.png')
 	);
+	$custom = '';
+	if (isset($USER['impersonatedBy']))
+		$custom .= str_replace('%', gender('y','a',$DB->users[$USER['impersonatedBy']]->get('gender')),
+			'Jesteś teraz zalogowan%<br/> jako inna osoba. <a href="..">[wróć]</a>');
+		
 	$logout = getIcon('poweroff.png');
 	$logout = '<a class="right" href="logout" '. getTipJS('wyloguj') .'>'. $logout .'</a>';
-	$PAGE->addMenuBox($USER['name'] .'&nbsp;', $items, $logout);	
+	$PAGE->addMenuBox($USER['name'] .'&nbsp;', $items, $custom . $logout);	
 }
 
 function actionRegister()
 {
 	$inputs = array(
-		array('login', 'login', 'text'),
-		array('hasło', 'password', 'password'),
-		array('powtórz hasło', 'password_repeat', 'password'),
-		array('imię i nawisko', 'name', 'text'),
-		array('email', 'email', 'text')
+		array('text', 'login', 'login'),
+		array('password', 'password', 'hasło'),
+		array('password', 'password_repeat', 'powtórz hasło'),
+		array('text', 'name', 'imię i nawisko'),
+		array('text', 'email', 'email')
 	);
 	
 	global $PAGE;	
@@ -155,10 +174,10 @@ function actionRegisterForm()
 	assertOrFail($_POST['password'] === $_POST['password_repeat'], 'Hasło nie zgadza się z powtórzeniem.', $correct);
 		
 	$DB->query('SELECT COUNT(*) FROM table_users WHERE login=$1', $_POST['login']);
-	assertOrFail($DB->fetch() === 0, 'Login już jest w użyciu.', $correct);
+	assertOrFail($DB->fetch_int() === 0, 'Login już jest w użyciu.', $correct);
 		
 	$DB->query('SELECT COUNT(*) FROM table_users WHERE email=$1', $_POST['email']);
-	assertOrFail($DB->fetch() === 0, 'Podany adres email już jest zarejestrowany. Jeżeli nie masz
+	assertOrFail($DB->fetch_int() === 0, 'Podany adres email już jest zarejestrowany. Jeżeli nie masz
 		maila z potwierdzeniem,	sprawdź spam lub <a href="reportBug">zgłoś problem</a>.',
 		$correct);
 	

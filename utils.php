@@ -105,9 +105,7 @@ function getOption($name)
 
 function actionEditOptions()
 {
-	if (!userCan('editOptions'))  throw new PolicyException();
-	actionEditOptionsForm();
-	
+	if (!userCan('editOptions'))  throw new PolicyException();	
 	$form = new Form();
 	
 	global $DB;
@@ -120,6 +118,7 @@ function actionEditOptions()
 	
 	global $PAGE;
 	$PAGE->title = 'Ustawienia';
+	$form->action = 'editOptionsForm';
 	$form->submitValue = 'Zapisz';
 	$PAGE->content .= $form->getHTML();
 }
@@ -127,11 +126,11 @@ function actionEditOptions()
 function actionEditOptionsForm()
 {
 	global $DB, $PAGE;
-	if (!isset($_POST['submitted']))  return;
 	foreach ($_POST as $name=>$value)
 		$DB->options[$name] = array('value' => $value);
 	$PAGE->addMessage('Pomyślnie zapisano ustawienia.', 'success');
 	logUser('admin setting');
+	actionEditOptions();
 }
 
 function actionDatabaseRaw()

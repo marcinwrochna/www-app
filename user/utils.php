@@ -43,10 +43,12 @@ function getName($uid, $default='')
 		return $DB->users[intval($uid)]->get('name');
 }
 
-function getUserBadge($uid, $email=false)
+function getUserBadge($uid, $email=false, $default='?')
 {
 	global $USER, $DB;
-	$name = getName($uid, '?');
+	if (!isset($DB->users[intval($uid)]))
+		return $default;
+	$name = $DB->users[intval($uid)]->get('name');
 	$icon = 'user-blue.gif';
 	if ($uid == $USER['uid'])  $icon = 'user-green.gif';
 	

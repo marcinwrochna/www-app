@@ -105,8 +105,12 @@ function actionEditProfile($uid = null)
 		'akadra'=>'Aktywna kadra',
 		'jadący'=>'Jadąc'. gender('y','a',$DB->users[$uid]->get('gender'))
 	);
+	
+	$impersonate = '<a href="impersonate('. $uid .')/" '.
+		getTipJS('wykonuje wszystko dokładnie, jakby Cię zalogować jako ta osoba') .'>impersonuj</a>';
 		
 	$inputs = array(
+		array('custom',       'impersonate',    '',                  'hidden'=>!$admin, 'custom' => $impersonate),
 		array('timestamp',    'registered',     'rejestracja',        true, 'hidden'=>!$admin),
 		array('timestamp',    'logged',         'ostatnie logowanie', true, 'hidden'=>!$admin),
 		array('text',         'name',           'imię i nazwisko',    !$admin),
@@ -114,7 +118,7 @@ function actionEditProfile($uid = null)
 		array('text',         'email',          'email',              !$admin),
 		array('custom',       'password',       'hasło',              true, 'hidden'=>$admin,
 				'default'=>'<a href="changePassword">zmień</a>'),
-		array('checkboxgroup','roles',          'description',     !$admin, 'options'=>$roleOptions),
+		array('checkboxgroup','roles',          'role',               !$admin, 'options'=>$roleOptions),
 		array('text',         'school',         'szkoła/kierunek studiów'),
 		array('select',       'maturayear',     'rocznik (ściślej: rok zdania matury)',
 				'options'=>$maturaYearOptions, 'other'=>''),
@@ -130,12 +134,15 @@ function actionEditProfile($uid = null)
 	
 	if ($form->submitted())
 	{
-		$DB->users[$uid]->update($form->fetchValues());
-		if (isset($_POST['roles']) && is_array($_POST['roles']))
+		$values = $form->fetchValues();
+		$values['maturayear'] = intval($values['maturayear']);			
+		$DB->users[$uid]->update($values);		
+		if ($admin)
 		{
 			$DB->query('DELETE FROM table_user_roles WHERE uid=$1', $uid);
-			foreach ($_POST['roles'] as $role)
-				$DB->user_roles[]= array('uid'=>$uid,'role'=>$role);
+			if (isset($_POST['roles']) && is_array($_POST['roles'])) //test for empty checkboxGroup
+				foreach ($_POST['roles'] as $role)
+					$DB->user_roles[]= array('uid'=>$uid,'role'=>$role);
 		}
 		$PAGE->addMessage('Pomyślnie zmieniono profil.', 'success');
 		logUser('user edit', $uid);
@@ -167,8 +174,8 @@ function getMaturaYearOptions()
 	$maturaOptions = array('3. gimnazjum ', '1. klasa liceum','2. klasa liceum ', '3. klasa liceum',
 		'I rok studiów', 'II  rok studiów', 'III rok studiów', 'IV rok studiów', 'V rok studiów');
 	$date = getdate();
-	$year = $date['year']+3;
-	if ($date['mon']>=9)  $year++;
+	$year = $date['year']+3; // Pierwszy element $maturaOptions ma maturę za 3 lata.
+	if ($date['mon']>=9)  $year++; // Od 1 września w "nowej" klasie. (może powinno być wcześniej?)
 	$maturaYearOptions = array();
 	foreach ($maturaOptions as $i=>$opt)
 	{

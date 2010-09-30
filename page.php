@@ -2,7 +2,7 @@
 
 function writeMTime($f)
 {
-	echo $f .'?'. filemtime($f);
+	echo ABSOLUTE_PATH_PREFIX . $f .'?'. filemtime($f);
 }
 
 class Page extends SimpleTemplate
@@ -54,7 +54,10 @@ class Page extends SimpleTemplate
 			'exception' => 'cancel.png',
 		);
 		if (isset($icons[$type]))
-			$text = "<img src='images/fatcow/32/${icons[$type]}' alt='$type'/>$text";
+		{
+			$src = ABSOLUTE_PATH_PREFIX .'images/fatcow/32/'. $icons[$type];
+			$text = "<img src='$src' alt='$type'/>$text";
+		}
 		
 		$this->topContent .= "<div class='contentBox message'>$text</div>";		
 	}
@@ -67,13 +70,7 @@ class Page extends SimpleTemplate
 		$menuItems = '';
 		foreach($items as $item)
 		{
-			if (!is_assoc($item))
-			{
-				if (count($item) == 4)
-					$item = array_combine(array('title','action','icon','perm'), $item);
-				else
-					$item = array_combine(array('title','action','icon'), $item);					
-			}
+			$item = applyDefaultKeys($item, array('title','action','icon','perm'));
 			if (!isset($item['perm']))
 				$item['perm'] = userCan($item['action']);
 			if (!$item['perm'])
