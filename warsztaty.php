@@ -199,6 +199,7 @@ function actionShowWorkshop($wid = null)
 	$data['proposer'] = getUserBadge($data['proposer_uid']);
 	
 	$participant = $DB->workshop_user[array('wid'=>$wid, 'uid'=>$USER['uid'])]->get('participant');
+	$participant = intval($participant);
 	
 	$data['by'] = array();		
 	$lecturers = getLecturers($wid);

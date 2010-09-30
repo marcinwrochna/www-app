@@ -69,6 +69,7 @@ function sendMail($subject, $content, $to, $isHTML = false)
 	$config = new Zend_Oauth_Config();
 	$config->setOptions(getGmailOAuthOptions());
 	// Could try-catch here
+	debug(getOption('gmailOAuthAccessToken'));
 	$config->setToken(unserialize(base64_decode(getOption('gmailOAuthAccessToken'))));
 	$config->setRequestMethod('GET');
 	$url = 'https://mail.google.com/mail/b/' . $email_address . '/smtp/';

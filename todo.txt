@@ -1,12 +1,24 @@
 Top priority:
+nieznana akcja: 500.shtml
+coś z /tinymce
 events - make the app support WWW7 as soon as possible
 restore tutoring
-Signup/Resign button rights are incosistent.
+Signup/Resign button rights are inconsistent.
 There's a sick amount of w1_users_login_key indexes in local pgdb
+actualize sitemap and others
+
+Zlecone:
+- sortowanie po nazwisku (lub chociaż po imieniu) tabelek wypluwanych przez aplikację
+- zliczanie rozmiarów koszulek
+- eksport danych w jakimś sensownym formacie (może da się podpiąć pod Googledocs API?)
 
 Zlecalne:
 do parseUserHTML() dodać HTMLPurifier'a
 common.js: tipon() - wyczyścić i sprawdzić y
+loguj czy i kto impersonuje, jeśli ustawiono $USER['impersonatedBy'] (log.php::logUser(), dodatkowa kolumna do DB i wyświetlanie w logu)
+podczas impersonowania maile wyświetlaj zamiast wysyłać
+dodać do DB->users kolumnę "surname", uaktualnianą przy zmianie "name",
+	która by ułatwiała i przyspieszała sortowanie po nazwisku (obecnie regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\'))
 
 zapłacono
 show profile: CV + warsztaty, punkty
@@ -38,6 +50,8 @@ change db_() to $DB->
 change showMessage() to $PAGE->addMessage()
 change <form> to new Form()
 move lecturer db-column to participant=enumParticiapntStatus('lecturer')
+checkUserCanEditTasks() seems stupid
+the whole app is one big XSS hole.
 
 change templates to '<?php if (): ?>\n something \n<?php endif;?>' syntax where applicable.
 change to $class = alternate('even','odd');
@@ -66,3 +80,5 @@ add lecturers when creating workshop
 buildMenuBox perm=true redundant?
 give kadra possibility to impersonate Tester (zlecalne?)
 better SELECT, DB_Slice?
+callAction, automatically log action(param). auto check permissions?
+make the app more open - publish lists, user profiles, ...
