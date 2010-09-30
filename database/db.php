@@ -34,11 +34,23 @@ abstract class DB
 		return $this->tables[TABLE_PREFIX . $name];
 	}	
 	
+	// Enable " $DB->tablename($pkey_col1, $pkey_col2) : DBRow " syntax
+	public function __call($name, $args)
+	{
+		if (isset($this->{$name}))
+			return $this->{$name}->offsetGet($args);
+		else
+			throw new KnownException("Element <i>\$DB->$name()</i> (ani funkcja ani tabela) nie istnieje.");
+	}
+	
 	public function num_rows()  { return $this->lastResult->count(); }
 	public function affected_rows()  { return $this->lastResult->affected_rows(); }
 	public function fetch() 	{ return $this->lastResult->fetch(); }
 	public function fetch_assoc($n = null) { return $this->lastResult->fetch_assoc($n); }
 	public function fetch_all() { return $this->lastResult->fetch_all(); }
+	public function fetch_column($c = null) { return $this->lastResult->fetch_column($c); }
+	public function fetch_int() 	{ return $this->lastResult->fetch_int(); }	
+	public function fetch_vector() 	{ return $this->lastResult->fetch_vector(); }	
 }
 
 abstract class DBTable implements ArrayAccess
@@ -59,7 +71,7 @@ abstract class DBTable implements ArrayAccess
 		if (count($this->pkeyColumns) == 0)
 			throw new KnownException('Relation \''. $this->name .'\' has no primary key.');		
 		$class = 'DBRow_'. $this->DB->driver;
-		return new DBRow_PostgreSQL($this->DB, $this, $pkey);
+		return new $class($this->DB, $this, $pkey);
 	}	
 	
 	public function offsetExists($pkey)  { return $this->offsetGet($pkey)->count() > 0; }
@@ -70,7 +82,7 @@ abstract class DBTable implements ArrayAccess
 
 
 
-abstract class DBRow
+abstract class DBRow implements Countable
 {
 	protected $DB;
 	protected $table;
@@ -91,7 +103,6 @@ abstract class DBRow
 	
 	abstract public function assoc($columns='*');
 	abstract public function update($values);
-	abstract public function count();
 	abstract public function delete();
 }
 
@@ -126,4 +137,13 @@ abstract class DBResult implements Iterator, Countable
 			$result[]= $row[$column];
 		return $result;
 	}
+	
+	public function fetch_int()
+	{
+		$r = $this->fetch();
+		if (ctype_digit($r))
+			return intval($r);
+		else
+			return false;	
+	}	
 }

@@ -53,7 +53,7 @@ class Form
 			</table>
 			%custom%
 			<?php if (!is_null($this->submitValue)) : ?>
-				<input type="submit" name="submitted" value="%submitValue%" />
+				<input type="submit" name="formsubmitted" value="%submitValue%" />
 			<?php endif; ?>
 		</form>
 		<?php
@@ -62,7 +62,7 @@ class Form
 	
 	public static function submitted()
 	{
-		return isset($_POST['submitted']);
+		return isset($_POST['formsubmitted']);
 	}
 	
 	public function getColumns()
@@ -98,7 +98,7 @@ class Form
 					$value = intval($value);
 					break;
 				case 'checkbox':
-					$value = empty($value) ? 0 : 1; // SQL has problems with true/false.
+					$value = empty($value) ? 0 : 1; // 0/1, cause SQL has problems with true/false.
 					break;
 			}
 			

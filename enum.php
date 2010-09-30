@@ -20,7 +20,7 @@ class Enum implements ArrayAccess, IteratorAggregate
 	{
 		if (is_null($id))
 			return self::$enumTypes[$enumName];
-		if (is_int($id))
+		if (is_numeric($id))
 			foreach(self::$enumTypes[$enumName] as $enumItem)
 				if ($enumItem->id == $id)
 					return $enumItem;					
@@ -48,6 +48,14 @@ class Enum implements ArrayAccess, IteratorAggregate
 	public function exists($offset) { return isset($this->items[$offset]); }
 	public function offsetUnset($offset)  { throw new KnownException('Undefined operation'); }
 	public function getIterator()  { return new ArrayIterator($this->items); }
+	
+	public function assoc($keyColumn, $valColumn)
+	{
+		$a = array();
+		foreach($this->items as $item)
+			$a[$item[$keyColumn]] = $item[$valColumn];
+		return $a;
+	}
 }
 
 class EnumItem extends ArrayObject
@@ -63,7 +71,7 @@ Enum::define('participantStatus',
 	applyDefaultHeaders(
 		array('id','description','canResign', 'icon', 'explanation'),
 		array(
-			'none'         => array(0, 'niezapisan%',         false),
+			'none'         => array(0, 'niezapisan%',         false, '',                'Nie jesteś zapisan% na te warsztaty.'),
 			'candidate'    => array(1, 'wstępnie zapisan%',   true , 'tick-yellow.png', 'Jesteś zapisan% (wstępnie; pamiętaj o zadaniach kwalifikacyjnych).'),
 			'rejected'     => array(2, 'nie spełnia wymagań', false, 'cross.png',       'Nie spełnił%ś wymagań.'),
 			'accepted'     => array(3, 'zakwalifikowan%',     false, 'tick.png',        'Zakwalifikował%ś się.'),
@@ -99,14 +107,31 @@ Enum::define('blockType',
 	array('description'=>'???')
 );
 
-Enum::define('subject', array(
-		'mathematics' => array('icon'=>'m', 'description'=>'matematyka',             'orderWeight'=>-1),
-		'cs_theory'   => array('icon'=>'it','description'=>'informatyka teoretyczna','orderWeight'=> 2),
-		'cs_practice' => array('icon'=>'ip','description'=>'informatyka praktyczna', 'orderWeight'=> 4),		
-		'physics'     => array('icon'=>'f', 'description'=>'fizyka',                 'orderWeight'=> 8),
-		'astronomy'   => array('icon'=>'a', 'description'=>'astronomia',             'orderWeight'=>16)
+Enum::define('subject', 
+	applyDefaultHeaders(
+		array('icon', 'description', 'orderWeight'),
+		array(
+			'mathematics' => array('m',  'matematyka',             -1),
+			'cs_theory'   => array('it', 'informatyka teoretyczna', 2),
+			'cs_practice' => array('ip', 'informatyka praktyczna',  4),		
+			'physics'     => array('f',  'fizyka',                  8),
+			'astronomy'   => array('a',  'astronomia',             16)
+		)
 	),
 	array('description'=>'???')	
+);
+
+Enum::define('solutionStatus', 
+	applyDefaultHeaders(
+		array('id', 'description', 'icon'),
+		array(
+			'none'     => array(0, 'brak',                 'solution-none.gif'),
+			'new'      => array(1, 'czeka na sprawdzenie', 'solution-new.gif'),
+ 			'returned' => array(2, 'do poprawy',           'solution-returned.gif'),
+ 			'graded'   => array(3, 'ocenione',             'solution-graded.gif')
+ 		)
+ 	),
+ 	array('description' => '???')
 );
 
 function actionEnumTest()

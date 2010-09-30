@@ -47,6 +47,9 @@ function tipon(parent,tip,width,y)
 	
 	tooltip.innerHTML = tip;
 	
+	// Move box left before measuring width, so that text isn't tightened.
+	tooltip.style.left = 0 +"px";
+	
 	var width = typeof(width) != 'undefined' ? width : $('#tooltip').width();
 	
 	var x = getAbsX(parent) + 10;

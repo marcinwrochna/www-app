@@ -98,7 +98,7 @@ abstract class DBRow_SQL extends DBRow
 	{
 		$query  = 'SELECT COUNT(*) FROM "'. $this->table->name .'" ';
 		$query .= $this->where;
-		return $this->DB->query($query, $this->pkey)->fetch();
+		return intval($this->DB->query($query, $this->pkey)->fetch());
 	}
 	
 	public function delete()
