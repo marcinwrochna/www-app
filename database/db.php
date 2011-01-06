@@ -37,7 +37,7 @@ abstract class DB
 	// Enable " $DB->tablename($pkey_col1, $pkey_col2) : DBRow " syntax
 	public function __call($name, $args)
 	{
-		if (isset($this->{$name}))
+		if (is_object($this->{$name}))
 			return $this->{$name}->offsetGet($args);
 		else
 			throw new KnownException("Element <i>\$DB->$name()</i> (ani funkcja ani tabela) nie istnieje.");
