@@ -1,4 +1,6 @@
 Top priority:
+check update30: insertPermission(admin-impersonate, registered-editTutoringApplication)
+
 nieznana akcja: 500.shtml
 coś z /tinymce
 events - make the app support WWW7 as soon as possible

@@ -114,7 +114,10 @@ function actionEditOptions()
 	{
 		$form->addRow($r['type'], $r['name'], $r['description']);
 		$form->values[$r['name']] = $r['value'];
-	}	
+	}
+	if (isset($form->values['gmailOAuthAccessToken']))
+		$form->values['gmailOAuthAccessToken'] =
+			substr($form->values['gmailOAuthAccessToken'],0, 16) . '...';
 	
 	global $PAGE;
 	$PAGE->title = 'Ustawienia';
@@ -127,7 +130,8 @@ function actionEditOptionsForm()
 {
 	global $DB, $PAGE;
 	foreach ($_POST as $name=>$value)
-		$DB->options[$name] = array('value' => $value);
+		if ($DB->options[$name]->get('type') != 'readonly')
+				$DB->options[$name] = array('value' => $value);
 	$PAGE->addMessage('Pomyślnie zapisano ustawienia.', 'success');
 	logUser('admin setting');
 	actionEditOptions();

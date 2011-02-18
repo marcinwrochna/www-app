@@ -57,7 +57,7 @@ else{ $config_file = $_INI['default_config']; }
 require_once 'uploader/'. $config_file;
 
 if($_INI['debug_php']){ phpinfo(); exit(); }
-elseif($_INI['debug_config']){ debug($_CONFIG['config_file_name'], $_CONFIG); exit(); }
+elseif($_INI['debug_config']){ ubr_debug($_CONFIG['config_file_name'], $_CONFIG); exit(); }
 elseif(isset($_GET['about'])){
 	kak("<u><b>UBER UPLOADER FILE UPLOAD</b></u><br>UBER UPLOADER VERSION =  <b>" . $_INI['uber_version'] . "</b><br>UBR_FILE_UPLOAD = <b>" . $THIS_VERSION . "</b><br>\n", 1, __LINE__, $_INI['path_to_css_file']);
 }

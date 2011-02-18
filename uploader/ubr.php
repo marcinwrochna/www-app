@@ -171,7 +171,7 @@ function getUploadInfo()
 		$file = get_object_vars($fileinfo);
 		$file['realname'] = $_POST_DATA[$slot];
 		$files[] = $file;
-		db_insert('uploads',array(
+		$DB->uploads->insert(array(
 			'filename' => $file['name'],
 			'realname' => $file['realname'],
 			'size' => $file['size'],

@@ -110,22 +110,19 @@ function actionEditProfile($uid = null)
 		getTipJS('wykonuje wszystko dokładnie, jakby Cię zalogować jako ta osoba') .'>impersonuj</a>';
 		
 	$inputs = array(
-		array('custom',       'impersonate',    '',                  'hidden'=>!$admin, 'custom' => $impersonate),
+		array('custom',       'impersonate',  '', 'custom' => $impersonate, 'hidden'=>!$admin),
 		array('timestamp',    'registered',     'rejestracja',        true, 'hidden'=>!$admin),
 		array('timestamp',    'logged',         'ostatnie logowanie', true, 'hidden'=>!$admin),
 		array('text',         'name',           'imię i nazwisko',    !$admin),
 		array('text',         'login',          'login',              !$admin),
 		array('text',         'email',          'email',              !$admin),
-		array('custom',       'password',       'hasło',              true, 'hidden'=>$admin,
-				'default'=>'<a href="changePassword">zmień</a>'),
+		array('custom',       'password',       'hasło',              true, 'hidden'=>$admin, 'default'=>'<a href="changePassword">zmień</a>'),
 		array('checkboxgroup','roles',          'role',               !$admin, 'options'=>$roleOptions),
 		array('text',         'school',         'szkoła/kierunek studiów'),
-		array('select',       'maturayear',     'rocznik (ściślej: rok zdania matury)',
-				'options'=>$maturaYearOptions, 'other'=>''),
+		array('select',       'maturayear',     'rocznik (ściślej: rok zdania matury)', 'options'=>$maturaYearOptions, 'other'=>''),
 		array('text',         'skadwieszowww',  'skąd wiesz o WWW?'),
 		array('richtextarea', 'zainteresowania','zainteresowania'),
-		array('checkbox',     'isselfcatered',  'nocleg i wyżywienie', 'text'=>'we własnym zakresie'.
-				' <small '. getTipJS('dotyczy np. mieszkańców Olsztyna') .'>[?]</small>')
+		//array('checkbox',     'isselfcatered',  'nocleg i wyżywienie', 'text'=>'we własnym zakresie <small '. getTipJS('dotyczy np. mieszkańców Olsztyna') .'>[?]</small>')
 	);	
 			
 	$action = 'editProfile';

@@ -8,7 +8,8 @@ function userCan($action, $owner=false)
 	global $USER, $DB;
 	$roles = $USER['roles'];
 	if ($owner === $USER['uid'] || (is_array($owner) && in_array($USER['uid'], $owner)))
-		$roles[]= 'owner';
+		if (in_array('registered', $USER['roles']))
+			$roles[]= 'owner';
 	$required = $DB->query('SELECT role FROM table_role_permissions WHERE action=$1', $action);
 	return (count(array_intersect($roles,$required->fetch_column()))>0);
 }

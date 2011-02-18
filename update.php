@@ -244,9 +244,11 @@ switch ($version)
 		);
 		setVersion(29);
 	case(29):
-		//insertPermission('admin', 'impersonate');
 		insertPermission('admin', 'viewTutoringApplications');
-		insertPermission('tutor', 'viewTutoringApplications');
-		//insertPermission('registered', 'editTutoringApplication');
+		insertPermission('tutor', 'viewTutoringApplications');		
 		setVersion(30);
+	case(30):
+		//insertPermission('admin', 'impersonate');
+		//insertPermission('registered', 'editTutoringApplication');
+		setVersion(31);
 }

@@ -12,7 +12,7 @@ function addTutoringMenuBox()
 	global $USER, $PAGE;
 	$PAGE->addMenuBox('Tutorial', array(
 		array('twoje podanie', 'editTutoringApplication', 'application-my.png', userCan('editProfile',$USER['uid'])),
-		array('lista podań',   'listTutorings', 'application-list.png'),
+		array('lista podań',   'viewTutoringApplications', 'application-list.png'),
 	));
 }
 
@@ -58,7 +58,7 @@ function actionEditTutoringApplicationForm()
 	actionEditTutoringApplication();
 }
 
-function actionListTutorings()
+function actionViewTutoringApplications()
 {
 	global $DB,$USER,$PAGE;
 	if (!userCan('viewTutoringApplications'))  throw new PolicyException();
@@ -86,7 +86,7 @@ function actionListTutorings()
 function actionViewTutoringApplication($uid)
 {
 	global $DB,$USER,$PAGE;
-	if (!userCan('viewTutoringApplications'))  throw new PolicyException();
+	if (!userCan('viewTutoringApplications', $uid))  throw new PolicyException();
 	
 	$uid = intval($uid);	
 	$user = $DB->users[$uid]->assoc('school,maturayear,podanieotutora,zainteresowania,tutoruid');
@@ -96,7 +96,7 @@ function actionViewTutoringApplication($uid)
 	$PAGE->title = 'Podanie o tutora';
 	$template = new SimpleTemplate($user);
 	?>
-	<a class="back" href="listTutorings">wróć</a>
+	<a class="back" href="viewTutoringApplications">wróć</a>
 	<b>czyje</b>: %badge%<br/>
 	<b>tutor</b>: <?php
 		echo getUserBadge($user['tutoruid'], false, 'nikt') .' ';
