@@ -128,6 +128,7 @@ function generateFormRows($inputs, $previous=array())
 define('VALUE_OTHER', -66642);
 function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $options=array(), $ignorePOST=false)
 {
+	global $PAGE;
 	// Handle named arguments.
 	if (is_array($type))
 		foreach ($type as $key => $val)
@@ -244,6 +245,14 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 			$row .= " />$text"; 
 			if ($rtype == 'timestamp')  $row .= '<small><i>YYYY-MM-DD HH:MM</i> lub <i>YYYY-MM-DD</i></small>';
 			$row .= "</td>";
+			
+			if (!empty($autocomplete))
+			{
+				foreach ($autocomplete as &$item)
+					$item = json_encode($item);
+				$autocomplete = implode(',', $autocomplete);
+				$PAGE->jsOnLoad .= '$("#school").autocomplete({minLength:1,source:['. $autocomplete.']});'."\n";
+			}
 	}
 	echo $row . "</tr>";
 	if (isset($other))

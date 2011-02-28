@@ -251,4 +251,41 @@ switch ($version)
 		//insertPermission('admin', 'impersonate');
 		//insertPermission('registered', 'editTutoringApplication');
 		setVersion(31);
+	case(31):
+		$DB->query('ALTER TABLE table_workshops ADD COLUMN edition int');
+		$DB->query('UPDATE table_workshops SET edition=6');
+		$DB->query('CREATE TABLE table_editions (edition int, name varchar(255))');
+		$DB->query('ALTER TABLE table_editions ADD PRIMARY KEY (edition)');
+		$DB->query('INSERT INTO table_editions VALUES (6, \'WWW6\')');
+		$DB->options[]= array(
+			'name' => 'currentEdition',
+			'description' => 'obecna edycja warsztatów',
+			'value' => '7',
+			'type' => 'int'
+		);
+		setVersion(32);
+	case(32):		
+		$DB->query('INSERT INTO table_editions VALUES (7, \'WWW7\')');
+		$DB->query('CREATE TABLE table_edition_user (edition int, uid int, qualified int, lecturer int)');
+		$DB->query('ALTER TABLE table_edition_user ADD PRIMARY KEY (edition, uid)');
+		$DB->query('INSERT INTO table_edition_user (SELECT 6, uid, 0, 0 FROM table_users)');
+		$DB->query('UPDATE table_edition_user eu SET qualified=
+			(SELECT count(*) FROM table_user_roles ur WHERE ur.uid=eu.uid AND ur.role=\'jadący\')');		
+		$DB->query('UPDATE table_edition_user eu SET lecturer=
+			(SELECT count(*) FROM table_user_roles ur WHERE ur.uid=eu.uid AND ur.role=\'akadra\')');
+			/*(SELECT count(*) FROM table_workshops w, table_workshop_user wu WHERE w.wid=wu.wid AND wu.uid=eu.uid
+				AND wu.participant=5 AND w.status>2)');*/
+		setVersion(33);
+	case(33):
+		$DB->query('DELETE FROM table_user_roles WHERE role=\'jadący\' OR role=\'akadra\' OR role=\'kadra\'');
+		setVersion(34);
+	case(34):
+		insertPermission('registered', 'applyAsLecturer');
+		$DB->query('ALTER TABLE table_workshops ADD COLUMN edition int');
+		$DB->query('UPDATE table_workshops SET edition=6');
+		$DB->query('DELETE FROM table_role_permissions WHERE action=\'signUpForWorkshop\' AND role=\'registered\'');
+		insertPermission('kadra', 'signUpForWorkshop');		
+		setVersion(35);
+	case(35):
+		//insertPermission('registered', 'applyAsParticipant');
 }

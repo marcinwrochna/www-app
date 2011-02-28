@@ -94,7 +94,6 @@ function actionShowLog()
 	$template = new SimpleTemplate(array('rows'=>$rows));
 	?>
 		<div class="contentBox panel userLog">
-		<h3>Log</h3>
 		<table>
 			<thead><th>kiedy</th><th>kto</th><th>co</th><th>które</th></thead>
 			%rows%

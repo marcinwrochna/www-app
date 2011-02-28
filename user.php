@@ -150,7 +150,8 @@ function actionRegister()
 	global $PAGE;	
 	$PAGE->title = 'Zarejestruj się';
 	$form = new Form($inputs, 'registerForm');
-	$form->custom = 'Wszystkie pola są obowiązkowe. Email będzie widoczny tylko dla zarejestrowanych.<br/>';
+	$form->custom = 'Wszystkie pola są obowiązkowe. Email będzie widoczny tylko dla
+		zarejestrowanych.<br/>Jedno konto powinno odpowiadać jednej osobie.<br/>';
 	$PAGE->content .= $form->getHTML();
 }
 

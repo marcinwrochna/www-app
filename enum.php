@@ -33,8 +33,10 @@ class Enum implements ArrayAccess, IteratorAggregate
 	{
 		$this->items = array();
 		foreach($items as $id=>$item)
-			$this->items[$id]= new EnumItem($item);
-		$this->default = new EnumItem($default);
+		{
+			$this->items[$id]= new EnumItem($item, $id);
+		}
+		$this->default = new EnumItem($default, 'default');
 	}
 	public function offsetGet($offset)
 	{
@@ -60,9 +62,18 @@ class Enum implements ArrayAccess, IteratorAggregate
 
 class EnumItem extends ArrayObject
 {
-	public function __construct($items)
+	private $id;
+	public function __construct($items, $id)
 	{
+		$this->id = $id;
 		parent::__construct($items, ArrayObject::ARRAY_AS_PROPS);
+	}
+	public function inArray($enumIds)
+	{
+		foreach ($enumIds as $enumId)
+			if ($enumId == $this->id)
+				return true;
+		return false;
 	}
 }
 
@@ -88,7 +99,7 @@ Enum::define('blockStatus',
 		array(
 			'new'        => array(0, 'nowe',               'nie rozpatrzono'     ),
 			'undetailed' => array(1, 'prośba o szczegóły', 'prośba o szczegóły'  ),
-			'rejected'   => array(2, 'beznadziejne',       'wstępnie rozpatrzono'),
+			'rejected'   => array(2, 'słabe',              'wstępnie rozpatrzono'),
 			'ok'         => array(3, 'ujdzie',             'wstępnie rozpatrzono'),
 			'great'      => array(4, 'świetne',            'wstępnie rozpatrzono')
 		)

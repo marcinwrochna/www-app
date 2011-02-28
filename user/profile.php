@@ -106,8 +106,13 @@ function actionEditProfile($uid = null)
 		'jadący'=>'Jadąc'. gender('y','a',$DB->users[$uid]->get('gender'))
 	);
 	
+	$genderOptions = array('m' => 'męski', 'f' => 'żeński');
+	
 	$impersonate = '<a href="impersonate('. $uid .')/" '.
 		getTipJS('wykonuje wszystko dokładnie, jakby Cię zalogować jako ta osoba') .'>impersonuj</a>';
+		
+	$schoolsAutoCompleteData = $DB->query('SELECT school FROM table_users WHERE school IS NOT NULL
+		GROUP BY school HAVING count(*)>1 ORDER BY count(*) DESC')->fetch_column();
 		
 	$inputs = array(
 		array('custom',       'impersonate',  '', 'custom' => $impersonate, 'hidden'=>!$admin),
@@ -117,8 +122,9 @@ function actionEditProfile($uid = null)
 		array('text',         'login',          'login',              !$admin),
 		array('text',         'email',          'email',              !$admin),
 		array('custom',       'password',       'hasło',              true, 'hidden'=>$admin, 'default'=>'<a href="changePassword">zmień</a>'),
+		array('select',       'gender',         'rodzaj gramatyczny', 'options'=>$genderOptions),
 		array('checkboxgroup','roles',          'role',               !$admin, 'options'=>$roleOptions),
-		array('text',         'school',         'szkoła/kierunek studiów'),
+		array('text',         'school',         'szkoła/kierunek studiów', 'autocomplete'=>$schoolsAutoCompleteData),
 		array('select',       'maturayear',     'rocznik (ściślej: rok zdania matury)', 'options'=>$maturaYearOptions, 'other'=>''),
 		array('text',         'skadwieszowww',  'skąd wiesz o WWW?'),
 		array('richtextarea', 'zainteresowania','zainteresowania'),

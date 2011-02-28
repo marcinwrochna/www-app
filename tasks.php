@@ -17,19 +17,13 @@ $solutionStatuses = array(
 );
 
 // Called by actionShowWorkshop
-function buildTaskList($wid, $participant)
+function buildTaskList($wid)
 {
 	global $USER, $DB;
 	$lecturers = getLecturers($wid); 
 	
 	$template = new SimpleTemplate();
 	echo '<h3>Zadania kwalifikacyjne</h3>';	
-	if ($participant)
-	{
-		$description = str_replace('% ', gender().' ', enumParticipantStatus($participant)->explanation);
-		$description = str_replace('%ś', gender('eś','aś'), $description);
-		echo 'Twój status: <i>'. $description .'</i>';
-	}
 	
 	$taskComment = $DB->workshops[$wid]->get('tasks_comment');
 	
@@ -296,8 +290,21 @@ function buildParticipantList($wid)
 	$DB->query('SELECT tid FROM table_tasks WHERE wid=$1 ORDER BY tid', $wid);
 	$tasks = $DB->fetch_column();
 	
+	$counts = array();
+	foreach(enumParticipantStatus() as $statusName => $status)
+		$counts[$status->id] = 0;
+	foreach ($participants as $participant)
+		$counts[$participant['participant']]++;
+	$countDescription = array();
+	foreach(enumParticipantStatus() as $statusName => $status)
+		if ($statusName != 'none' || $counts[$status->id])
+		$countDescription[]= str_replace('%','ych',$status->description) .': '. $counts[$status->id];
+				/*$row['participants'] .= '<a '. getTipJS($tip) .'>';
+				$row['participants'] .= ($row['count_accepted'] + $row['count_autoaccepted']) .'</a>';*/
+		
+	
 	echo '<h3 style="display:inline-block">Zapisani</h3>';
-	echo '<span class="right">w sumie: '. count($participants) .'</span><br/>';
+	echo '<table class="right"><tr><td>'. implode('</td><td>', $countDescription) .'</td></tr></table><br/>';
 	echo '<table style="border-top: 1px black solid">';
 	echo '<thead><tr><th>uczestnik</th>';
 	foreach ($tasks as $tid)  echo "<th>$tid</th>";

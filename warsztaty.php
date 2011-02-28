@@ -25,9 +25,9 @@ function actionListPublicWorkshops()
 	// Wypisz liczbę godzin, na jakie się zapisał.
 	$DB->query('SELECT SUM(w.duration)
 		FROM table_workshops w, table_workshop_user wu
-		WHERE w.status=$1 AND wu.wid=w.wid AND wu.uid=$2',
-		enumBlockStatus('great')->id, $USER['uid']);
-	$sum = $DB->fetch();
+		WHERE w.status=$1 AND w.edition=$2 AND wu.wid=w.wid AND wu.uid=$3',
+		enumBlockStatus('great')->id, getOption('currentEdition'), $USER['uid']);
+	$sum = intval($DB->fetch());
 	if ($sum)
 	{
 		$msg = "Zapisał". gender('e') ."ś się na $sum × 1,5 godzin warsztatów.";
@@ -90,10 +90,14 @@ function listWorkshops($which, $where, $columns)
 			$orderby = "$o,$orderby";
 	
 	// WHERE
-	if (!empty($where))  $where = "AND $where";	
+	$whereClauses = array();
+	if (!empty($where))  $whereClauses[]= $where;	
+	$whereClauses[]= "w.edition=". intval(getOption('currentEdition'));
 	if (isset($_GET['subject']) && enumSubject()->exists($_GET['subject']))
-		$where .= ' AND EXISTS (SELECT * FROM table_workshop_domain wd
+		$whereClauses[]= 'EXISTS (SELECT * FROM table_workshop_domain wd
 			WHERE wd.wid=w.wid AND wd.domain=\''. $_GET['subject'] .'\')';
+	if (!empty($whereClauses))  $where = 'WHERE '. implode(' AND ', $whereClauses);
+	else $where = '';
 	
 	$selectParticipants = '';
 	foreach(enumParticipantStatus() as $statusName => $status)
@@ -102,13 +106,13 @@ function listWorkshops($which, $where, $columns)
 		
 	
 	$workshops = $DB->query('
-		SELECT w.wid, w.proposer_uid, w.title, w.status, w.type, w.duration, w.link,
+		SELECT w.wid, w.title, w.status, w.type, w.edition AS duration, w.link,
 			'. $selectParticipants .'
 			(SELECT participant FROM table_workshop_user wu
 			 WHERE wu.wid=w.wid AND wu.uid=$1) AS participant
-		FROM table_workshops w, table_users u
-		WHERE u.uid=w.proposer_uid '. $where .'
-		ORDER BY '. $orderby, $USER['uid']);
+		FROM table_workshops w
+		'. $where .'
+		ORDER BY w.edition DESC, '. $orderby, $USER['uid']);
 	
 	$PAGE->headerTitle = "<h2><a href='list${which}Workshops'>". $PAGE->title . "</a></h2>";
 	$template = new SimpleTemplate();
@@ -194,9 +198,8 @@ function actionShowWorkshop($wid = null)
 	
 	$data = $DB->workshops[$wid]->assoc('*');
 	$data['title'] = htmlspecialchars($data['title']);
-	$data['type'] = enumBlockType(intval($data['type']))->description;
+	$data['type'] = ucfirst(enumBlockType(intval($data['type']))->description);
 	$data['description'] = parseUserHTML($data['description']);	
-	$data['proposer'] = getUserBadge($data['proposer_uid']);
 	
 	$participant = $DB->workshop_user[array('wid'=>$wid, 'uid'=>$USER['uid'])]->get('participant');
 	$participant = intval($participant);
@@ -206,12 +209,16 @@ function actionShowWorkshop($wid = null)
 	$displayEmail = $participant || userCan('editWorkshop', $lecturers);
 	foreach ($lecturers as $lecturer)
 		$data['by'][]= getUserBadge($lecturer, $displayEmail);	
-	$data['by'] =  implode(', ', $data['by']);
+	if (count($data['by']) == 1)
+		$data['by'] =  'Prowadzi: '. $data['by'][0];
+	else
+		$data['by'] =  'Prowadzą: '. implode(', ', $data['by']);
 	
 	if (!userCan('showWorkshop', $lecturers))  throw new PolicyException();	
 
 	if (empty($data['link']))
-		$data['link'] = 'http://warsztatywww.wikidot.com/www6:'. urlencode($data['title']);
+		$data['link'] = 'http://warsztatywww.wikidot.com/www'. intval(getOption('currentEdition')).
+			':'. urlencode($data['title']);
 		
 	$subjects = $DB->query('SELECT domain FROM table_workshop_domain WHERE wid=$1', $wid);
 	$data['subjects'] = array();
@@ -223,30 +230,26 @@ function actionShowWorkshop($wid = null)
 	$PAGE->headerTitle = '';
 	$template = new SimpleTemplate($data);
 	?>		
-		<span class='left'>%wid%.&nbsp;</span><h2>%title%</h2>
-		(%type%: %subjects%)<br/>
-		by %by%<br/>
-		%duration% × 1,5 godz.<br/>
-		<a href="%link%" title="opis warsztatów na wikidot">zobacz opis</a><br/>
+		<span class='left'>%wid%.&nbsp;</span><h2>%title% <div class='tabs'>
+			<a class='selected'>opis</a>
+			<a href="showWorkshopTasks(%wid%)">zapisy i zadania</a>
+		</div></h2>
+		%type%: %subjects%.<br/>
+		%by%<br/>
+		Czas: %duration% × 1,5 godz.<br/>
+		<a href="%link%" title="opis warsztatów na wikidot">zobacz opis na wikidot</a><br/>
 		<br/>		
 	<?php
 	
-	// Lista zapisanych uczestników.
-	if (userCan('showWorkshopParticipants', $lecturers))	
-		echo buildParticipantList($wid);
-	// Przycisk zapisz/wypisz się.
-	if ($participant)
+	// Przycisk zapisz/wypisz się (taki sam w showWorkshopTasks).
+	if (enumParticipantStatus($participant)->inArray(array('candidate', 'autoaccepted')))
 		echo getButton('wypisz się', "resignFromWorkshop($wid)", 'cart-remove.png')  .'<br/>';
-	else if (userCan('signUpForWorkshop', $lecturers))
+	else if (!$participant && userCan('signUpForWorkshop', $lecturers))
 		echo getButton('zapisz się', "signUpForWorkshop($wid)", 'cart-put.png') .'<br/>';
-	echo '<br/><br/>';
-		
-	// Lista zadań kwalifikacyjnych.
-	echo buildTaskList($wid, $participant);
+	echo '<br/>';
 		
 	// Opis propozycji.
 	if (userCan('showWorkshopDetails', $lecturers)) {
-		echo '<hr/><br/>';
 		echo 'Opis propozycji: <div class="descriptionBox">%description%</div>';
 	}
 	// Status przyjęcia warsztatów.
@@ -269,6 +272,50 @@ function actionShowWorkshop($wid = null)
 	// Przycisk edycji warsztatów.
 	if (userCan('editWorkshop', $lecturers))
 		echo getButton('edytuj warsztaty', "editWorkshop($wid)", 'brick-edit.png');
+	$PAGE->content .= $template->finish();
+}
+
+function actionShowWorkshopTasks($wid)
+{
+	global $USER, $DB, $PAGE;
+	$wid = intval($wid);
+	
+	$data = $DB->workshops[$wid]->assoc('*');
+	$data['title'] = htmlspecialchars($data['title']);
+	$data['type'] = ucfirst(enumBlockType(intval($data['type']))->description);
+	$data['description'] = parseUserHTML($data['description']);	
+	$lecturers = getLecturers($wid);
+	$participant = $DB->workshop_user[array('wid'=>$wid, 'uid'=>$USER['uid'])]->get('participant');
+	$participant = intval($participant);
+	
+	$PAGE->title = $data['title'] .' - zapisy i zadania';
+	$PAGE->headerTitle = '';
+	$template = new SimpleTemplate($data);
+	?>		
+		<span class='left'>%wid%.&nbsp;</span><h2>%title% <div class='tabs'>
+			<a href='showWorkshop(%wid%)'>opis</a>
+			<a class='selected'>zapisy i zadania</a>
+		</div></h2>
+	<?php
+	
+	$description = str_replace('% ', gender().' ', enumParticipantStatus($participant)->explanation);
+	$description = str_replace('%ś', gender('eś','aś'), $description);
+	echo 'Twój status: <i>'. $description .'</i><br/>';
+	
+	// Przycisk zapisz/wypisz się (taki sam w showWorkshop).
+	if (enumParticipantStatus($participant)->inArray(array('candidate', 'autoaccepted')))
+		echo getButton('wypisz się', "resignFromWorkshop($wid)", 'cart-remove.png')  .'<br/>';
+	else if (!$participant && userCan('signUpForWorkshop', $lecturers))
+		echo getButton('zapisz się', "signUpForWorkshop($wid)", 'cart-put.png') .'<br/>';
+	echo '<br/>';
+	
+	// Lista zapisanych uczestników.
+	if (userCan('showWorkshopParticipants', $lecturers))	
+		echo buildParticipantList($wid) . '<br/>';
+		
+	// Lista zadań kwalifikacyjnych.
+	echo buildTaskList($wid);
+	
 	$PAGE->content .= $template->finish();
 }
 
@@ -298,7 +345,7 @@ function actionEditWorkshop($wid)
 	
 	if ($new)
 	{
-		showMessage('Minął termin zgłaszania propozycji, wypełniasz formularz na własną odpowiedzialność.', 'warning');
+		//showMessage('Minął termin zgłaszania propozycji, wypełniasz formularz na własną odpowiedzialność.', 'warning');
 		
 		if (!userCan('createWorkshop'))  throw new PolicyException();
 		$data = array(
@@ -312,7 +359,7 @@ function actionEditWorkshop($wid)
 			'type' => 'workshop',
 			'duration' => 3*2, //3*3*60min
 			'duration_min' => 90,
-			'link' => 'http://warsztatywww.wikidot.com/www6:tytul-warsztatow'
+			'link' => 'http://warsztatywww.wikidot.com/www'. getOption('currentEdition') .':tytul-warsztatow'
 		);
 	}
 	else
@@ -439,11 +486,14 @@ function actionEditWorkshopForm($wid)
 	{
 		if (!userCan('createWorkshop'))  throw new PolicyException();
 
-		$data = $data + array('status' => enumBlockStatus('new')->id);
+		$data = $data + array(
+			'edition' => intval(getOption('currentEdition')),
+			'status' => enumBlockStatus('new')->id			
+		);
 		$DB->workshops[] = $data;
 		$wid = $DB->workshops->lastValue();
 		$DB->workshop_user[]= array('wid'=>$wid, 'uid'=>$USER['uid'],
-			'participant'=>enumParticipantStatus('lecturer'));		
+			'participant'=>enumParticipantStatus('lecturer')->id);
 		if (!empty($_POST['subjects']))
 			foreach ($_POST['subjects'] as $d)
 				$DB->workshop_domain[]= array('wid'=>$wid, 'domain'=>$d, 'level'=>1);

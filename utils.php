@@ -22,7 +22,7 @@ function is_assoc(&$array) {
 function addSiteMenuBox()
 {
 	global $PAGE;
-	$PAGE->addMenuBox('Aplikacja WWW6', array(
+	$PAGE->addMenuBox('Aplikacja WWW'. getOption('currentEdition'), array(
 		array('strona główna', 'homepage',                         'house.png',   true),
 		array('wikidot',       'http://warsztatywww.wikidot.com/', 'wikidot.gif', true),
 		array('zgłoś problem', 'reportBug',                        'bug.png',     true)
@@ -31,10 +31,116 @@ function addSiteMenuBox()
 
 function actionHomepage()
 {
-	global $PAGE, $DB;
+	global $PAGE, $DB, $USER;
 	$PAGE->title = 'Strona główna';	
 	$PAGE->headerTitle = '';	
 	$PAGE->content .= getOption('homepage');
+	
+	/* todo-list: lecturers. */	
+	$currentEdition = getOption('currentEdition');
+	$row = $DB->edition_user($currentEdition, $USER['uid']);
+	$didApplyAsLecturer = false;
+	$didApplyAsParticipant = false;		
+	$didQualify = false;
+	if ($row->count())
+	{
+		if ($row->get('lecturer'))
+			$didApplyAsLecturer = true;
+		else
+			$didApplyAsParticipant = true;
+		$didQualify = $row->get('qualified');
+	}
+	
+	$DB->query('
+		SELECT count(*)
+		FROM table_workshops w, table_workshop_user wu
+		WHERE w.wid=wu.wid AND w.edition=$1 AND wu.uid=$2 AND wu.participant=$3',
+		$currentEdition, $USER['uid'], enumParticipantStatus('lecturer')->id
+	);
+	$didCreateWorkshop = $DB->fetch() > 0;
+	/*$DB->query('
+		SELECT count(*)
+		FROM table_workshops w, table_workshop_user wu
+		WHERE w.wid=wu.wid AND w.edition=$1 AND wu.uid=$2 AND wu.participant=$3 AND w.status>=$4',
+		$currentEdition, $USER['uid'], enumParticipantStatus('lecturer')->id, enumBlockStatus('ok')->id
+	);
+	$didGetAccepted = $DB->fetch() > 0;*/
+	
+	$elements = array(
+		array('applyAsLecturer', 'Zgłoś', 'Zgłosił%ś', ' się jako kadra.', $didApplyAsLecturer),
+		array($didApplyAsLecturer, 'Wypełnij potrzebne formularze.'),
+		array('createWorkshop', 'Zaproponuj', 'Zaproponował%ś', ' blok warsztatowy (do 15 kwietnia).', $didCreateWorkshop),
+		array($didCreateWorkshop, 'Czekaj na wstępną akceptację.', 'Wstępnie zaakceptowano Twój blok warsztatowy.', '', $didQualify),
+		array($didCreateWorkshop, 'Napisz opis dla uczestników na wikidocie (do 1 maja).'),
+		array($didQualify, 'Napisz (do 10 maja) i sprawdź (do 10 lipca) zadania kwalifikacyjne.'),
+	);
+	
+	$template = new SimpleTemplate();
+	echo '<h4>Chcesz poprowadzić warszaty?</h4><ul class="todoList">';
+	if (!in_array('registered', $USER['roles']))
+		echo '<li><a href="register">Załóż konto</a>/zaloguj się.</li>';	
+	foreach ($elements as $element)
+		echo buildTodoElement($element);
+	echo '</ul>';	
+	echo 'Jeżeli blok warsztatowy ma prowadzić więcej osób, to jedna z nich powinna dodać propozycję
+		i podpiąć do niej pozostałych prowadzących.<br/><br/>';
+	
+	/* todo-list: participants. */
+	$didSignup = false;
+	$didWriteMotivationLetter = false;
+	$didEverything = ($didSignup && $didWriteMotivationLetter) || $didQualify;
+	
+	$elements = array(
+		array('applyAsParticipant', 'Zgłoś', 'Zgłosił%ś', ' się jako uczestnik (od 1 maja).', $didApplyAsParticipant),
+		array($didApplyAsParticipant, 'Wypełnij potrzebne formularze.'),
+		array($didApplyAsParticipant, 'Zapisz', 'Zapisał%ś', ' się na co najmniej 4 bloki warsztatowe.', $didSignup),		
+		array('showQualificationStatus', 'Napisz', 'Napisał%ś', ' list motywacyjny.', $didWriteMotivationLetter),
+		array($didSignup, 'Rozwiąż zadania kwalifikacyjne (10 maja - 5 lipca).'),
+		array($didEverything, 'Czekaj na wyniki.', 'Został%ś zakwalifikowan%.', '', $didQualify),
+	);
+	
+	echo '<h4>Chcesz tylko uczestniczyć w warsztatach?</h4><ul class="todoList">';
+	if (!in_array('registered', $USER['roles']))
+		echo '<li><a href="register">Załóż konto</a>/zaloguj się.</li>';
+	foreach ($elements as $element)
+		echo buildTodoElement($element);	
+	echo '</ul>';
+	
+	$PAGE->content .= $template->finish();
+}
+
+function actionApplyAsLecturer()
+{
+	if (!userCan('applyAsLecturer'))  throw new PolicyException();
+	applyForCurrentWorkshopEdition(true);
+}
+	
+function actionApplyAsParticipant()
+{
+	if (!userCan('applyAsParticipant'))  throw new PolicyException();
+	applyForCurrentWorkshopEdition(false);
+}
+
+function applyForCurrentWorkshopEdition($lecturer)
+{
+	global $DB, $PAGE, $USER;
+	
+	if ($DB->edition_user(getOption('currentEdition'), $USER['uid'])->count())
+	{
+		$PAGE->addMessage('Już zgłoszono Cię na tę edycję warsztatów.', 'userError');
+		actionHomepage();
+		return;
+	}
+		
+	$DB->edition_user[] = array(
+		'edition'   => getOption('currentEdition'),
+		'uid'       => $USER['uid'],
+		'qualified' => 0,
+		'lecturer'  => $lecturer ? 1 : 0
+	);
+	$DB->user_roles[] = array('uid' => $USER['uid'], 'role' => $lecturer ? 'kadra' : 'uczestnik');
+	$PAGE->addMessage('Pomyślnie zgłoszono Cię jako '. ($lecturer ? 'kadrę.' : 'uczestnika.'), 'success');
+	actionHomepage();
 }
 
 function actionReportBug()

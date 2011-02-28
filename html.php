@@ -16,13 +16,15 @@
 	<link rel="icon" type="image/png" href="<?php writeMTime('images/favicon.png'); ?>" />
 	<link rel="stylesheet" type="text/css" href="<?php writeMTime('css.css'); ?>" />
 	<link rel="stylesheet" type="text/css" href="<?php writeMTime('images/icons/icons_png.css'); ?>" />
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/themes/ui-lightness/jquery-ui.css" type="text/css" media="all" />
 	<title>%title% - WWW</title>
 
 	%head%
 	<script type="text/javascript" src="<?php writeMTime('common.js'); ?>"></script>
 	<script type="text/javascript" src="<?php writeMTime('tinymce/tiny_mce_gzip.js'); ?>"></script>
 	<script type="text/javascript" src="<?php writeMTime('tinymce/config.js'); ?>"></script>	
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js"></script>	
 	<script type="text/javascript">tinyMCE_GZ.init(tinyMCE_GZ_config);</script>
 	<script type="text/javascript">
 		tinyMCE_config.latex_renderUrl = "%latexPath%";

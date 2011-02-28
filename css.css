@@ -302,3 +302,8 @@ table.bordered tr.odd  td { border-top:    1px #AAA solid; }
 table.bordered td { color: black; }
 
 .printable table { width: auto; }
+
+.todoList .disabled { color: gray; }
+/* .todoList .enabled { list-style-image: url('images/icons/arrow-small.gif'); } */
+.todoList .todo { background-color: #FFE; list-style-image: url('images/icons/arrow-small.gif');}
+.todoList .done { background-color: #EFE; list-style-image: url('images/icons/checkmark.gif');}

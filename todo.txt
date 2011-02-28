@@ -1,13 +1,12 @@
 Top priority:
 check update30: insertPermission(admin-impersonate, registered-editTutoringApplication)
-
+check update: uploader/ubr.php s/db_insert/$DB->users_insert/
 nieznana akcja: 500.shtml
 coś z /tinymce
-events - make the app support WWW7 as soon as possible
-restore tutoring
 Signup/Resign button rights are inconsistent.
 There's a sick amount of w1_users_login_key indexes in local pgdb
 actualize sitemap and others
+Finish homepage todo-lists.
 
 Zlecone:
 - sortowanie po nazwisku (lub chociaż po imieniu) tabelek wypluwanych przez aplikację
@@ -21,6 +20,9 @@ loguj czy i kto impersonuje, jeśli ustawiono $USER['impersonatedBy'] (log.php::
 podczas impersonowania maile wyświetlaj zamiast wysyłać
 dodać do DB->users kolumnę "surname", uaktualnianą przy zmianie "name",
 	która by ułatwiała i przyspieszała sortowanie po nazwisku (obecnie regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\'))
+in actionEditWorkshop 'Minął termin zgłaszania propozycji' could be automatic.
+in actionEditWorkshop make url in JS when title changes: http://warsztatywww.wikidot.com/www7:tytul-warsztatow
+
 
 zapłacono
 show profile: CV + warsztaty, punkty
