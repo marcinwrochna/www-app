@@ -3,18 +3,6 @@
 	tasks.php
 	Included in warsztaty.php
 */
-$participantStatuses = array(
-	0 => 'niezapisany',
-	1 => 'wstępnie zapisany',
-	2 => 'uczestnik nie spełnia wymagań',
-	3 => 'zakwalifikowany',
-	4 => 'zapisany (kadra)'
-);
-$solutionStatuses = array(
-	1 => 'czeka na sprawdzenie',
- 	2 => 'do poprawy',
- 	3 => 'ocenione'
-);
 
 // Called by actionShowWorkshop
 function buildTaskList($wid)
@@ -78,6 +66,8 @@ function buildTaskList($wid)
 			getButton('dodaj zadanie', "createTask($wid)", 'plugin-add.png').
 			'</td></tr>';
 	echo '</table><br/>';
+	if (!userCan('editTasks', $lecturers) && userCan('editWorkshop', $lecturers))
+		echo '<i>Warsztaty czekają na wstępną akceptację</i>';
 	return $template->finish();
 }
 
@@ -122,7 +112,7 @@ function actionEditTask($wid, $tid, $new = false)
 	}
 	
 	$form->submitValue = 'Zapisz';
-	$PAGE->content .= '<a class="back" href="showWorkshop('. $wid .')">wróć</a>';	
+	$PAGE->content .= '<a class="back" href="showWorkshopTasks('. $wid .')">wróć</a>';	
 	$PAGE->content .= $form->getHTML(); 
 }
 

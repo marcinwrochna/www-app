@@ -35,6 +35,13 @@ function gender($m='y', $f='a', $gender=null)
 	return ($gender==='f'?$f:$m);
 }
 
+function genderize($s, $gender=null)
+{
+	$s = str_replace('%ś', gender('eś','aś',$gender), $s);
+	$s = str_replace('%', gender('y','a',$gender), $s);
+	return $s;
+}
+
 function getName($uid, $default='')
 {
 	global $DB;	

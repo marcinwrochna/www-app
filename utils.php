@@ -68,7 +68,7 @@ function actionHomepage()
 	
 	$elements = array(
 		array('applyAsLecturer', 'Zgłoś', 'Zgłosił%ś', ' się jako kadra.', $didApplyAsLecturer),
-		array($didApplyAsLecturer, 'Wypełnij potrzebne formularze.'),
+		array($didApplyAsLecturer, 'Wypełnij profil.'),
 		array('createWorkshop', 'Zaproponuj', 'Zaproponował%ś', ' blok warsztatowy (do 15 kwietnia).', $didCreateWorkshop),
 		array($didCreateWorkshop, 'Czekaj na wstępną akceptację.', 'Wstępnie zaakceptowano Twój blok warsztatowy.', '', $didQualify),
 		array($didCreateWorkshop, 'Napisz opis dla uczestników na wikidocie (do 1 maja).'),
@@ -92,7 +92,7 @@ function actionHomepage()
 	
 	$elements = array(
 		array('applyAsParticipant', 'Zgłoś', 'Zgłosił%ś', ' się jako uczestnik (od 1 maja).', $didApplyAsParticipant),
-		array($didApplyAsParticipant, 'Wypełnij potrzebne formularze.'),
+		array($didApplyAsParticipant, 'Wypełnij profil.'),
 		array($didApplyAsParticipant, 'Zapisz', 'Zapisał%ś', ' się na co najmniej 4 bloki warsztatowe.', $didSignup),		
 		array('showQualificationStatus', 'Napisz', 'Napisał%ś', ' list motywacyjny.', $didWriteMotivationLetter),
 		array($didSignup, 'Rozwiąż zadania kwalifikacyjne (10 maja - 5 lipca).'),
@@ -139,6 +139,7 @@ function applyForCurrentWorkshopEdition($lecturer)
 		'lecturer'  => $lecturer ? 1 : 0
 	);
 	$DB->user_roles[] = array('uid' => $USER['uid'], 'role' => $lecturer ? 'kadra' : 'uczestnik');
+	$USER['roles'][] = $lecturer ? 'kadra' : 'uczestnik';
 	$PAGE->addMessage('Pomyślnie zgłoszono Cię jako '. ($lecturer ? 'kadrę.' : 'uczestnika.'), 'success');
 	actionHomepage();
 }

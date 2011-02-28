@@ -265,14 +265,14 @@ switch ($version)
 		);
 		setVersion(32);
 	case(32):		
-		$DB->query('INSERT INTO table_editions VALUES (7, \'WWW7\')');
+		/*$DB->query('INSERT INTO table_editions VALUES (7, \'WWW7\')');
 		$DB->query('CREATE TABLE table_edition_user (edition int, uid int, qualified int, lecturer int)');
 		$DB->query('ALTER TABLE table_edition_user ADD PRIMARY KEY (edition, uid)');
-		$DB->query('INSERT INTO table_edition_user (SELECT 6, uid, 0, 0 FROM table_users)');
-		$DB->query('UPDATE table_edition_user eu SET qualified=
-			(SELECT count(*) FROM table_user_roles ur WHERE ur.uid=eu.uid AND ur.role=\'jadący\')');		
-		$DB->query('UPDATE table_edition_user eu SET lecturer=
-			(SELECT count(*) FROM table_user_roles ur WHERE ur.uid=eu.uid AND ur.role=\'akadra\')');
+		$DB->query('INSERT INTO table_edition_user (SELECT 6, uid, 0, 0 FROM table_users)');*/
+		$DB->query('UPDATE table_edition_user SET qualified=
+			(SELECT count(*) FROM table_user_roles ur WHERE ur.uid=uid AND ur.role=\'jadący\')');		
+		$DB->query('UPDATE table_edition_user SET lecturer=
+			(SELECT count(*) FROM table_user_roles ur WHERE ur.uid=uid AND ur.role=\'akadra\')');
 			/*(SELECT count(*) FROM table_workshops w, table_workshop_user wu WHERE w.wid=wu.wid AND wu.uid=eu.uid
 				AND wu.participant=5 AND w.status>2)');*/
 		setVersion(33);
@@ -287,5 +287,8 @@ switch ($version)
 		insertPermission('kadra', 'signUpForWorkshop');		
 		setVersion(35);
 	case(35):
+		$DB->query('DELETE FROM table_user_roles WHERE role=\'uczestnik\'');
+		setVersion(36);
+		
 		//insertPermission('registered', 'applyAsParticipant');
 }

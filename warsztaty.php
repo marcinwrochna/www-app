@@ -267,7 +267,7 @@ function actionShowWorkshop($wid = null)
 		echo '<br/>';		
 	}
 	else if (userCan('showWorkshopDetails', $lecturers)) {
-		 echo 'Status: '. describeWorkshopStatus($data['status']) .'<br/><br/>';
+		 echo 'Status: '. enumBlockStatus($data['status'])->status .'<br/><br/>';
 	}	
 	// Przycisk edycji warsztatów.
 	if (userCan('editWorkshop', $lecturers))

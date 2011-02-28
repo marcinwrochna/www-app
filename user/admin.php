@@ -33,14 +33,17 @@ function actionAdminUsers($filterBy = null)
 		'jadący' => array('j','jadący')
 	);
 	
-	$where = '';
+	$where = 'WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid)';
+	if (isset($filterBy) && $filterBy == 'all')
+		$where = '';
 	if (isset($filterBy) && in_array($filterBy, array_keys($roledefs)))
-		$where = ' WHERE EXISTS (SELECT * FROM table_user_roles r
+		$where = 'WHERE EXISTS (SELECT * FROM table_user_roles r
 			WHERE r.uid=u.uid AND r.role=\''. $filterBy .'\')';
 	
 	
 	$PAGE->title = 'Zarządzanie użytkownikami';
 	$template = new SimpleTemplate();
+	echo '<a href="adminUsers(all)">wszystkie konta</a><br/>';
 	
 	$users = $DB->query("SELECT u.uid, u.name, u.email, u.motivationletter, u.proponowanyreferat
 	                 FROM table_users u $where ORDER BY u.uid");	
@@ -114,14 +117,13 @@ function actionEditUserStatus($uid)
 	$workshops = $DB->query('
 		SELECT w.wid, w.title, w.duration, wu.*
 		FROM table_workshop_user wu, table_workshops w
-		WHERE w.wid=wu.wid AND uid=$1', $uid);
+		WHERE w.edition=$1 AND w.wid=wu.wid AND uid=$2', getOption('currentEdition'), $uid);
 	foreach ($workshops as $row) 
 	{	
-		global $participantStatuses;
 		if ($row['lecturer'])
-			$row['status'] = 'prowadząc'. gender('y','a',$user['gender']);
+			$row['status'] = genderize('prowadząc%', $user['gender']);
 		else
-			$row['status'] = $participantStatuses[intval($row['participant'])];
+			$row['status'] = genderize(enumParticipantStatus($row['participant'])->description, $user['gender']);
 		if (!empty($row['admincomment']))
 			$row['comment'] = '<a '. getTipJS($row['admincomment']) .'>(komentarz)</a>';
 		else 
