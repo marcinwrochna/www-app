@@ -5,7 +5,7 @@ nieznana akcja: 500.shtml
 coś z /tinymce
 Signup/Resign button rights are inconsistent.
 There's a sick amount of w1_users_login_key indexes in local pgdb
-actualize sitemap and others
+upversion notify.php, tasks, check everything.
 Finish homepage todo-lists.
 
 Zlecone:
@@ -28,7 +28,6 @@ zapłacono
 show profile: CV + warsztaty, punkty
 
 tinymce <code> (task solution - at least indentation)
-checklista ("dodaj zadania kwalifikacyjne", "sprawdź rozwiązania od N uczestników", ...)
 sprawdzać łączny czas trwania warsztatów 9*2*2+2 (+info, krótsze pobyty)?
 ==Zadania kwalifikacyjne==
 add to user todo checklists

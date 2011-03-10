@@ -180,12 +180,14 @@ function actionEditUserStatusForm($uid)
 	if (!$oldj && $newj)
 	{
 		$DB->user_roles[]= array('uid'=>$uid,'role'=>'jadący');
+		$DB->edition_user(getOption('currentEdition'), $uid)->update(array('qualified'=>1));
 		logUser('set jadący 1', $uid);
 		$PAGE->addMessage('Pomyślnie dodano do jadących.', 'success');
 	}
 	else if ($oldj && !$newj)
 	{
 		$DB->user_roles[array($uid,'jadący')]->delete();
+		$DB->edition_user(getOption('currentEdition'), $uid)->update(array('qualified'=>0));
 		logUser('set jadący 0', $uid);		
 		$PAGE->addMessage('Pomyślnie usunięto z jadących.', 'success');			
 	}

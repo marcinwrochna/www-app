@@ -106,7 +106,7 @@ function listWorkshops($which, $where, $columns)
 		
 	
 	$workshops = $DB->query('
-		SELECT w.wid, w.title, w.status, w.type, w.edition AS duration, w.link,
+		SELECT w.wid, w.title, w.status, w.type, w.duration, w.link,
 			'. $selectParticipants .'
 			(SELECT participant FROM table_workshop_user wu
 			 WHERE wu.wid=w.wid AND wu.uid=$1) AS participant

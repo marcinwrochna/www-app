@@ -14,19 +14,18 @@ description=
 run_cmd=
 
 [files]
-current_page=12
-FILE_NAME_0=39;Brak;0;16;1;1;0;/var/www/html/www/www/todo.txt;0
-FILE_NAME_1=7890;PHP;0;16;1;1;0;/var/www/html/www/www/user/admin.php;0
-FILE_NAME_2=3700;PHP;0;16;1;1;0;/var/www/html/www/www/template.php;0
-FILE_NAME_3=322;Brak;0;16;1;1;0;/home/token/docs/listarzeczydospakowania.txt;0
-FILE_NAME_4=1329;PHP;0;16;1;1;0;/var/www/html/www/www/html.php;0
-FILE_NAME_5=1719;PHP;0;16;1;1;0;/var/www/html/www/www/config.php;0
-FILE_NAME_6=3628;PHP;0;16;1;1;0;/var/www/html/www/www/utils.php;0
-FILE_NAME_7=3656;PHP;0;16;1;1;0;/var/www/html/www/www/user.php;0
-FILE_NAME_8=314;Brak;0;16;1;1;0;/home/token/docs/todo.txt;0
-FILE_NAME_9=384;PHP;0;16;1;1;0;/var/www/html/www/www/tutoring.php;0
-FILE_NAME_10=276;PHP;0;16;1;1;0;/var/www/html/www/www/user/utils.php;0
-FILE_NAME_11=347;Brak;0;16;1;1;0;/home/token/tmp/hlo.txt;0
+current_page=0
+FILE_NAME_0=1408;None;0;16;1;1;0;/var/www/html/www/www/todo.txt;0;4
+FILE_NAME_1=384;PHP;0;16;1;1;0;/var/www/html/www/www/tutoring.php;0;4
+FILE_NAME_2=12259;PHP;0;16;1;1;0;/var/www/html/www/www/update.php;0;4
+FILE_NAME_3=0;PHP;0;16;1;1;0;/var/www/html/www/www/install.php;0;4
+FILE_NAME_4=2522;PHP;0;16;1;1;0;/var/www/html/www/www/log.php;0;4
+FILE_NAME_5=399;PHP;0;16;1;1;0;/var/www/html/www/www/warsztaty.php;0;4
+FILE_NAME_6=50;PHP;0;16;1;1;0;/var/www/html/www/www/tasks.php;0;4
+FILE_NAME_7=2831;PHP;0;16;1;1;0;/var/www/html/www/www/enum.php;0;4
+FILE_NAME_8=4856;PHP;0;16;1;1;0;/var/www/html/www/www/utils.php;0;4
+FILE_NAME_9=6182;CSS;0;16;1;1;0;/var/www/html/www/www/css.css;0;4
+FILE_NAME_10=6930;PHP;0;16;1;1;0;/var/www/html/www/www/user/admin.php;0;4
 
 [long line marker]
 long_line_behaviour=1
