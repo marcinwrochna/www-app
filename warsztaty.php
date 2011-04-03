@@ -68,29 +68,44 @@ function listWorkshops($which, $where, $columns)
 	
 	$cols = array(
 		'wid'           => array('th'=>'#',          'order'=>'w.wid'),
-		'lecturers'     => array('th'=>'prowadzący', 'order'=>'regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')'),
+		'lecturers'     => array('th'=>'prowadzący', 'order'=>'lecturers'),
 		'title'         => array('th'=>'tytuł',      'order'=>'w.title'),
 		'type'          => array('th'=>'rodzaj',     'order'=>'w.type'),
 		'subject'       => array('th'=>'dziedziny',  'order'=>'w.domain_order'),
 		'duration'      => array('th'=>'czas [1,5h]','order'=>'w.duration DESC'),
 		'status'        => array('th'=>'status',     'order'=>'w.status'),
-		'participants'  => array('th'=>'zapisy',     'order'=>'count DESC'),
+		'participants'  => array('th'=>'zapisy',     'order'=>'count_accepted DESC'),
 	);
 	
+	$from = '';
+	$whereClauses = array();
+	$orderby = array();
 	// ORDER BY
 	$allowed = array();
-	foreach ($cols as $col)  $allowed[]= $col['order'];	
+	foreach ($cols as $col)  if ($col['order'] != 'lecturers')  $allowed[]= $col['order'];	
 	if (!isset($_SESSION['workshopOrder']))  $_SESSION['workshopOrder'] = array();
-	if (isset($_GET['order']))  $_SESSION['workshopOrder'][]= $_GET['order'];
+	if (isset($_GET['order']) && $_GET['order'] =='lecturers')
+	{
+		$orderby[] = 'regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')';
+		$from = ', table_users u';
+		$whereClauses[] = 'EXISTS (SELECT * FROM table_workshop_user wu
+			WHERE w.wid=wu.wid AND u.uid=wu.uid
+				AND participant='. enumParticipantStatus('lecturer')->id .')';
+		$PAGE->addMessage('Przy sortowaniu po prowadzących wspólne warsztaty pokazywane są wielokrotnie.', 'info');
+	}
+	else if (isset($_GET['order']))
+		$_SESSION['workshopOrder'][]= $_GET['order'];			
 	while (count($_SESSION['workshopOrder'])>3)
 		array_shift($_SESSION['workshopOrder']);
-	$orderby = 'w.title';
-	foreach ($_SESSION['workshopOrder'] as $o)
-		if (in_array($o, $allowed, true))
-			$orderby = "$o,$orderby";
+	
+	$orderClauses = array_reverse($_SESSION['workshopOrder']);
+	$orderClauses[]= 'w.title';
+	foreach ($orderClauses as $o)
+		if (in_array($o, $allowed, true) && !in_array($o, $orderby))
+			$orderby[]= $o;
+	$orderby = implode(',', $orderby);
 	
 	// WHERE
-	$whereClauses = array();
 	if (!empty($where))  $whereClauses[]= $where;	
 	$whereClauses[]= "w.edition=". intval(getOption('currentEdition'));
 	if (isset($_GET['subject']) && enumSubject()->exists($_GET['subject']))
@@ -103,6 +118,8 @@ function listWorkshops($which, $where, $columns)
 	foreach(enumParticipantStatus() as $statusName => $status)
 		$selectParticipants .= '(SELECT COUNT(*) FROM table_workshop_user wu
 			WHERE wu.wid=w.wid AND participant='. $status->id .') AS count_'. $statusName .',';
+	//$selectParticipants .=  '(SELECT COUNT(*) FROM table_workshop_user wu
+	//	WHERE wu.wid=w.wid) AS count,';
 		
 	
 	$workshops = $DB->query('
@@ -110,7 +127,7 @@ function listWorkshops($which, $where, $columns)
 			'. $selectParticipants .'
 			(SELECT participant FROM table_workshop_user wu
 			 WHERE wu.wid=w.wid AND wu.uid=$1) AS participant
-		FROM table_workshops w
+		FROM table_workshops w'. $from .'
 		'. $where .'
 		ORDER BY w.edition DESC, '. $orderby, $USER['uid']);
 	
@@ -382,59 +399,15 @@ function actionEditWorkshop($wid)
 	foreach (enumSubject() as $subjectName => $subject)	
 		$subjectOptions[$subjectName] = $subject->description;
 	
-	// Uwaga na nadchodzący syf.
+	$durationOptions = array(6=>'9h (6x1.5h)', 9=>'13.5h (9x1.5h)');
 	
-	$durationOptions = array(0=>'ε', 1=>'1,5h', 2=>'3h', 3=>'4,5h', 4=>'6h', 5=>'7,5h', 6=>'9h',
-		8=>'4*3h', 9=>'5*3h', 10=>'6*3h', 11=>'7*3h', 12=>'9*3h');
-	
-	$duration = isset($_POST['duration']) ? intval($_POST['duration']) : $data['duration'];
-	$durationControl = '<input type="text" name="duration" value="'. $duration .'" size="3" id="durTxt"/>'.
-		'<small id="durComment">razy 1,5h</small>'.
-		'<input type="hidden" name="duration_hidden" value="'. $duration .'" id="durHid"/>';
-	$durationControl =
-		'<a href="javascript:durationChange(-1)" style="display:none;" class="smallButton" id="durm">-</a>'.
-		$durationControl .
-		'<a href="javascript:durationChange(+1)" style="display:none;" class="smallButton" id="durp">+</a>';		
-	$PAGE->jsOnLoad .= '
-		$("#durComment").hide();
-		$("#durm").show();
-		$("#durp").show();
-		$("#durTxt").attr("disabled","disabled");
-		$("#durTxt").attr("name","duration_string");
-		$("#durTxt").attr("size", 7);
-		$("#durTxt").addClass("light");
-		$("#durHid").attr("name","duration");
-		durationChange(0);
-	';
-	$PAGE->js .= '
-		function durationChange(d) {
-			descs = {0:"ε"};
-			for (i=1;i<=9;i++)  descs[2*i] = (3*i)+"h";
-			for (i=1;i<=9;i++)  descs[2*i-1] = (3*i-2)+"h 30min";
-			v = parseInt($("#durHid").val());
-			v+=d;
-			if (!(v>=0 && v<=18))  v=6;
-			$("#durHid").val(v);
-			$("#durTxt").val(descs[v]);
-			if (v>0)  $("#durm").show();
-			else $("#durm").hide();
-			if (v<18)  $("#durp").show();
-			else $("#durp").hide();
-		}
-	';
-	
-	
-	$PAGE->js .= '
-		function formTypeChange(optionId) {
-			if (optionId == 1) $("#row_duration").show();
-			else $("#row_duration").hide();
-		}
-	';
 	if ($data['type'] != 'workshop')
 	{
-		$PAGE->jsOnLoad .= 'document.getElementById("row_duration").style.display = "none";';
-		$PAGE->jsOnLoad .= 'document.getElementById("row_duration_other").style.display = "none";';
+		$PAGE->jsOnLoad .= '$("#row_duration").hide();';
+		$PAGE->jsOnLoad .= '$("#row_duration_other").hide();';
 	}
+	if (in_array($data['duration'], array_keys($durationOptions)))
+		$PAGE->jsOnLoad .= '$("#row_duration_other").hide();';
 	
 	$typeOptions = array();
 	foreach (enumBlockType() as $typeName => $type)
@@ -445,11 +418,9 @@ function actionEditWorkshop($wid)
 		array('richtextarea',  'description', 'Opis'. $comment                            ),
 		array('checkboxgroup', 'subjects',    'Dziedzina',    'options' => $subjectOptions),
 		array('select',        'type',        'Rodzaj',       'options' => $typeOptions,
-		                     'properties'=>'onchange="formTypeChange(this.selectedIndex)"'),
-		array('custom',        'duration',    'Czas trwania', 'custom'=>$durationControl  ),
+		                     'properties'=>'onchange="$(\'#row_duration\').toggle(this.selectedIndex=='. enumBlockType('workshop')->id .');"'),
+		array('select',        'duration',    'Czas trwania', 'options' => $durationOptions, 'other' => '[x1,5h]<span class="left">(niestandardowy czas należy<br/> skonsultować z organizatorami)</span>'),
 		array('text',          'link',        'Link do opisu na wikidot'                  ),
-		/*array('select',        'duration',    'Czas trwania',
-			'options'=>$durationOptions, 'other'=>'<small>1,5h razy</small>'),*/
 	);		
 	
 	$PAGE->title = $new ? 'Dodaj warsztaty' : 'Edytuj warsztaty';
@@ -477,6 +448,9 @@ function actionEditWorkshopForm($wid)
 		'link' => trim($_POST['link']),
 		'domain_order' => empty($_POST['subjects']) ? 0 : subjectOrder($_POST['subjects'])
 	);
+	
+	if ($data['duration'] == VALUE_OTHER) 
+		$data['duration'] = intval($_POST['duration_other']);
 	
 	if (empty($data['link']))  $data['link'] = null;
 	else if (strpos($data['link'], 'http://') !== 0  &&  strpos($data['link'], 'https://') !== 0)
