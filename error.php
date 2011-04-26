@@ -102,6 +102,10 @@ function errorParse($errno, $errstr='', $errfile='', $errline='', &$logMessage=n
 		}
 	 }
 
+	$server = '';
+	foreach ($_SERVER as $name => $value)
+		$server .= json_encode($name) ." :\t". json_encode($value) ."\n";
+	
 	if (isset($logMessage))  $logMessage = 
 	"	===WWW $err===
 		'$errstr'
@@ -113,7 +117,8 @@ function errorParse($errno, $errstr='', $errfile='', $errline='', &$logMessage=n
 		================
 		\$_GET: ". json_encode($_GET) ."
 		\$_POST: ". json_encode($_POST) ."
-		\$_SERVER: ". json_encode($_SERVER) ."
+		\$_SERVER: {\n". $server ."
+		}
 		\$_SESSION: ". json_encode($_SESSION) ."
 		================
 	";

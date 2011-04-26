@@ -251,7 +251,7 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 				foreach ($autocomplete as &$item)
 					$item = json_encode($item);
 				$autocomplete = implode(',', $autocomplete);
-				$PAGE->jsOnLoad .= '$("#school").autocomplete({minLength:1,source:['. $autocomplete.']});'."\n";
+				$PAGE->jsOnLoad .= '$("#'. $name .'").autocomplete({minLength:1,source:['. $autocomplete.']});'."\n";
 			}
 	}
 	echo $row . "</tr>";

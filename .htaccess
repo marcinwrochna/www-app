@@ -4,8 +4,15 @@ RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^(.*)$           -                                                [last,L,NE]
 
 # Warning: actions can't have the same name as a directory.
+# impersonate($1)/$2($3)
 RewriteRule ^impersonate\((.+)\)/(.+)\((.*)\)$            index.php?impersonate=$1&action=$2&args=$3&%{QUERY_STRING} [last,L,NE]
+# impersonate($1)/$2
 RewriteRule ^impersonate\((.+)\)/(.+)$                    index.php?impersonate=$1&action=$2&%{QUERY_STRING}         [last,L,NE]
+# impersonate($1)[/]
 RewriteRule ^impersonate\((.+)\)/?$                       index.php?impersonate=$1&%{QUERY_STRING}                   [last,L,NE]
+# $2($3)
 RewriteRule ^(.+)\((.*)\)$                                index.php?action=$1&args=$2&%{QUERY_STRING}                [last,L,NE]
+# $2($3 - some email clients cut the confirmRegistration(key) link
+RewriteRule ^(.+)\((.*)$                                  index.php?action=$1&args=$2&%{QUERY_STRING}                [last,L,NE]
+# $2
 RewriteRule ^(.+)$                                        index.php?action=$1&%{QUERY_STRING}                        [last,L,NE]

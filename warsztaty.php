@@ -378,6 +378,7 @@ function actionEditWorkshop($wid)
 			'duration_min' => 90,
 			'link' => 'http://warsztatywww.wikidot.com/www'. getOption('currentEdition') .':tytul-warsztatow'
 		);
+		$lecturers = array($USER['uid']);
 	}
 	else
 	{
@@ -390,6 +391,14 @@ function actionEditWorkshop($wid)
 		$data['subjects'] = $data['subjects']->fetch_column();
 	}
 	
+	foreach ($lecturers as $lecturer)
+		$data['lecturers'][]= getUserBadge($lecturer, $displayEmail);	
+	$data['lecturers'] =  implode(', ', $data['lecturers']);
+	$lecturersDescription = (count($lecturers) > 1) ? 'Prowadzą' : 'Prowadzi';
+	if ($new)
+		$lecturersDescription .= ' <small>Więcej prowadzących będzie można dodać później edytując warsztaty.</small>';
+	else 
+		$lecturersDescription .= " <a href='editWorkshopLecturers($wid)'>[zmień]</a>";
 	
 	$comment = 'Poruszana tematyka, trudność, zakres materiału, na czym będą polegać (zadania teoretyczne, kodowanie,
 		przeprowadzanie doświadczeń). Zachęcamy do wysyłania możliwie wyczerpujących opisów.';
@@ -415,6 +424,7 @@ function actionEditWorkshop($wid)
 	
 	$inputs = array(
 		array('text',          'title',       'Tytuł'                                     ),
+		array('readonly',      'lecturers',   $lecturersDescription                       ),
 		array('richtextarea',  'description', 'Opis'. $comment                            ),
 		array('checkboxgroup', 'subjects',    'Dziedzina',    'options' => $subjectOptions),
 		array('select',        'type',        'Rodzaj',       'options' => $typeOptions,
@@ -489,6 +499,104 @@ function actionEditWorkshopForm($wid)
 		actionEditWorkshop($wid);
 	}
 }
+
+function actionEditWorkshopLecturers($wid)
+{
+	global $USER, $DB, $PAGE;
+	$wid = intval($wid);
+	$lecturers = getLecturers($wid);
+	if (!userCan('editWorkshop', $lecturers))  throw new PolicyException();
+	
+	
+	
+	foreach ($lecturers as $lecturer)
+		$inputs[]= 
+			array('custom', 'uid'. $lecturer, getUserBadge($lecturer, $displayEmail),
+				'custom'=>"<a href='removeWorkshopLecturer($wid;$lecturer)'>[usuń]</a>");	
+	//$data['lecturers'] =  implode(', ', $data['lecturers']);
+	$autoCompleteData = $DB->query('
+		SELECT name FROM table_users u
+		WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=$1)
+		ORDER BY name', 'kadra')->fetch_column();
+	//throw new KnownException(json_encode($autoCompleteData));
+	$inputs[]=
+		array('text', 'lecturer', 'Imię Nazwisko lub uid', 'autocomplete' => $autoCompleteData);
+	
+	$PAGE->title = 'Dodaj/usuń prowadzących';
+	$PAGE->content .= "<a class='back' href='editWorkshop($wid)'>wróć</a>";
+	$PAGE->content .= '<h3>'. $DB->workshops($wid)->get('title') .'</h3>';
+	$form = new Form($inputs, "addWorkshopLecturer($wid)");
+	$form->submitValue = 'Dodaj';
+	$PAGE->content .= $form->getHTML(); 
+}
+
+function actionRemoveWorkshopLecturer($wid, $uid, $confirm = false)
+{
+	global $USER, $DB, $PAGE;
+	$wid = intval($wid);	
+	$uid = intval($uid);
+	$lecturers = getLecturers($wid);
+	if (!userCan('editWorkshop', $lecturers))  throw new PolicyException();
+	
+	if (!in_array($uid, $lecturers))
+		$PAGE->addMessage('Wskazany użytkownik nie należy do prowadzących.', 'userError');
+	else if (($uid == $USER['uid']) && !$confirm)
+	{
+		$PAGE->addMessage('Czy na pewno chcesz usunąć samego siebie z prowadzących?<br/>'.
+			"<a href='removeWorkshopLecturer($wid;$uid;1)' class='button'>tak</a> ".
+			"<a href='editWorkshopLecturers($wid)' class='button'>anuluj</a>",
+			'warning');
+	}
+	else
+	{
+		$DB->query('DELETE FROM table_workshop_user WHERE wid=$1 AND uid=$2', $wid, $uid);
+		$PAGE->addMessage('Pomyślnie usunięto użytkownika z prowadzących.', 'success');
+	}
+	actionEditWorkshopLecturers($wid);
+}
+
+function actionAddWorkshopLecturer($wid)
+{
+	global $USER, $DB, $PAGE;
+	$wid = intval($wid);
+	$lecturers = getLecturers($wid);
+	if (!userCan('editWorkshop', $lecturers))  throw new PolicyException();
+	
+	$lecturer = $_POST['lecturer'];
+	if (is_numeric($lecturer))
+	{
+		$uid = intval($lecturer);
+		$cnt = $DB->query('SELECT count(*) FROM table_users WHERE uid=$1', $uid)->fetch();
+		if ($cnt != 1)  throw new KnownException('Niepoprawny uid.');
+	}
+	else
+	{
+		$uid = $DB->query('SELECT uid FROM table_users WHERE name=$1', trim($lecturer))->fetch();
+		if ($uid === null)
+		{
+			$names = $DB->query('
+				SELECT uid, name FROM table_users u
+				WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=$1)
+				ORDER BY name', 'kadra')->fetch_all();		
+			$best = array('uid'=>-1, 'name'=>'?', 'dist'=>100000);
+			foreach($names as $name)
+				if (levenshtein($name['name'], $lecturer) < $best['dist'])
+					$best = array('uid'=>$name['uid'], 'name'=>$name['name'], 'dist'=>levenshtein($name['name'], $lecturer));
+			$uid = $best['uid'];
+			$PAGE->addMessage('Niedokładnie dopasowano użytkownika #'. $uid .' '. $best['name']);
+		}
+	}
+	
+	if (in_array($uid, $lecturers))
+		$PAGE->addMessage('Wskazany użytkownik już jest prowadzącym.', 'userError');
+	else
+	{
+		$DB->workshop_user[]= array('uid'=>$uid, 'wid'=>$wid, 'participant'=>enumParticipantStatus('lecturer')->id);
+		$PAGE->addMessage('Pomyślnie dodano użytkownika do prowadzących.', 'success');
+	}
+	actionEditWorkshopLecturers($wid);
+}
+
 
 function actionSignUpForWorkshop($wid)
 {
