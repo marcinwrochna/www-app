@@ -186,6 +186,7 @@ table.workshopDescription { width: inherit; }
 .box, .descriptionBox { border: 1px #AAA solid; padding: 1em; padding-left: 2em;}
 .descriptionBox { overflow: auto; }
 
+table.workshopList td { text-align: left; }
 .workshopList th, thead th {
 	border-bottom: 1px #530 solid;
 }

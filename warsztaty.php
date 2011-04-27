@@ -362,7 +362,7 @@ function actionEditWorkshop($wid)
 	
 	if ($new)
 	{
-		//showMessage('Minął termin zgłaszania propozycji, wypełniasz formularz na własną odpowiedzialność.', 'warning');
+		showMessage('Minął termin zgłaszania propozycji, wypełniasz formularz na własną odpowiedzialność.', 'warning');
 		
 		if (!userCan('createWorkshop'))  throw new PolicyException();
 		$data = array(
@@ -396,7 +396,7 @@ function actionEditWorkshop($wid)
 	$data['lecturers'] =  implode(', ', $data['lecturers']);
 	$lecturersDescription = (count($lecturers) > 1) ? 'Prowadzą' : 'Prowadzi';
 	if ($new)
-		$lecturersDescription .= ' <small>Więcej prowadzących będzie można dodać później edytując warsztaty.</small>';
+		$data['lecturers'] .= ' <small class="right">Więcej prowadzących będzie można dodać później edytując warsztaty.</small>';
 	else 
 		$lecturersDescription .= " <a href='editWorkshopLecturers($wid)'>[zmień]</a>";
 	
@@ -555,14 +555,15 @@ function actionRemoveWorkshopLecturer($wid, $uid, $confirm = false)
 	actionEditWorkshopLecturers($wid);
 }
 
-function actionAddWorkshopLecturer($wid)
+function actionAddWorkshopLecturer($wid, $confirm = false)
 {
 	global $USER, $DB, $PAGE;
 	$wid = intval($wid);
 	$lecturers = getLecturers($wid);
 	if (!userCan('editWorkshop', $lecturers))  throw new PolicyException();
 	
-	$lecturer = $_POST['lecturer'];
+	// lecturer usually passed in POST, passed here if confirming.
+	$lecturer = ($confirm === false) ? $_POST['lecturer'] : $confirm;
 	if (is_numeric($lecturer))
 	{
 		$uid = intval($lecturer);
@@ -578,12 +579,16 @@ function actionAddWorkshopLecturer($wid)
 				SELECT uid, name FROM table_users u
 				WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=$1)
 				ORDER BY name', 'kadra')->fetch_all();		
-			$best = array('uid'=>-1, 'name'=>'?', 'dist'=>100000);
+			$best = 100000;
+			$bestname = '';
 			foreach($names as $name)
-				if (levenshtein($name['name'], $lecturer) < $best['dist'])
-					$best = array('uid'=>$name['uid'], 'name'=>$name['name'], 'dist'=>levenshtein($name['name'], $lecturer));
-			$uid = $best['uid'];
-			$PAGE->addMessage('Niedokładnie dopasowano użytkownika #'. $uid .' '. $best['name']);
+				if (levenshtein($name['name'], $lecturer) < $best)
+				{
+					$best = levenshtein($name['name'], $lecturer);
+					$uid = $name['uid'];					
+					$bestname = $name['name'];
+				}
+			$PAGE->addMessage("Niedokładnie dopasowano użytkownika #$uid <i>$bestname</i>", 'info');
 		}
 	}
 	
@@ -591,8 +596,22 @@ function actionAddWorkshopLecturer($wid)
 		$PAGE->addMessage('Wskazany użytkownik już jest prowadzącym.', 'userError');
 	else
 	{
-		$DB->workshop_user[]= array('uid'=>$uid, 'wid'=>$wid, 'participant'=>enumParticipantStatus('lecturer')->id);
-		$PAGE->addMessage('Pomyślnie dodano użytkownika do prowadzących.', 'success');
+		$DB->query('SELECT count(*) FROM table_workshop_user WHERE wid=$1 AND uid=$2', $wid, $uid);
+		if ($DB->fetch() && ($confirm === false))
+		{
+			$PAGE->addMessage('Użytkownik jest już zapisany jako uczestnik. Wypisać i dodać do prowadzących?<br/>'.
+				"<a href='addWorkshopLecturer($wid;$uid)' class='button'>tak</a> ".
+				"<a href='editWorkshopLecturers($wid)' class='button'>anuluj</a>",
+				'warning');
+		}
+		else
+		{
+			if ($confirm !== false)
+				$DB->query('DELETE FROM table_workshop_user WHERE wid=$1 AND uid=$2', $wid, $uid);
+			$DB->workshop_user[]= array('uid'=>$uid, 'wid'=>$wid,
+				'participant'=>enumParticipantStatus('lecturer')->id);
+			$PAGE->addMessage('Pomyślnie dodano użytkownika do prowadzących.', 'success');
+		}
 	}
 	actionEditWorkshopLecturers($wid);
 }
