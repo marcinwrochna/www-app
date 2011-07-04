@@ -449,6 +449,8 @@ function actionEditWorkshopForm($wid)
 	global $USER, $DB, $PAGE;
 	$wid = intval($wid);
 	$new = ($wid==-1);	
+	if (empty($_POST['title']) || strlen(trim($_POST['title'])))
+		return actionEditWorkshop($wid);
 	
 	$data = array(
 		'title' => $_POST['title'],
@@ -483,7 +485,6 @@ function actionEditWorkshopForm($wid)
 				$DB->workshop_domain[]= array('wid'=>$wid, 'domain'=>$d, 'level'=>1);
 		$PAGE->addMessage('Pomyślnie dodano propozycję warsztatów. Będzie widoczna na liście po wstępnym zaakceptowaniu.', 'success');
 		logUser('workshop new', $wid);
-		actionEditWorkshop($wid);
 	}
 	else
 	{
@@ -496,8 +497,8 @@ function actionEditWorkshopForm($wid)
 				$DB->workshop_domain[]= array('wid'=>$wid, 'domain'=>$d, 'level'=>1);
 		$PAGE->addMessage('Pomyślnie zmieniono warsztaty', 'success');
 		logUser('workshop edit', $wid);
-		actionEditWorkshop($wid);
 	}
+	actionEditWorkshop($wid);
 }
 
 function actionEditWorkshopLecturers($wid)

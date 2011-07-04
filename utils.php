@@ -35,8 +35,7 @@ function actionHomepage()
 	$PAGE->title = 'Strona główna';	
 	$PAGE->headerTitle = '';	
 	$PAGE->content .= getOption('homepage');
-	
-	/* todo-list: lecturers. */	
+	$isProfileFilled = assertProfileFilled(true);	
 	$currentEdition = getOption('currentEdition');
 	$row = $DB->edition_user($currentEdition, $USER['uid']);
 	$didApplyAsLecturer = false;
@@ -50,7 +49,53 @@ function actionHomepage()
 			$didApplyAsParticipant = true;
 		$didQualify = $row->get('qualified');
 	}
+	$didApply = $didApplyAsParticipant || $didApplyAsLecturer;
 	
+	$template = new SimpleTemplate();
+	
+	/* todo-list: participants. */
+	$query = 'SELECT count(*)
+		FROM table_workshops w, table_workshop_user wu
+		WHERE w.wid=wu.wid AND w.edition=$1 AND wu.uid=$2 AND
+			(wu.participant>=$3) AND w.status>=$4';
+	$DB->query($query, $currentEdition, $USER['uid'],
+		enumParticipantStatus('candidate')->id, enumBlockStatus('ok')->id);
+	$didSignup = $DB->fetch() >= 4;
+	$DB->query($query, $currentEdition, $USER['uid'],
+		enumParticipantStatus('accepted')->id, enumBlockStatus('ok')->id);
+	$didTasks = $DB->fetch() >= 4;
+	$mLetter = $DB->users[$USER['uid']]->get('motivationletter');	
+	$words = str_word_count(strip_tags($mLetter));
+	$didWriteMLetter = ($words > getOption('motivationLetterWords'));
+	$MLetterText = ' list motywacyjny.';
+	if (!$didWriteMLetter && $words)
+		$MLetterText =' dłuższy list motywacyjny. (napisał'. gender('e') .'ś '. 
+			$words .' < '. getOption('motivationLetterWords') .' słów)';
+	$didEverything = (($didSignup && $didWriteMLetter) || $didQualify) && $didApplyAsParticipant;
+	
+	$elements = applyDefaultHeaders(
+		array('done',                 'enabled',           'action',                     'notDoneText', 'doneText', 'commonText'),
+		array(
+			array($didApplyAsParticipant, !$didApply,             'applyAsParticipant',      'Zgłoś', 'Zgłosił%ś', ' się jako uczestnik.'),
+			array($isProfileFilled,       $didApplyAsParticipant, 'editProfile',             'Wypełnij', 'Wypełnił%ś', ' profil.'),
+			array($didSignup,             $didApplyAsParticipant, 'listPublicWorkshops',     'Zapisz', 'Zapisał%ś', ' się na co najmniej 4 bloki warsztatowe.'),		
+			array($didWriteMLetter,       true,                   'showQualificationStatus', 'Napisz', 'Napisał%ś', $MLetterText, ),
+			array($didTasks,              $didSignup,             null,                      'Rozwiąż', 'Rozwiązał%ś', ' zadania kwalifikacyjne (do 10 lipca).'),
+			array($didQualify,            $didEverything,         null,                      'Czekaj na wyniki.', 'Został%ś zakwalifikowan%.', ''),
+		)
+	);
+	foreach ($elements as $i => &$element)
+		if($i && !is_null($element['done']))
+			$element['done'] = $element['done'] && $didApplyAsParticipant;
+	
+	echo '<h4>Chcesz tylko uczestniczyć w warsztatach?</h4><ul class="todoList">';
+	if (!in_array('registered', $USER['roles']))
+		echo '<li><a href="register">Załóż konto</a>/zaloguj się.</li>';
+	foreach ($elements as &$element)
+		echo buildTodoElement($element);	
+	echo '</ul><br/>';	
+		
+	/* todo-list: lecturers. */		
 	$DB->query('
 		SELECT count(*)
 		FROM table_workshops w, table_workshop_user wu
@@ -64,50 +109,60 @@ function actionHomepage()
 		WHERE w.wid=wu.wid AND w.edition=$1 AND wu.uid=$2 AND wu.participant=$3 AND w.status>=$4',
 		$currentEdition, $USER['uid'], enumParticipantStatus('lecturer')->id, enumBlockStatus('ok')->id
 	);
-	$didGetAccepted = $DB->fetch() > 0;*/
+	$didGetAccepted = $DB->fetch() > 0;*/	
+	$didCreateWorkshop = $didCreateWorkshop && $didApplyAsLecturer;
+	$didQualify = $didQualify && $didApplyAsLecturer;
 	
-	$elements = array(
-		array('applyAsLecturer', 'Zgłoś', 'Zgłosił%ś', ' się jako kadra.', $didApplyAsLecturer),
-		array($didApplyAsLecturer, 'Wypełnij profil.'),
-		array('createWorkshop', 'Zaproponuj', 'Zaproponował%ś', ' blok warsztatowy (do 15 kwietnia).', $didCreateWorkshop),
-		array($didCreateWorkshop, 'Czekaj na wstępną akceptację.', 'Wstępnie zaakceptowano Twój blok warsztatowy.', '', $didQualify),
-		array($didCreateWorkshop, 'Napisz opis dla uczestników na wikidocie (do 1 maja).'),
-		array($didQualify, 'Napisz (do 10 maja) i sprawdź (do 10 lipca) zadania kwalifikacyjne.'),
+	$elements = applyDefaultHeaders(
+		array('done',              'enabled',           'action',          'notDoneText', 'doneText', 'commonText'),
+		array(
+			array($didApplyAsLecturer, !$didApply,          'applyAsLecturer', 'Zgłoś', 'Zgłosił%ś', ' się jako kadra.'),
+			array($isProfileFilled, $didApplyAsLecturer, 'editProfile',     'Wypełnij', 'Wypełnił%ś', ' profil.'),
+			array($didCreateWorkshop,  true,                'createWorkshop',  'Zaproponuj', 'Zaproponował%ś', ' blok warsztatowy (do 15 kwietnia).'),
+			array($didQualify,         $didCreateWorkshop,  null,              'Czekaj na wstępną akceptację.', 'Wstępnie zaakceptowano Twój blok warsztatowy.', ''),
+			array(null,                $didCreateWorkshop,  null,              'Napisz', 'Napisał%ś', ' opis dla uczestników na wikidocie (do 1 maja).'),
+			array(null,                $didQualify,         null,              '', '', 'Napisz (do 10 maja) i sprawdź (do 10 lipca) zadania kwalifikacyjne.', ),
+		)
 	);
-	
-	$template = new SimpleTemplate();
+	foreach ($elements as $i => &$element)
+		if($i && !is_null($element['done']))
+			$element['done'] = $element['done'] && $didApplyAsLecturer;
 	echo '<h4>Chcesz poprowadzić warszaty?</h4><ul class="todoList">';
 	if (!in_array('registered', $USER['roles']))
 		echo '<li><a href="register">Załóż konto</a>/zaloguj się.</li>';	
-	foreach ($elements as $element)
+	foreach ($elements as &$element)
 		echo buildTodoElement($element);
 	echo '</ul>';	
 	echo 'Jeżeli blok warsztatowy ma prowadzić więcej osób, to jedna z nich powinna dodać propozycję
-		i podpiąć do niej pozostałych prowadzących.<br/><br/>';
-	
-	/* todo-list: participants. */
-	$didSignup = false;
-	$didWriteMotivationLetter = false;
-	$didEverything = ($didSignup && $didWriteMotivationLetter) || $didQualify;
-	
-	$elements = array(
-		array('applyAsParticipant', 'Zgłoś', 'Zgłosił%ś', ' się jako uczestnik (od 1 maja).', $didApplyAsParticipant),
-		array($didApplyAsParticipant, 'Wypełnij profil.'),
-		array($didApplyAsParticipant, 'Zapisz', 'Zapisał%ś', ' się na co najmniej 4 bloki warsztatowe.', $didSignup),		
-		array('showQualificationStatus', 'Napisz', 'Napisał%ś', ' list motywacyjny.', $didWriteMotivationLetter),
-		array($didSignup, 'Rozwiąż zadania kwalifikacyjne (10 maja - 5 lipca).'),
-		array($didEverything, 'Czekaj na wyniki.', 'Został%ś zakwalifikowan%.', '', $didQualify),
-	);
-	
-	echo '<h4>Chcesz tylko uczestniczyć w warsztatach?</h4><ul class="todoList">';
-	if (!in_array('registered', $USER['roles']))
-		echo '<li><a href="register">Załóż konto</a>/zaloguj się.</li>';
-	foreach ($elements as $element)
-		echo buildTodoElement($element);	
-	echo '</ul>';
+		i podpiąć do niej pozostałych prowadzących. Na wikidot trzeba mieć wikidotowe konto.';
 	
 	$PAGE->content .= $template->finish();
 }
+
+function buildTodoElement($element)
+{
+	global $USER;
+	// arguments: 'done', 'enabled', 'action', 'doneText', 'notDoneText', 'commonText'
+	foreach ($element as $key => $val)
+		$$key = $val;
+		
+	if ($action)
+		$enabled = $enabled && userCan($action);
+		
+	if (!is_null($done))
+		$class = $done ? 'done' : ($enabled ? 'todo' : 'disabled');
+	else 
+		$class = $enabled ? 'enabled' : 'disabled';
+	if (!in_array('registered', $USER['roles']))
+		$class  = 'disabled';		
+	
+	if ($enabled && $action)
+		$notDoneText = "<a href='$action'>$notDoneText</a>";
+	$result = ($done ? $doneText : $notDoneText) . $commonText;
+	$result = genderize	($result);
+	return "<li class='$class'>$result</li>";
+}
+
 
 function actionApplyAsLecturer()
 {
@@ -329,4 +384,10 @@ function validEmail($email)
     }
     if (DEBUG<1 && !(checkdnsrr($domain,"MX") ||  checkdnsrr($domain,"A")))  return false; // domain not found in DNS
     return true;
+}
+
+function dbg($o)
+{
+	global $PAGE;
+	$PAGE->addMessage(htmlspecialchars(json_encode($o)));
 }

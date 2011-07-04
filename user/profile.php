@@ -86,6 +86,7 @@ function actionPasswordResetForm()
 function actionEditProfile($uid = null)
 {
 	global $USER, $PAGE, $DB;
+	$currentEdition = getOption('currentEdition');
 	$admin = true;
 	if (is_null($uid))
 	{
@@ -100,13 +101,20 @@ function actionEditProfile($uid = null)
 	}
 		
 	$maturaYearOptions = getMaturaYearOptions();
-	$roleOptions = array(
-		'admin'=>'Admin','tutor'=>'Tutor','kadra'=>'Kadra', 'uczestnik'=>'Uczestnik',
-		'akadra'=>'Aktywna kadra',
-		'jadący'=>'Jadąc'. gender('y','a',$DB->users[$uid]->get('gender'))
-	);
 	
 	$genderOptions = array('m' => 'męski', 'f' => 'żeński');
+	$rolesOptions = array(
+		'admin'=>'Admin',
+		'tutor'=>'Tutor',
+		'jadący'=>'Jadąc'. gender('y','a',$DB->users[$uid]->get('gender'))
+	);
+	$roleOptions = array(
+		'none'=>'Nikt',
+		'uczestnik'=>'Uczestnik',
+		'auczestnik'=>'Zakwalifikowany uczestnik',
+		'kadra'=>'Kadra',
+		'akadra'=>'Zakwalifikowana kadra',
+	);
 	
 	$impersonate = '<a href="impersonate('. $uid .')/" '.
 		getTipJS('wykonuje wszystko dokładnie, jakby Cię zalogować jako ta osoba') .'>impersonuj</a>';
@@ -123,7 +131,8 @@ function actionEditProfile($uid = null)
 		array('text',         'email',          'email',              !$admin),
 		array('custom',       'password',       'hasło',              true, 'hidden'=>$admin, 'default'=>'<a href="changePassword">zmień</a>'),
 		array('select',       'gender',         'rodzaj gramatyczny', 'options'=>$genderOptions),
-		array('checkboxgroup','roles',          'role',               !$admin, 'options'=>$roleOptions),
+		array('select',       'role',           'rola w obecnej edycji', !$admin, 'options'=>$roleOptions, 'notdb'=> true),
+		array('checkboxgroup','roles',          'role',               'options'=>$rolesOptions, 'hidden'=>!$admin),
 		array('text',         'school',         'szkoła/kierunek studiów', 'autocomplete'=>$schoolsAutoCompleteData),
 		array('select',       'maturayear',     'rocznik (ściślej: rok zdania matury)', 'options'=>$maturaYearOptions, 'other'=>''),
 		array('text',         'skadwieszowww',  'skąd wiesz o WWW?'),
@@ -138,14 +147,38 @@ function actionEditProfile($uid = null)
 	if ($form->submitted())
 	{
 		$values = $form->fetchValues();
-		$values['maturayear'] = intval($values['maturayear']);			
+		$values['maturayear'] = intval($values['maturayear']);
+		$role = $values['role'];
+		unset($values['role']);
 		$DB->users[$uid]->update($values);		
 		if ($admin)
 		{
-			$DB->query('DELETE FROM table_user_roles WHERE uid=$1', $uid);
 			if (isset($_POST['roles']) && is_array($_POST['roles'])) //test for empty checkboxGroup
-				foreach ($_POST['roles'] as $role)
-					$DB->user_roles[]= array('uid'=>$uid,'role'=>$role);
+				$roles = $_POST['roles'];
+			
+			if ($role == 'none')
+				$DB->edition_user($currentEdition, $uid)->delete();
+			else
+			{
+				$value = array(
+					'qualified' => in_array($role, array('auczestnik', 'akadra')) ? 1 : 0,
+					'lecturer' => in_array($role, array('kadra', 'akadra')) ? 1 : 0
+				);
+				$roles[]= $value['lecturer'] ? 'kadra' : 'uczestnik';
+				if ($role == 'akadra')  $roles[]='akadra';
+				
+				if ($DB->edition_user($currentEdition, $uid)->count())
+					$DB->edition_user($currentEdition, $uid)->update($value);
+				else 
+				{
+					$value['edition'] = $currentEdition; $value['uid'] = $uid;
+					$DB->edition_user[]= $value;
+				}
+			}
+			
+			$DB->query('DELETE FROM table_user_roles WHERE uid=$1', $uid);
+			foreach ($roles as $role)
+				$DB->user_roles[]= array('uid'=>$uid,'role'=>$role);
 		}
 		$PAGE->addMessage('Pomyślnie zmieniono profil.', 'success');
 		logUser('user edit', $uid);
@@ -154,6 +187,14 @@ function actionEditProfile($uid = null)
 	$form->values = $DB->users[$uid]->assoc($form->getColumns().',confirm');
 	$roles = $DB->query('SELECT role FROM table_user_roles WHERE uid=$1', $uid);
 	$form->values['roles'] = $roles->fetch_column();
+	$row = $DB->edition_user($currentEdition, $uid);
+	if (!$row->count())
+		$form->values['role'] = 'none';
+	else
+	{
+		$form->values['role'] =  $row->get('qualified') ? 'a' : '';
+		$form->values['role'] .= $row->get('lecturer') ? 'kadra' : 'uczestnik';
+	}
 	if ($admin)
 	{
 		if ($form->values['confirm'] > 0)

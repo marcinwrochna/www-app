@@ -22,7 +22,8 @@ abstract class DB
 	protected function __construct($connectParams)
 	{
 		if (!$this->connect($connectParams))
-			throw new DbException('Połączenie z bazą danych nie powiodło się.');
+			throw new KnownException('Połączenie z bazą danych nie powiodło się.<br/>
+			<pre>'. $this->last_error() .'</pre>');
 	}
 	abstract public function connect($connectParams);
 	

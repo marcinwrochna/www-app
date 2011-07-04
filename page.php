@@ -120,38 +120,3 @@ function showMessage($text, $type='unknown')
 	global $PAGE;
 	$PAGE->addMessage($text, $type);	
 }
-
-function buildTodoElement($element)
-{
-	global $USER;
-	
-	$class = 'enabled';
-	if (is_bool($element[0]))
-		$class = $element[0] ? 'enabled' : 'disabled';
-	else if (is_string($element[0]))
-		$class = userCan($element[0]) ? 'enabled' : 'disabled';
-	if (count($element) == 5 && $class == 'enabled')
-		$class = $element[4] ? 'done' : 'todo';
-	if (!in_array('registered', $USER['roles']))
-		$class = 'disabled';
-		
-	$result = "<li class='$class'>";
-	if (count($element) == 2)
-		$result .= $element[1];
-	else
-	{
-		if ($element[4])
-		{
-			$s = str_replace('%ś', gender('eś','aś'), $element[2]);
-			$result .= str_replace('%', gender('y','a'), $s);
-		}
-		else if (is_string($element[0]) && $class != 'disabled')
-			$result .= "<a href='${element[0]}'>${element[1]}</a>";
-		else 
-			$result .= $element[1];
-		$result .= $element[3];
-	}
-	$result .= "</li>";
-	return $result;
-}
-

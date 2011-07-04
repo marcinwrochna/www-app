@@ -69,7 +69,7 @@ class Form
 	{
 		$columns = array();
 		foreach ($this->rows as $row)
-			if (!in_array($row['type'], array('checkboxgroup', 'custom')))
+			if (!in_array($row['type'], array('checkboxgroup', 'custom')) && empty($row['notdb']))
 				$columns[]= '"'. $row['name'] .'"';
 		return implode(',', $columns);
 	}

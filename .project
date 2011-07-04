@@ -14,21 +14,24 @@ description=
 run_cmd=
 
 [files]
-current_page=5
-FILE_NAME_0=1408;None;0;16;1;1;0;/var/www/html/www/www/todo.txt;0;4
+current_page=9
+FILE_NAME_0=447;None;0;16;1;1;0;/var/www/html/www/www/todo.txt;0;4
 FILE_NAME_1=384;PHP;0;16;1;1;0;/var/www/html/www/www/tutoring.php;0;4
-FILE_NAME_2=12259;PHP;0;16;1;1;0;/var/www/html/www/www/update.php;0;4
+FILE_NAME_2=12793;PHP;0;16;1;1;0;/var/www/html/www/www/update.php;0;4
 FILE_NAME_3=0;PHP;0;16;1;1;0;/var/www/html/www/www/install.php;0;4
 FILE_NAME_4=2522;PHP;0;16;1;1;0;/var/www/html/www/www/log.php;0;4
-FILE_NAME_5=16881;PHP;0;16;1;1;0;/var/www/html/www/www/warsztaty.php;0;4
-FILE_NAME_6=50;PHP;0;16;1;1;0;/var/www/html/www/www/tasks.php;0;4
-FILE_NAME_7=3808;PHP;0;16;1;1;0;/var/www/html/www/www/enum.php;0;4
-FILE_NAME_8=4856;PHP;0;16;1;1;0;/var/www/html/www/www/utils.php;0;4
-FILE_NAME_9=6182;CSS;0;16;1;1;0;/var/www/html/www/www/css.css;0;4
-FILE_NAME_10=6930;PHP;0;16;1;1;0;/var/www/html/www/www/user/admin.php;0;4
-FILE_NAME_11=1172;PHP;0;16;1;1;0;/var/www/html/www/www/page.php;0;4
-FILE_NAME_12=2625;PHP;0;16;1;1;0;/var/www/html/www/www/user/profile.php;0;4
-FILE_NAME_13=7427;PHP;0;16;1;1;0;/var/www/html/www/www/form.php;0;4
+FILE_NAME_5=11018;PHP;0;16;1;1;0;/var/www/html/www/www/warsztaty.php;0;4
+FILE_NAME_6=6876;PHP;0;16;1;1;0;/var/www/html/www/www/user/profile.php;0;4
+FILE_NAME_7=3921;CSS;0;16;1;1;0;/var/www/html/www/www/css.css;0;4
+FILE_NAME_8=3289;PHP;0;16;1;1;0;/var/www/html/www/www/page.php;0;4
+FILE_NAME_9=948;PHP;0;16;1;1;0;/var/www/html/www/www/user/utils.php;0;4
+FILE_NAME_10=2195;PHP;0;16;1;1;0;/var/www/html/www/www/enum.php;0;4
+FILE_NAME_11=90;PHP;0;16;1;1;0;/var/www/html/www/www/notify.php;0;4
+FILE_NAME_12=331;PHP;0;16;1;1;0;/var/www/html/www/www/index.php;0;4
+FILE_NAME_13=1738;PHP;0;16;1;1;0;/var/www/html/www/www/config.php;0;4
+FILE_NAME_14=10609;PHP;0;16;1;1;0;/var/www/html/www/www/tasks.php;0;4
+FILE_NAME_15=3221;PHP;0;16;1;1;0;/var/www/html/www/www/user.php;0;4
+FILE_NAME_16=0;None;0;16;1;1;0;/var/www/html/www/www/.htaccess;0;4
 
 [long line marker]
 long_line_behaviour=1

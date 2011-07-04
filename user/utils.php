@@ -14,28 +14,29 @@ function userCan($action, $owner=false)
 	return (count(array_intersect($roles,$required->fetch_column()))>0);
 }
  
-function assertProfileFilled()
+function assertProfileFilled($quiet = false)
 {
 	global $USER, $DB, $PAGE;
 	$user = $DB->users[$USER['uid']]->assoc('school,maturayear,zainteresowania');
 	
 	if (empty($user['maturayear']) || empty($user['school']) || empty($user['zainteresowania']))
 	{
-		$PAGE->addMessage('Wypełnij najpierw wszystkie dane w <a href="editProfile">profilu</a>!',
-			'userError');
+		if (!$quiet)
+			$PAGE->addMessage('Wypełnij najpierw wszystkie dane w <a href="editProfile">profilu</a>!',
+				'userError');
 		return false;
 	}
 	return true;
 }
 
-function gender($m='y', $f='a', $gender=null)
+function gender($m='y', $f='a', $gender='user')
 {
 	global $USER;
-	if (is_null($gender))  $gender = $USER['gender'];
+	if ($gender === 'user')  $gender = $USER['gender'];
 	return ($gender==='f'?$f:$m);
 }
 
-function genderize($s, $gender=null)
+function genderize($s, $gender='user')
 {
 	$s = str_replace('%ś', gender('eś','aś',$gender), $s);
 	$s = str_replace('%', gender('y','a',$gender), $s);

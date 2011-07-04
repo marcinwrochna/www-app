@@ -6,7 +6,7 @@ coś z /tinymce
 Signup/Resign button rights are inconsistent.
 There's a sick amount of w1_users_login_key indexes in local pgdb
 upversion notify.php, tasks, check everything.
-Finish homepage todo-lists.
+Forms shouldn't be sent when POST is empty. (workaround in actionEditWorkshopForm)
 
 Zlecone:
 - sortowanie po nazwisku (lub chociaż po imieniu) tabelek wypluwanych przez aplikację

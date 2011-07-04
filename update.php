@@ -289,6 +289,20 @@ switch ($version)
 	case(35):
 		$DB->query('DELETE FROM table_user_roles WHERE role=\'uczestnik\'');
 		setVersion(36);
-		
-		//insertPermission('registered', 'applyAsParticipant');
+	case(36):
+		insertPermission('registered', 'applyAsParticipant');
+		setVersion(37);
+	case(37):
+		$DB->query('UPDATE table_edition_user SET qualified=1 WHERE uid IN
+			(SELECT wu.uid FROM table_workshop_user wu, table_workshops w
+				WHERE w.wid=wu.wid AND w.edition=$1 AND wu.participant=$2 
+				AND w.status>=$3 ORDER BY w.wid
+			)',
+			getOption('currentEdition'), enumParticipantStatus('lecturer')->id, enumBlockStatus('ok')->id);
+		setVersion(38);	
+	case(38):
+		$DB->query('DELETE FROM table_user_roles WHERE role=\'akadra\'');
+		$DB->query('INSERT INTO table_user_roles (SELECT uid, \'akadra\' AS role FROM table_edition_user
+			WHERE qualified=1 AND lecturer=1 AND edition=$1)', getOption('currentEdition'));
+		setVersion(39);
 }

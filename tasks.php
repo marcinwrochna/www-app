@@ -29,6 +29,7 @@ function buildTaskList($wid)
 	}
 	echo '<div class="descriptionBox">'. parseUserHTML($taskComment) .'</div>';
 	
+	$participant = $DB->workshop_user($wid, $USER['uid'])->get('participant') == enumParticipantStatus('candidate')->id;
 	
 	echo '<table class="tasks">';
 	$tasks = $DB->query('SELECT * FROM table_tasks WHERE wid=$1 ORDER BY tid', $wid);
@@ -166,7 +167,7 @@ function actionDeleteTask($wid, $tid, $confirmed = false)
 	{	
 		$PAGE->addMessage('Czy na pewno chcesz usunąć poniższe zadanie?<br/>'.
 		 	'<a class="button" href="deleteTask('. $wid .';'. $tid .';true)">Tak</a> '.
-		 	'<a class="button" href="showWorkshop('. $wid .')">Anuluj</a>',
+		 	'<a class="button" href="showWorkshopTasks('. $wid .')">Anuluj</a>',
 		 	'warning');
 		 $PAGE->title = 'Usuwanie zadania';
 		 $description = $DB->tasks($wid,$tid)->get('description');
@@ -181,7 +182,7 @@ function actionDeleteTask($wid, $tid, $confirmed = false)
 		$DB->tasks($wid,$tid)->delete();
 		$PAGE->addMessage('Usunięto zadanie.', 'success');
 		logUser('task delete', $wid);
-		actionShowWorkshop($wid);
+		actionShowWorkshopTasks($wid);
 	}
 }
 
@@ -235,7 +236,7 @@ function actionEditSolution($wid, $tid)
 	$form->submitValue = 'Zapisz';
 	$form->values = $data;
 	
-	$PAGE->content .= '<a class="back" href="showWorkshop('. $wid .')">wróć</a>';
+	$PAGE->content .= '<a class="back" href="showWorkshopTasks('. $wid .')">wróć</a>';
 	$PAGE->content .= 'Zadanie '. $tid .' z <b>'. $DB->workshops[$wid]->get('title') .'</b><br/>';
 	$PAGE->content .= 'treść <div class="descriptionBox">'. parseUserHTML($task['description']) .'</div>';
 	$PAGE->content .= $feedback;	
@@ -271,7 +272,7 @@ function buildParticipantList($wid)
 	global $DB, $PAGE;
 	$wid = intval($wid);
 	$template = new SimpleTemplate();
-	$DB->query('SELECT wu.uid, wu.participant, u.gender
+	$DB->query('SELECT wu.uid, wu.participant, wu.points, u.gender
 		FROM table_workshop_user wu, table_users u
 		WHERE wu.uid=u.uid AND wu.wid=$1 AND wu.participant>0
 		ORDER BY regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\'), u.uid', $wid);
@@ -298,13 +299,13 @@ function buildParticipantList($wid)
 	echo '<table style="border-top: 1px black solid">';
 	echo '<thead><tr><th>uczestnik</th>';
 	foreach ($tasks as $tid)  echo "<th>$tid</th>";
-	echo '<th>ogólnie</th></tr></thead><tbody>';
+	echo '<th>punktów (0..100)</th><th>ogólnie</th></tr></thead><tbody>';
 	$kadra = array();
 	foreach ($participants as $participant)
 	{
 		$uid = $participant['uid'];
 		$status = $participant['participant'];
-		if (count($DB->user_roles($uid, 'kadra')))
+		if (count($DB->user_roles($uid, 'kadra'))) // TODO role=kadra to edition_user.lecturer=1
 		{			
 			if ($status != enumParticipantStatus('lecturer')->id)
 				$kadra[$uid]= getUserBadge($uid);
@@ -324,6 +325,7 @@ function buildParticipantList($wid)
 				$s = EnumSolutionStatus($solutions[$tid]);
 				echo '<td>'. getIcon($s->icon, $s->description) .'</td>';
 			}
+			echo '<td>'. $participant['points'] .'</td>';
 			$desc = EnumParticipantStatus($status)->description;
 			$desc = str_replace('%', gender('y','a', $participant['gender']), $desc);
 			$icon = getIcon('arrow-right.png',	'zobacz i oceń rozwiązania', "showTaskSolutions($wid;$uid)");
@@ -338,6 +340,78 @@ function buildParticipantList($wid)
 	
 	return $template->finish();
 }
+
+function actionShowPointsTable()
+{
+	global $DB, $PAGE;
+	$PAGE->title = 'Podsumowanie punktów';
+	$template = new SimpleTemplate();
+	$DB->query('SELECT wu.uid, wu.wid, wu.participant, wu.points, w.title, u.name
+		FROM table_workshops w, table_workshop_user wu, table_users u
+		WHERE wu.uid=u.uid AND w.edition=$1 AND wu.wid=w.wid AND wu.points IS NOT NULL 
+		ORDER BY regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\'), u.uid, wu.wid',
+		getOption('currentEdition'));
+	$data = $DB->fetch_all();
+	if (empty($data))
+	{
+		$PAGE->content .= 'Brak danych (nikt nikogo nie ocenił w tej edycji).';
+		return;
+	}
+	
+	$dataByUid = array();
+	$titles = array();
+	foreach ($data as $row)
+	{
+		if (!is_array($dataByUid[$row['uid']]))
+			$dataByUid[$row['uid']] = array('points' => array(), 'name' => $row['name']);
+		$dataByUid[$row['uid']]['points'][$row['wid']]= $row['points'];
+		$titles[$row['wid']] = $row['title'];
+	}
+	ksort($titles);
+	$wids = array_keys($titles);
+	echo '<table style="text-align: center"><thead><tr><th></th>';
+	foreach ($wids as $wid)
+		echo '<th><a '. getTipJS($titles[$wid]) .'>'. $wid .'</th>';
+	echo '</thead><tbody>';
+	$class = 'third';	
+	foreach ($dataByUid as $uid => $user)
+	{
+		echo '<tr class="'. $class .'"><td>'. $user['name'] .'</td>';
+		$tdclass = 'third';
+		foreach ($wids as $wid)
+		{
+			echo '<td class="'. $tdclass .'">';
+			echo isset($user['points'][$wid]) ? $user['points'][$wid] : '-';
+			echo '</td>';
+			$tdclass = ($tdclass=='even')?'odd':(($tdclass=='odd')?'third':'even');
+		}
+		$class = ($class=='even')?'odd':(($class=='odd')?'third':'even');
+	}
+	// A row to equalize column widths.
+	echo '<tr style="visibility: hidden"><td></td><td></td>';
+	foreach ($wids as $wid)
+	echo '<td>0000</td>';
+	echo '</tr>';
+		
+	echo '</tbody></table>';
+	
+	
+	echo '<table><thead><tr><th>#</th><th>tytuł</th></thead><tbody>';
+	foreach ($titles as $wid => $title)
+		echo "<tr><td>$wid</td><td>$title</td></tr>";
+	echo '</tbody></table>';
+	
+	$PAGE->content .= $template->finish();
+}
+
+/*function getShort($s)
+{
+	$s = explode(' ', $s);
+	$r = '';
+	foreach ($s as $e)
+			$r .= mb_substr($e, 0, 1, 'utf8');
+	return $r;
+}*/
 
 function actionEditTasksComment($wid)
 {
@@ -364,7 +438,7 @@ function actionEditTasksCommentForm($wid)
 	checkUserCanEditTasks($wid);
 	$DB->workshops[$wid]->update(array('tasks_comment'=>$_POST['tasks_comment']));
 	$PAGE->addMessage('Pomyślnie zapisano komentarz do zadań.', 'success');
-	actionShowWorkshop($wid);
+	actionShowWorkshopTasks($wid);
 }
 
 function actionShowTaskSolutions($wid, $uid)
@@ -384,7 +458,7 @@ function actionShowTaskSolutions($wid, $uid)
 		array('readonly', 'workshop',     'warsztaty', 'default' => $DB->workshops[$wid]->get('title')),
 		array('readonly', 'name',         'uczestnik', 'default' => getUserBadge($uid, true)),
 		array('select',   'participant',  'status',	'options' => $statusOptions),
-		array('int',      'points',       'punktów <small>(0..20)</small>'),
+		array('int',      'points',       'punktów <small>(0..100)</small>'),
 		array('textarea', 'admincomment', 'komentarz tylko dla organizatorów')
 	));
 	$form->action = "showTaskSolutionsForm($wid;$uid)";
@@ -392,7 +466,7 @@ function actionShowTaskSolutions($wid, $uid)
 	$form->submitValue = 'Zapisz';
 	
 	$PAGE->title = 'Rozwiązania zadań';
-	$PAGE->content .= '<a class="back" href="showWorkshop('. $wid .')">wróć</a>';
+	$PAGE->content .= '<a class="back" href="showWorkshopTasks('. $wid .')">wróć</a>';
 	$PAGE->content .= '<h3>Ogólnie</h3>';
 	$PAGE->content .= $form->getHTML();
 	$PAGE->content .= '<br/>';
@@ -483,7 +557,8 @@ function actionEditSolutionsGradeForm($wid,$uid,$tid,$submitted)
 	
 	checkUserCanEditTasks($wid);
 	
-	$DB->task_solutions($wid, $uid, $tid, $submitted)->update(array(
+	dbg($DB->task_solutions($wid, $tid, $uid, $submitted)->count());
+	$DB->task_solutions($wid, $tid, $uid, $submitted)->update(array(
 		'status' => $_POST['status'],
 		'grade' => $_POST['grade'],
 		'feedback' => $_POST['feedback']

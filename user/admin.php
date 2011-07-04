@@ -16,6 +16,7 @@ function addAdminMenuBox()
 		array('lista danych personalnych', 'listPersonalData', null, $admin),
 		array('lista dot. dojazdów',       'listArrivalData',  null, $admin),
 		array('lista dot. posiłków',       'listDailyCounts',  null, $admin),
+		array('podsumowanie punktów',      'showPointsTable',  null, $admin),
 	));
 }
 

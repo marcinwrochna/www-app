@@ -124,7 +124,7 @@ function addUserMenuBox()
 	global $USER, $PAGE, $DB;
 	$items = array(
 		array('profil',         'editProfile',             'user-green.png', userCan('editProfile',$USER['uid'])),
-		array('kwalifikacja',   'showQualificationStatus', 'qual.png'           ),
+		array('list motywacyjny',   'showQualificationStatus', 'qual.png'           ),
 		array('dodatkowe dane', 'editAdditionalInfo',      'page-white-edit.png')
 	);
 	$custom = '';
@@ -158,6 +158,11 @@ function actionRegister()
 function actionRegisterConfirm($confirmkey)
 {
 	global $DB, $PAGE;
+	if (!is_numeric($confirmkey) || $confirmkey<2)
+	{
+		$PAGE->addMessage('Wpisany link nie zawiera numerku, skopiuj cały link z maila.', 'userError');	
+		return;
+	}
 	$DB->query('UPDATE table_users SET confirm=0 WHERE confirm=$1', $confirmkey);
 	$PAGE->addMessage('Pomyślnie dokończono rejestrację. Możesz się teraz zalogować.', 'success');
 	return;
@@ -222,13 +227,12 @@ function actionShowQualificationStatus()
 {
 	if (!userCan('showQualificationStatus'))  throw new PolicyException();
 	global $USER, $PAGE, $DB;
-	$PAGE->title = 'Kwalifikacja';
+	$PAGE->title = 'List motywacyjny';
 	if (!assertProfileFilled())  return;
 		
 	$inputs = array(
 		array('type'=>'richtextarea', 'name'=>'motivationletter', 'description'=>
-				'<h3>List motywacyjny</h3>
-				Napisz ('. getOption('motivationLetterWords') .'-300 słów)<br/>
+				'Napisz ('. getOption('motivationLetterWords') .'-300 słów)<br/>
 				1. Czego oczekuję od Warsztatów?<br/>
 				2. Jakie są moje zainteresowania naukowe?<br/>'),
 		array('type'=>'textarea', 'name'=>'proponowanyreferat', 'description'=>
@@ -245,57 +249,14 @@ function actionShowQualificationStatus()
 
 	if ($form->submitted())
 	{
-		$DB->users[$USER['uid']] = $form->fetchValues();
+		$DB->users[$USER['uid']]->update($form->fetchValues());
 		$PAGE->addMessage('Pomyślnie zapisano list motywacyjny.', 'success');
 		logUser('user edit3');		
-	}	
-	
-	showQualificationStatus();
+	}
 	
 	$form->values = $DB->users[$USER['uid']]->assoc($form->getColumns());
 	$form->submitValue = 'Zapisz';
 	$PAGE->content .= $form->getHTML();
-}
-
-
-function showQualificationStatus()
-{
-	global $USER,$DB,$PAGE;
-	$data = $DB->users[$USER['uid']]->assoc('motivationletter,proponowanyreferat');	
-	$template = new SimpleTemplate();
-	?>
-		<h3>Status</h3>
-		<p>
-		<?php
-			// Sprawdź istnienie i długość listu motywacyjnego.
-			$length = strlen(trim(strip_tags($data['motivationletter'])));
-			$words = str_word_count(strip_tags($data['motivationletter']));
-			if (!$length)
-				echo getIcon('arrow-small.gif') .' Napisz list motywacyjny.';
-			else if ($words < getOption('motivationLetterWords'))
-				echo getIcon('arrow-small.gif') .' Napisz dłuższy list motywacyjny. ('.
-					'napisał'. gender('e') .'ś '.
-					$words .' < '. getOption('motivationLetterWords') .' słów)';
-			else
-				echo getIcon('checkmark.gif') .' List motywacyjny ok.';
-			echo '<br/>';
-			
-			// Sprawdź liczbę i długość zapisanych warsztatów.
-			$result = $DB->query('SELECT COUNT(*) AS count, SUM(duration) AS sum
-				FROM table_workshops w, table_workshop_user wu
-				WHERE w.status=4 AND wu.wid=w.wid AND wu.uid=$1', $USER['uid']);
-			$result = $result->fetch_assoc();			
-			if ($result['count']<4)
-				echo getIcon('arrow-small.gif') .' Zarejestruj się na więcej warsztatów.'.
-					' (masz '. $result['count']. ' < 4)';
-			else
-				echo getIcon('checkmark.gif') .' Zapisy na warsztaty ok.';
-			echo '<br/>';
-			
-		?>
-		</p>		
-	<?php
-	$PAGE->content .= $template->finish();	
 }
 
 function actionEditAdditionalInfo($uid = null)
