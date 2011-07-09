@@ -299,7 +299,7 @@ function buildParticipantList($wid)
 	echo '<table style="border-top: 1px black solid">';
 	echo '<thead><tr><th>uczestnik</th>';
 	foreach ($tasks as $tid)  echo "<th>$tid</th>";
-	echo '<th>punktów (0..100)</th><th>ogólnie</th></tr></thead><tbody>';
+	echo '<th>punktów (0..6)</th><th>ogólnie</th></tr></thead><tbody>';
 	$kadra = array();
 	foreach ($participants as $participant)
 	{
@@ -458,7 +458,7 @@ function actionShowTaskSolutions($wid, $uid)
 		array('readonly', 'workshop',     'warsztaty', 'default' => $DB->workshops[$wid]->get('title')),
 		array('readonly', 'name',         'uczestnik', 'default' => getUserBadge($uid, true)),
 		array('select',   'participant',  'status',	'options' => $statusOptions),
-		array('int',      'points',       'punktów <small>(0..100)</small>'),
+		array('int',      'points',       'punktów <small>(0..6)</small>'),
 		array('textarea', 'admincomment', 'komentarz tylko dla organizatorów')
 	));
 	$form->action = "showTaskSolutionsForm($wid;$uid)";

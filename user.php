@@ -112,7 +112,7 @@ function addLoginMenuBox()
 					<input class="inputText"  type="password" name="password"/><br/>
 					<input class="inputButton"  type="submit" value="Zaloguj"/><br/>
 					<a href="register">zarejestruj się</a><br/>
-					<a href="passwordReset">zapomniałem hasła</a>				
+					<a href="passwordReset">zapomniałem/am hasła</a>				
 			</form>
 		</div>
 	<?php

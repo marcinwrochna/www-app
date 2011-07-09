@@ -14,24 +14,33 @@ description=
 run_cmd=
 
 [files]
-current_page=9
+current_page=24
 FILE_NAME_0=447;None;0;16;1;1;0;/var/www/html/www/www/todo.txt;0;4
 FILE_NAME_1=384;PHP;0;16;1;1;0;/var/www/html/www/www/tutoring.php;0;4
-FILE_NAME_2=12793;PHP;0;16;1;1;0;/var/www/html/www/www/update.php;0;4
+FILE_NAME_2=12379;PHP;0;16;1;1;0;/var/www/html/www/www/update.php;0;4
 FILE_NAME_3=0;PHP;0;16;1;1;0;/var/www/html/www/www/install.php;0;4
 FILE_NAME_4=2522;PHP;0;16;1;1;0;/var/www/html/www/www/log.php;0;4
-FILE_NAME_5=11018;PHP;0;16;1;1;0;/var/www/html/www/www/warsztaty.php;0;4
-FILE_NAME_6=6876;PHP;0;16;1;1;0;/var/www/html/www/www/user/profile.php;0;4
-FILE_NAME_7=3921;CSS;0;16;1;1;0;/var/www/html/www/www/css.css;0;4
-FILE_NAME_8=3289;PHP;0;16;1;1;0;/var/www/html/www/www/page.php;0;4
-FILE_NAME_9=948;PHP;0;16;1;1;0;/var/www/html/www/www/user/utils.php;0;4
-FILE_NAME_10=2195;PHP;0;16;1;1;0;/var/www/html/www/www/enum.php;0;4
-FILE_NAME_11=90;PHP;0;16;1;1;0;/var/www/html/www/www/notify.php;0;4
-FILE_NAME_12=331;PHP;0;16;1;1;0;/var/www/html/www/www/index.php;0;4
-FILE_NAME_13=1738;PHP;0;16;1;1;0;/var/www/html/www/www/config.php;0;4
-FILE_NAME_14=10609;PHP;0;16;1;1;0;/var/www/html/www/www/tasks.php;0;4
-FILE_NAME_15=3221;PHP;0;16;1;1;0;/var/www/html/www/www/user.php;0;4
-FILE_NAME_16=0;None;0;16;1;1;0;/var/www/html/www/www/.htaccess;0;4
+FILE_NAME_5=1492;PHP;0;16;1;1;0;/var/www/html/www/www/user/profile.php;0;4
+FILE_NAME_6=3921;CSS;0;16;1;1;0;/var/www/html/www/www/css.css;0;4
+FILE_NAME_7=3289;PHP;0;16;1;1;0;/var/www/html/www/www/page.php;0;4
+FILE_NAME_8=948;PHP;0;16;1;1;0;/var/www/html/www/www/user/utils.php;0;4
+FILE_NAME_9=3445;PHP;0;16;1;1;0;/var/www/html/www/www/enum.php;0;4
+FILE_NAME_10=90;PHP;0;16;1;1;0;/var/www/html/www/www/notify.php;0;4
+FILE_NAME_11=331;PHP;0;16;1;1;0;/var/www/html/www/www/index.php;0;4
+FILE_NAME_12=988;PHP;0;16;1;1;0;/var/www/html/www/www/config.php;0;4
+FILE_NAME_13=3221;PHP;0;16;1;1;0;/var/www/html/www/www/user.php;0;4
+FILE_NAME_14=0;None;0;16;1;1;0;/var/www/html/www/www/.htaccess;0;4
+FILE_NAME_15=6465;PHP;0;16;1;1;0;/var/www/html/www/www/error.php;0;4
+FILE_NAME_16=662;PHP;0;16;1;1;0;/var/www/html/www/www/common.php;0;4
+FILE_NAME_17=11018;PHP;0;16;1;1;0;/var/www/html/www/www/warsztaty.php;0;4
+FILE_NAME_18=0;PHP;0;16;1;1;0;/var/www/html/www/www/database.php;0;4
+FILE_NAME_19=1310;PHP;0;16;1;1;0;/var/www/html/www/www/database/postgresql.php;0;4
+FILE_NAME_20=0;PHP;0;16;1;1;0;/var/www/html/www/www/utils.php;0;4
+FILE_NAME_21=8052;PHP;0;16;1;1;0;/var/www/html/www/www/tasks.php;0;4
+FILE_NAME_22=2267;PHP;0;16;1;1;0;/var/www/html/www/www/plan.php;0;4
+FILE_NAME_23=811;PHP;0;16;1;1;0;/var/www/html/www/www/user/admin.php;0;4
+FILE_NAME_24=3449;PHP;0;16;1;1;0;/var/www/html/www/www/form.php;0;4
+FILE_NAME_25=856;PHP;0;16;1;1;0;/var/www/html/www/www/template.php;0;4
 
 [long line marker]
 long_line_behaviour=1

@@ -25,8 +25,6 @@
 				echo $template->finish();
 		class Page extends SimpleTemplate - used as global $PAGE
 				
-		generateFormRows($inputs, $previous=array())
-		buildFormRow()
 		
 		getTipJS($tip) - returns a " onmouseout=... onmouseover=... " string.
 		getIcon($name, $tip=false, $href=false) - returns an icon from images/icons/, with optionally a tip and <a href>.

@@ -9,9 +9,9 @@ function actionChangePassword()
 	if (!in_array('registered', $USER['roles']))  throw new PolicyException();
 	$PAGE->title = 'Zmień hasło';
 	$form = new Form(array(
-		array('stare hasło', 'oldpassword', 'password'),
-		array('nowe hasło', 'newpassword', 'password'),
-		array('powtórz hasło', 'newpassword_repeat', 'password')
+		array('password', 'oldpassword', 'stare hasło'),
+		array('password', 'newpassword', 'nowe hasło'),
+		array('password', 'newpassword_repeat', 'powtórz hasło')
 	), 'changePasswordForm');
 	$form->submitValue = 'Zmień';
 	$PAGE->content .= $form->getHTML();
@@ -46,8 +46,8 @@ function actionPasswordReset()
 	$PAGE->title = 'Resetuj hasło';	
 	$PAGE->content .= 'Wpisz swój login lub email - dostaniesz wiadomość z nowym hasłem.';
 	$form = new Form(array(
-		array('login', 'login', 'text'),
-		array('email', 'email', 'text'),
+		array('text', 'login', 'login'),
+		array('text', 'email', 'email'),
 	), 'passwordResetForm');
 	$PAGE->content .= $form->getHTML();
 }

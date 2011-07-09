@@ -39,10 +39,12 @@ class Form
 			'columnWidth' => $this->columnWidth,
 			'custom' => $this->custom,
 			'submitValue' => $this->submitValue,
+			'formid' => $this->getFormId(),
 		);
 		$template = new SimpleTemplate($params);
 		?>
 		<form method="post" action="%action%" name="form" id="theform">
+			<input type="hidden" name="formid" value="%formid%" />
 			<?php if (is_null($this->columnWidth)) : ?>		
 				<table>
 			<?php else: ?>
@@ -60,9 +62,9 @@ class Form
 		return $template->finish();
 	}
 	
-	public static function submitted()
+	public function submitted()
 	{
-		return isset($_POST['formsubmitted']);
+		return isset($_POST['formid']) && ($_POST['formid'] == $this->getFormId());
 	}
 	
 	public function getColumns()
@@ -109,6 +111,11 @@ class Form
 		}
 		return $values;
 	}
+	
+	public function getFormId()
+	{
+		return sha1($this->action);
+	}
 }
 
 function generateFormRows($inputs, $previous=array())
@@ -116,7 +123,7 @@ function generateFormRows($inputs, $previous=array())
 	foreach ($inputs as $row)
 	{
 		if (isset($row['name']))  $arguments = $row;
-		else  $arguments = array('type'=>$row[2], 'name'=>$row[1], 'description'=>$row[0]);
+		else  $arguments = array('type'=>$row[0], 'name'=>$row[1], 'description'=>$row[2]);
 		if (isset($arguments['readonly']) && $arguments['readonly'] && isset($arguments['default']))
 			; // w starych formularzach czasami pola informujące ustawione mają zawartość w 'default' zamiast w previous
 		else if (isset($previous[$arguments['name']]) && !is_null($previous[$arguments['name']]))
