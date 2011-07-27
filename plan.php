@@ -17,10 +17,14 @@ function actionShowPlan()
 
 function actionShowCorrelation()
 {
+	global $DB, $PAGE;
 	$r = db_query('SELECT wid,title FROM table_workshops WHERE type=1 AND status=4 ORDER BY title');
-	$workshops = db_fetch_all($r);
+	$DB->query('SELECT wid,title  FROM table_workshops
+	            WHERE edition=$1 AND type=$2 AND status=$3  ORDER BY title',
+		getOption('currentEdition'), enumBlockType('workshop')->id, enumBlockStatus('great')->id
+	);
+	$workshops = $DB->fetch_all();
 	
-	global $PAGE;
 	$PAGE->title = 'Macierz korelacji';
 	$PAGE->content .=  'Dla każdej pary warsztatów (z listy publicznych) wyświetlana jest liczba
 		\'jadących\' uczestników zakwalifikowanych na oba. Prowadzący i kadrowicze też się liczą.
@@ -37,22 +41,22 @@ function actionShowCorrelation()
 	$PAGE->content .= '</tr>';
 	foreach($workshops as $w)
 	{
-		$r = db_query_params('
+		$DB->query('
 			SELECT w.wid,w.title, 
 				(SELECT COUNT(*) FROM w1_users u WHERE 
 					EXISTS (SELECT * FROM w1_user_roles r WHERE u.uid=r.uid AND role=\'jadący\') AND
 					EXISTS (SELECT * FROM w1_workshop_user wu WHERE u.uid=wu.uid AND wu.wid=w.wid AND (lecturer>0 OR participant>=3)) AND
 					EXISTS (SELECT * FROM w1_workshop_user wu WHERE u.uid=wu.uid AND wu.wid=$1 AND (lecturer>0 OR participant>=3))) AS cnt
 			FROM table_workshops w
-			WHERE w.type=1 AND w.status=4
+			WHERE edition=$2 AND w.type=$3 AND w.status=$4
 			ORDER BY w.title',
-			array($w['wid'])
+			$w['wid'], getOption('currentEdition'), enumBlockType('workshop')->id, enumBlockStatus('great')->id
 		);
 		
 		$PAGE->content .= '<tr class="'. $class .'" id="w'. $w['wid']. '">';
 		$PAGE->content .= '<td><b>'. $w['wid'] .'</b></td><td>'. $w['title'] .'</td>';
 		$tdclass = 'third';
-		while ($row = db_fetch_assoc($r)) {
+		while ($row = $DB->fetch_assoc()) {
 			$PAGE->content .= '<td class="'. $tdclass .'" id="w'.$row['wid'].'_w'.$w['wid'].'">';
 			if ($row['wid'] == $w['wid'])  $PAGE->content .= '<span class="diagonal">';
 			$PAGE->content .= intval($row['cnt']);

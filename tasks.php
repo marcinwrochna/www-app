@@ -29,7 +29,10 @@ function buildTaskList($wid)
 	}
 	echo '<div class="descriptionBox">'. parseUserHTML($taskComment) .'</div>';
 	
-	$participant = $DB->workshop_user($wid, $USER['uid'])->get('participant') == enumParticipantStatus('candidate')->id;
+	$participant = $DB->workshop_user($wid, $USER['uid'])->get('participant');
+	$isParticipant = ($participant == enumParticipantStatus('candidate')->id) || 
+	                 ($participant == enumParticipantStatus('accepted')->id)  || 
+	                 ($participant == enumParticipantStatus('rejected')->id);
 	
 	echo '<table class="tasks">';
 	$tasks = $DB->query('SELECT * FROM table_tasks WHERE wid=$1 ORDER BY tid', $wid);
@@ -45,7 +48,7 @@ function buildTaskList($wid)
 			echo getIcon('plugin-delete.png', 'usuń zadanie', 'deleteTask'. $params);			
 			echo '</td>';
 		}		
-		if ($participant && userCan('sendTaskSolution'))
+		if ($isParticipant && userCan('sendTaskSolution'))
 		{
 			echo '<td>';
 			$DB->query('SELECT status, grade FROM table_task_solutions
@@ -194,6 +197,7 @@ function actionEditSolution($wid, $tid)
 	
 	$participant = $DB->workshop_user($wid, $USER['uid'])->get('participant');
 	if (!$participant)  throw new PolicyException();
+	$isCandidate = ($participant == enumParticipantStatus('candidate')->id);
 
 	$task = $DB->tasks($wid, $tid)->assoc('*');
 	$DB->query("SELECT * FROM table_task_solutions
@@ -226,11 +230,11 @@ function actionEditSolution($wid, $tid)
 		if (!empty($solutions[0]['grade']))
 			$feedback .= 'ocena: '. htmlspecialchars($solutions[0]['grade']) .'<br/>';
 		if (!empty($solutions[0]['feedback']))
-			$feedback .= 'komentarz: '. htmlspecialchars($solutions[0]['feedback']) .'<br/>';
+			$feedback .= 'komentarz: <div class="descriptionBox">'. htmlspecialchars($solutions[0]['feedback']) .'</div><br/>';
 	}
 	
 	$form = new Form(array(
-		array('richtextarea', 'solution', 'rozwiązanie &nbsp; <small>(edytor umożliwia załączanie plików)</small>')
+		array('richtextarea', 'solution', 'rozwiązanie &nbsp; <small>(edytor umożliwia załączanie plików)</small>'),
 	));
 	$form->action = "editSolutionForm($wid;$tid)";
 	$form->submitValue = 'Zapisz';
@@ -238,9 +242,12 @@ function actionEditSolution($wid, $tid)
 	
 	$PAGE->content .= '<a class="back" href="showWorkshopTasks('. $wid .')">wróć</a>';
 	$PAGE->content .= 'Zadanie '. $tid .' z <b>'. $DB->workshops[$wid]->get('title') .'</b><br/>';
-	$PAGE->content .= 'treść <div class="descriptionBox">'. parseUserHTML($task['description']) .'</div>';
+	$PAGE->content .= 'treść: <div class="descriptionBox">'. parseUserHTML($task['description']) .'</div>';
 	$PAGE->content .= $feedback;	
-	$PAGE->content .= $form->getHTML();
+	if ($isCandidate)
+		$PAGE->content .= $form->getHTML();
+	else
+		$PAGE->content .= 'rozwiązanie <div class="descriptionBox">'. $data['solution'] .'</div>';
 }
 
 function actionEditSolutionForm($wid, $tid)
@@ -561,7 +568,8 @@ function actionEditSolutionsGradeForm($wid,$uid,$tid,$submitted)
 	$DB->task_solutions($wid, $tid, $uid, $submitted)->update(array(
 		'status' => $_POST['status'],
 		'grade' => $_POST['grade'],
-		'feedback' => $_POST['feedback']
+		'feedback' => $_POST['feedback'],
+		'notified' => 2
 	));
 	$PAGE->addMessage("Pomyślnie zapisano informacje o zadaniu $tid.", 'success');
 	actionShowTaskSolutions($wid, $uid);

@@ -1,6 +1,6 @@
 
 [indentation]
-indent_width=4
+indent_width=3
 indent_type=1
 indent_hard_tab_width=8
 detect_indent=false
@@ -17,7 +17,7 @@ run_cmd=
 current_page=24
 FILE_NAME_0=447;None;0;16;1;1;0;/var/www/html/www/www/todo.txt;0;4
 FILE_NAME_1=384;PHP;0;16;1;1;0;/var/www/html/www/www/tutoring.php;0;4
-FILE_NAME_2=12379;PHP;0;16;1;1;0;/var/www/html/www/www/update.php;0;4
+FILE_NAME_2=13679;PHP;0;16;1;1;0;/var/www/html/www/www/update.php;0;4
 FILE_NAME_3=0;PHP;0;16;1;1;0;/var/www/html/www/www/install.php;0;4
 FILE_NAME_4=2522;PHP;0;16;1;1;0;/var/www/html/www/www/log.php;0;4
 FILE_NAME_5=1492;PHP;0;16;1;1;0;/var/www/html/www/www/user/profile.php;0;4
@@ -28,7 +28,7 @@ FILE_NAME_9=3445;PHP;0;16;1;1;0;/var/www/html/www/www/enum.php;0;4
 FILE_NAME_10=90;PHP;0;16;1;1;0;/var/www/html/www/www/notify.php;0;4
 FILE_NAME_11=331;PHP;0;16;1;1;0;/var/www/html/www/www/index.php;0;4
 FILE_NAME_12=988;PHP;0;16;1;1;0;/var/www/html/www/www/config.php;0;4
-FILE_NAME_13=3221;PHP;0;16;1;1;0;/var/www/html/www/www/user.php;0;4
+FILE_NAME_13=8970;PHP;0;16;1;1;0;/var/www/html/www/www/user.php;0;4
 FILE_NAME_14=0;None;0;16;1;1;0;/var/www/html/www/www/.htaccess;0;4
 FILE_NAME_15=6465;PHP;0;16;1;1;0;/var/www/html/www/www/error.php;0;4
 FILE_NAME_16=662;PHP;0;16;1;1;0;/var/www/html/www/www/common.php;0;4
@@ -38,10 +38,10 @@ FILE_NAME_19=1310;PHP;0;16;1;1;0;/var/www/html/www/www/database/postgresql.php;0
 FILE_NAME_20=0;PHP;0;16;1;1;0;/var/www/html/www/www/utils.php;0;4
 FILE_NAME_21=8052;PHP;0;16;1;1;0;/var/www/html/www/www/tasks.php;0;4
 FILE_NAME_22=2267;PHP;0;16;1;1;0;/var/www/html/www/www/plan.php;0;4
-FILE_NAME_23=811;PHP;0;16;1;1;0;/var/www/html/www/www/user/admin.php;0;4
-FILE_NAME_24=3449;PHP;0;16;1;1;0;/var/www/html/www/www/form.php;0;4
+FILE_NAME_23=8902;PHP;0;16;1;1;0;/var/www/html/www/www/user/admin.php;0;4
+FILE_NAME_24=576;PHP;0;16;1;1;0;/var/www/html/www/www/form.php;0;4
 FILE_NAME_25=856;PHP;0;16;1;1;0;/var/www/html/www/www/template.php;0;4
 
 [long line marker]
-long_line_behaviour=1
+long_line_behaviour=2
 long_line_column=100

@@ -305,4 +305,18 @@ switch ($version)
 		$DB->query('INSERT INTO table_user_roles (SELECT uid, \'akadra\' AS role FROM table_edition_user
 			WHERE qualified=1 AND lecturer=1 AND edition=$1)', getOption('currentEdition'));
 		setVersion(39);
+	case(39):
+		$DB->query('ALTER TABLE table_users ADD COLUMN lastmodification int');
+		$DB->query('UPDATE table_users SET lastmodification = 
+			(SELECT MAX(l.time) FROM w1_log l WHERE l.type=\'user edit2\' AND l.uid=w1_users.uid)');
+		setVersion(40);
+	case(40):
+		// Change type of table_users.comments to text.
+		$DB->query('ALTER TABLE table_users ADD column tmp text');
+		$DB->query('UPDATE table_users SET tmp = comments');
+		$DB->query('ALTER TABLE table_users DROP column comments');
+		$DB->query('ALTER TABLE table_users ADD column comments text');
+		$DB->query('UPDATE table_users SET comments = tmp');
+		$DB->query('ALTER TABLE table_users DROP column tmp');
+		setVersion(41);
 }

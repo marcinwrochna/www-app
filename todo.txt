@@ -1,5 +1,4 @@
 Top priority:
-check update30: insertPermission(admin-impersonate, registered-editTutoringApplication)
 check update: uploader/ubr.php s/db_insert/$DB->users_insert/
 nieznana akcja: 500.shtml
 coś z /tinymce

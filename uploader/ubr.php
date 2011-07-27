@@ -149,7 +149,7 @@ function buildUberUploadHead($path_to_redirect)
 
 function getUploadInfo()
 {
-	global $TEMP_DIR, $USER, $_INI;
+	global $TEMP_DIR, $DB, $USER, $_INI;
 	if (!isset($_GET['upload_id']) || !preg_match("/^[a-zA-Z0-9]{32}$/", $_GET['upload_id']))
 		return false;
 	$UPLOAD_ID = $_GET['upload_id'];
@@ -171,14 +171,14 @@ function getUploadInfo()
 		$file = get_object_vars($fileinfo);
 		$file['realname'] = $_POST_DATA[$slot];
 		$files[] = $file;
-		$DB->uploads->insert(array(
+		$DB->uploads[]= array(
 			'filename' => $file['name'],
 			'realname' => $file['realname'],
 			'size' => $file['size'],
 			'filename' => $file['name'],
 			'uploader' => $USER['uid'],
 			'utime' => time()
-		));
+		);
 	}
 	//POST {"myuploaddir":"uploader\/files\/","upfile_1273473433362":"shortkehrli.txt"}
 	//FILE {"upfile_1273473364588":{"slot":"upfile_1273473364588","name":"shortkehrli.txt","size":"24714","type":"text\/plain","status":"1","status_desc":"OK"}}

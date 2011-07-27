@@ -262,9 +262,9 @@ function actionShowQualificationStatus()
 function actionEditAdditionalInfo($uid = null)
 {
 	global $USER, $DB, $PAGE;
-	if (!userCan('editAdditionalInfo'))  throw new PolicyException();
+	if (!userCan('editAdditionalInfo') && !userCan('adminUsers'))  throw new PolicyException();
 	$admin = true;
-	if (is_null($uid))
+	if (is_null($uid) || $uid == $USER['uid'])
 	{
 		$uid = intval($USER['uid']);
 		$admin = false;
@@ -277,9 +277,9 @@ function actionEditAdditionalInfo($uid = null)
 	}
 	
 	$tshirtsizes = array('XS','S','M','L','XL','XXL');
-	$tshirtsizes = array_combine($tshirtsizes,$tshirtsizes);	
+	$tshirtsizes = array_combine($tshirtsizes, $tshirtsizes);	
 	
-	$starttime = strtotime('2010/08/19 00:00');
+	$starttime = strtotime('2011/08/08 00:00');
 	$mealhours = array(9=>'śniadanie', 14=>'obiad', 19=>'kolacja');
 	$stayoptions = array();
 	// Warsztaty mają 11 dni [0..10].
@@ -318,7 +318,9 @@ function actionEditAdditionalInfo($uid = null)
 	
 	if ($form->submitted() && !$admin)
 	{
-		$DB->users[$uid] = $form->fetchValues();
+		$values = $form->fetchValues();
+		$values['lastmodification'] = time();
+		$DB->users[$uid]->update($values);
 		$PAGE->addMessage('Pomyślnie zapisano dane.', 'success');
 		logUser('user edit2', $uid);		
 	}

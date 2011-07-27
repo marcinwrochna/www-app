@@ -17,8 +17,8 @@ $count = 0;
 while (($row = $result->fetch_assoc()) !== false)
 {
 	$count++;
-	$wid = $row['wid'];
-	$uid = $row['uid'];
+	$wid = intval($row['wid']);
+	$uid = intval($row['uid']);
 	
 	$address = array();
 	$r = $DB->query('SELECT u.name, u.email FROM table_users u, table_workshop_user wu
@@ -29,7 +29,7 @@ while (($row = $result->fetch_assoc()) !== false)
 		$address[]= array($lecturer['name'], $lecturer['email']);
 	
 	$workshop = $DB->workshops($wid)->get('title');
-	$user = $DB->users($uid)->get('name, login, email, gender');
+	$user = $DB->users($uid)->assoc('name, login, email, gender');
 	$title = 'Rozwiązania zadań ('. $user['name'] .')';
 	$email = $user['name']. ' ('. $user['email'] .') wysłał'. gender('','a',$user['gender']);
 	$email .= " rozwiązania zadań kwalifikacyjnych do warsztatów\n$workshop\n";
@@ -52,4 +52,39 @@ while (($row = $result->fetch_assoc()) !== false)
 	echo "Sent email to $address<br/>\n";
 }
 echo "$count emails in total.<br/>\n";
+	
+
+$result = $DB->query('SELECT wid,uid FROM table_task_solutions '.
+	'WHERE notified=2 GROUP BY wid,uid');
+$count = 0;
+while (($row = $result->fetch_assoc()) !== false)
+{
+	$count++;
+	$wid = intval($row['wid']);
+	$uid = intval($row['uid']);
+	$address = array($DB->users($uid)->assoc('name,email'));
+	$workshop = $DB->workshops($wid)->get('title');
+	$title = 'Rozwiązania zadań ('. $workshop .')';
+	$email = "Oceniono Twoje rozwiązania zadań kwalifikacyjnych do warsztatów\n$workshop\n";
+	$email .= "Wszystkie informacje na\n";
+	$email .= "http://warsztatywww.nstrefa.pl/showWorkshopTasks($wid)\n\n";
+	$email .= "--------\n(poniżej streszczenie, ale coś mogło się już zmienić)\n\n";
+	$r = $DB->query('SELECT tid, submitted, status, grade, feedback FROM table_task_solutions WHERE '.
+	 "wid=$wid AND uid=$uid AND notified=2");
+	$r = $DB->fetch_all($r);
+	foreach ($r as $task)
+	{
+		$email .= "Zadanie ". $task['tid'] .". (". strftime('%a %T', $task['submitted']) .")\n";		
+		$email .= "status: ". EnumSolutionStatus($task['status'])->description ."\n";
+		$email .= "ocena: ". $task['grade'] ."\n";
+		$email .= "komentarz:\n". $task['feedback'];
+		$email .= "\n\n";
+	}
+	$DB->query('UPDATE table_task_solutions SET notified = 3 WHERE wid=$1 AND uid=$2 AND notified=2', $wid,$uid);
+	
+	sendMail($title, $email, $address);
+	$address = json_encode($address);
+	echo "Sent (grade) email to $address<br/>\n";
+}
+echo "$count (grade) emails in total.<br/>\n";
 	

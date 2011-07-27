@@ -274,28 +274,39 @@ function actionListArrivalData($comments = true)
 			$PAGE->content .= '<a href="listArrivalData(1)">z uwagami</a>';
 	}
 	$users = $DB->query('
-		SELECT u.uid, u.name, u.telephone, u.parenttelephone, u.staybegin, u.stayend, u.gatherplace, u.comments
+		SELECT u.uid, u.name, u.telephone, u.parenttelephone, u.staybegin, u.stayend, u.gatherplace, u.comments, u.lastmodification
 		FROM table_users u
 		WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
 		ORDER BY u.gatherplace DESC, u.staybegin, regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')	
 	');	
 		
 	$PAGE->content .= '<table class="bordered"><thead><tr><th>imię i nazwisko</th><th>komórka</th>'.
-		'<th>przyjazd</th><th>wyjazd</th><th>zbiórka</th>'. ($comments?'<th>uwagi</th>':'') .
+		'<th>przyjazd</th><th>wyjazd</th><th>zbiórka</th>'.
+		($comments?'<th>uwagi</th><th>ost. zmiana</th>':'') .
 		'</tr></thead>';
 	foreach ($users as $user)
 	{
-		$starttime = strtotime('2010/08/19 00:00');
+		$starttime = strtotime('2011/08/08 00:00');
 		if (!is_null($user['staybegin']))
 			$user['staybegin'] = strftime('%a %d. %H:00', $starttime + 3600*$user['staybegin']);
 		if (!is_null($user['stayend']))
-			$user['stayend'  ] = strftime('%a %d. %H:00', $starttime + 3600*$user['stayend'  ]);
+			$user['stayend']   = strftime('%a %d. %H:00', $starttime + 3600*$user['stayend']  );
+		if (!is_null($user['lastmodification']))
+		{
+			$t = $user['lastmodification'];			
+			$user['lastmodification'] = strftime('%Y-%m-%d', $t);
+			// Highlight if older than 300 days
+			if ($t < time() -  300 * 24 * 60 * 60)
+				$user['lastmodification'] = '<span style="color:#a00">'. $user['lastmodification'] . '</span>';
+		}
 		if ($user['gatherplace'] == 'none')
 			$user['gatherplace'] = ' - ';
+		else
+			$user['gatherplace'] = ucfirst($user['gatherplace']);
 		$PAGE->content .= formatAssoc(
 			'<tr class="'. alternate('even','odd') .'"><td>%name%</td><td>%telephone%</td>'.
 			'<td>%staybegin%</td><td>%stayend%</td><td>%gatherplace%</td>'.
-			($comments?'<td>%comments%</td>':'').
+			($comments?'<td>%comments%</td><td>%lastmodification%</td>':'').
 			'</tr>',
 			$user
 		);
@@ -323,7 +334,7 @@ function actionListDailyCounts()
 		&nbsp; &nbsp; a nie tuż po kolacji, to należy patrzeć na kolumnę <i>kolacja</i>)';
 	$PAGE->content .= '<table class="bordered" style="width:auto">';
 	$PAGE->content .= '<thead><tr><th>dzień</th>';
-	$starttime = strtotime('2010/08/19 00:00');
+	$starttime = strtotime('2011/08/08 00:00');
 	$mealhours = array(9=>'śniadanie', 14=>'obiad', 19=>'kolacja');	
 	foreach ($mealhours as $meal)
 		$PAGE->content .= '<th>'. $meal .'</th>';

@@ -23,13 +23,9 @@ class Form
 	
 	public function addRow($row) //$type, $name, $description
 	{
-		if (is_array($row))
-			$this->rows[]= applyDefaultKeys($row, array('type','name','description','readonly'));
-		else 
-		{
+		if (!is_array($row))
 			$row = func_get_args();
-			$this->rows[]= applyDefaultKeys($row, array('type','name','description', 'readonly'));
-		}
+		$this->rows[]= applyDefaultKeys($row, array('type','name','description','readonly'));
 	}
 	
 	public function getHTML()
