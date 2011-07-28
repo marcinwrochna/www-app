@@ -2,7 +2,7 @@
 /*
  * user/admin.php
  */
- 
+
 function addAdminMenuBox()
 {
 	global $PAGE, $USER;
@@ -24,7 +24,7 @@ function actionAdminUsers($filterBy = null)
 {
 	global $USER, $DB, $PAGE;
 	if (!userCan('adminUsers'))  throw new PolicyException();
-	
+
 	$roledefs = array(
 		'admin' => array('Adm','administrator'),
 		'kadra' => array('K','kadra (bez zaakceptowanych warsztatów)'),
@@ -33,28 +33,28 @@ function actionAdminUsers($filterBy = null)
 		'tutor' => array('T','tutor'),
 		'jadący' => array('j','jadący')
 	);
-	
+
 	$where = 'WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid)';
 	if (isset($filterBy) && $filterBy == 'all')
 		$where = '';
 	if (isset($filterBy) && in_array($filterBy, array_keys($roledefs)))
 		$where = 'WHERE EXISTS (SELECT * FROM table_user_roles r
 			WHERE r.uid=u.uid AND r.role=\''. $filterBy .'\')';
-	
-	
+
+
 	$PAGE->title = 'Zarządzanie użytkownikami';
 	$template = new SimpleTemplate();
 	echo '<a href="adminUsers(all)">wszystkie konta</a><br/>';
-	
+
 	$users = $DB->query("SELECT u.uid, u.name, u.email, u.motivationletter, u.proponowanyreferat
-	                 FROM table_users u $where ORDER BY u.uid");	
+	                 FROM table_users u $where ORDER BY u.uid");
 	$users = $users->fetch_all();
 	$mails = array();
 	foreach ($users as $row)
 		$mails[]= $row['name'] .' <'.$row['email'] .'>';
 	$mails = htmlspecialchars(implode(', ', $mails));
 	echo '<a href="mailto:'. $mails .'" '. getTipJS($mails) .'>link "mailto:"</a><br/>';
-	
+
 	?>
 	<table>
 	<tr>
@@ -70,24 +70,24 @@ function actionAdminUsers($filterBy = null)
 			$row['roles'] = '';
 			foreach ($r->fetch_column() as $role)
 				$row['roles'] .= "<a href='adminUsers($role)' ".
-					getTipJS($roledefs[$role][1]) .">".	$roledefs[$role][0] ."</a> ";			
-			
+					getTipJS($roledefs[$role][1]) .">".	$roledefs[$role][0] ."</a> ";
+
 			$row['ml_words'] = str_word_count(strip_tags($row['motivationletter']));
 			$row['pr_chars'] = strlen($row['proponowanyreferat']);
 			$row['class'] = $class;
-			
+
 			$sub = new SimpleTemplate($row);
 			?><tr class='%class%'>
 				<td>%uid%</td><td>%name%</td><td>%email%</td><td>%roles%</td>
 				<td>%ml_words%</td><td>%pr_chars%</td>
 				<td>
-					<a href='editProfile(%uid%)'>edytuj</a> 
-					<a href='editUserStatus(%uid%)'>status</a> 
+					<a href='editProfile(%uid%)'>edytuj</a>
+					<a href='editUserStatus(%uid%)'>status</a>
 					<a href='editAdditionalInfo(%uid%)'>dane</a>
 				</td>
 			</tr><?php
 			echo $sub->finish();
-				
+
 			$class = ($class=='even')?'odd':'even';
 		}
 	?></table>
@@ -110,24 +110,24 @@ function actionEditUserStatus($uid)
 	$user['maturayeartext'] = '('. $user['maturayear'] .')';
 	$maturaYearOptions = getMaturaYearOptions();
 	if (array_key_exists(strval($user['maturayear']), $maturaYearOptions))
-		$user['maturayeartext'] = $maturaYearOptions[$user['maturayear']];	
-	$user['jadący'] = (array_search('jadący', $user['roles']) !== false) ? 'checked="checked"' : '';	
-	$user['genderya'] = gender('y','a',$user['gender']);	
-		
+		$user['maturayeartext'] = $maturaYearOptions[$user['maturayear']];
+	$user['jadący'] = (array_search('jadący', $user['roles']) !== false) ? 'checked="checked"' : '';
+	$user['genderya'] = gender('y','a',$user['gender']);
+
 	$user['workshops'] = '<table>';
 	$workshops = $DB->query('
 		SELECT w.wid, w.title, w.duration, wu.*
 		FROM table_workshop_user wu, table_workshops w
 		WHERE w.edition=$1 AND w.wid=wu.wid AND uid=$2', getOption('currentEdition'), $uid);
-	foreach ($workshops as $row) 
-	{	
+	foreach ($workshops as $row)
+	{
 		if ($row['lecturer'])
 			$row['status'] = genderize('prowadząc%', $user['gender']);
 		else
 			$row['status'] = genderize(enumParticipantStatus($row['participant'])->description, $user['gender']);
 		if (!empty($row['admincomment']))
 			$row['comment'] = '<a '. getTipJS($row['admincomment']) .'>(komentarz)</a>';
-		else 
+		else
 			$row['comment'] = '';
 		$template = new SimpleTemplate($row);
 		?><tr>
@@ -139,17 +139,17 @@ function actionEditUserStatus($uid)
 		$user['workshops'] .= $template->finish();
 	}
 	$user['workshops'] .= '</table>';
-	
+
 
 	$PAGE->title = $user['name'] . ' - kwalifikacja';
 	if (userCan('adminUsers'))
-		$PAGE->headerTitle = getUserHeader($uid, $user['name'], 'editUserStatus'); 
-	$template = new SimpleTemplate($user);	
+		$PAGE->headerTitle = getUserHeader($uid, $user['name'], 'editUserStatus');
+	$template = new SimpleTemplate($user);
 	 ?>
 		<span class="left">%badge% (%login%) &nbsp; %email%</span>
 		<span class="right">%school% - %maturayeartext%</span><br/>
-		
-		<h3 onclick='$("#zaint_sign").toggle(); $("#zaint").toggle("fast");'>			
+
+		<h3 onclick='$("#zaint_sign").toggle(); $("#zaint").toggle("fast");'>
 			 <span id='zaint_sign'>+</span> Zainteresowania</h3>
 		<div class="descriptionBox" id="zaint" style="display:none">%zainteresowania%</div>
 		<h3>List motywacyjny</h3>
@@ -159,7 +159,7 @@ function actionEditUserStatus($uid)
 		<h3>Warsztaty</h3>
 		%workshops%
 		<br/>
-		
+
 		<form method="post" action="editUserStatusForm(%uid%)">
 			<h3 style="display: inline">Jadąc%genderya%</h3>
 			<input type="checkbox" name="jadący" value="1" %jadący%>
@@ -175,7 +175,7 @@ function actionEditUserStatusForm($uid)
 	global $DB, $PAGE;
 	$uid = intval($uid);
 	if (!userCan('adminUsers'))  throw new PolicyException();
-	
+
 	$oldj = isset($DB->user_roles[array('uid'=>$uid,'role'=>'jadący')]);
 	$newj = !empty($_POST['jadący']);
 	if (!$oldj && $newj)
@@ -189,12 +189,12 @@ function actionEditUserStatusForm($uid)
 	{
 		$DB->user_roles[array($uid,'jadący')]->delete();
 		$DB->edition_user(getOption('currentEdition'), $uid)->update(array('qualified'=>0));
-		logUser('set jadący 0', $uid);		
-		$PAGE->addMessage('Pomyślnie usunięto z jadących.', 'success');			
+		logUser('set jadący 0', $uid);
+		$PAGE->addMessage('Pomyślnie usunięto z jadących.', 'success');
 	}
 	else
-		$PAGE->addMessage('Pozostawiono status.');		
-	actionEditUserStatus($uid);	
+		$PAGE->addMessage('Pozostawiono status.');
+	actionEditUserStatus($uid);
 }
 
 
@@ -203,7 +203,7 @@ function getUserHeader($uid, $name, $action)
 	global $DB;
 	$prev = $DB->query('SELECT MAX(uid) FROM table_users WHERE uid<$1', $uid)->fetch();
 	$next = $DB->query('SELECT MIN(uid) FROM table_users WHERE uid>$1', $uid)->fetch();
-	
+
 	$s = "<a class='back' href='adminUsers'>wróć do listy</a>";
 	if (is_string($next))
 		$s = "<a class='back' href='$action($next)' title='następny'>→</a>". $s;
@@ -218,7 +218,7 @@ function getUserHeader($uid, $name, $action)
 	foreach ($actions as $a=>$aname)
 		$s .= "<a href='$a($uid)'". (($a == $action)?" class='selected'":"") .">$aname</a>";
 	$s .= "</div></h2>";
-	return $s;	
+	return $s;
 }
 
 
@@ -229,7 +229,7 @@ function actionListPersonalData()
 	$PAGE->title = 'Lista danych personalnych';
 	if (!isset($_GET['print']))
 	{
-		$PAGE->content .= '<a class="right" href="?print">wersja do druku</a><br/>';	
+		$PAGE->content .= '<a class="right" href="?print">wersja do druku</a><br/>';
 		$users = $DB->query('
 			SELECT u.name, u.email FROM table_users u
 			WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
@@ -246,8 +246,8 @@ function actionListPersonalData()
 		SELECT u.uid, u.name, u.telephone, u.parenttelephone, u.pesel, u.address
 		FROM table_users u
 		WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
-		ORDER BY regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')	
-	');	
+		ORDER BY regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')
+	');
 	$PAGE->content .= '<table class="bordered"><thead><tr><th>imię i nazwisko</th><th>komórka</th>'.
 		'<th>telefon do rodziców</th><th>PESEL</th><th>adres zameldowania</th></tr></thead>';
 	foreach ($users as $user)
@@ -267,7 +267,7 @@ function actionListArrivalData($comments = true)
 	$PAGE->title = 'Lista danych dot. dojazdu';
 	if (!isset($_GET['print']))
 	{
-		$PAGE->content .= '<a class="right" href="?print">wersja do druku</a>';	
+		$PAGE->content .= '<a class="right" href="?print">wersja do druku</a>';
 		if ($comments)
 			$PAGE->content .= '<a href="listArrivalData(0)">bez uwag</a>';
 		else
@@ -277,9 +277,9 @@ function actionListArrivalData($comments = true)
 		SELECT u.uid, u.name, u.telephone, u.parenttelephone, u.staybegin, u.stayend, u.gatherplace, u.comments, u.lastmodification
 		FROM table_users u
 		WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
-		ORDER BY u.gatherplace DESC, u.staybegin, regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')	
-	');	
-		
+		ORDER BY u.gatherplace DESC, u.staybegin, regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')
+	');
+
 	$PAGE->content .= '<table class="bordered"><thead><tr><th>imię i nazwisko</th><th>komórka</th>'.
 		'<th>przyjazd</th><th>wyjazd</th><th>zbiórka</th>'.
 		($comments?'<th>uwagi</th><th>ost. zmiana</th>':'') .
@@ -293,7 +293,7 @@ function actionListArrivalData($comments = true)
 			$user['stayend']   = strftime('%a %d. %H:00', $starttime + 3600*$user['stayend']  );
 		if (!is_null($user['lastmodification']))
 		{
-			$t = $user['lastmodification'];			
+			$t = $user['lastmodification'];
 			$user['lastmodification'] = strftime('%Y-%m-%d', $t);
 			// Highlight if older than 300 days
 			if ($t < time() -  300 * 24 * 60 * 60)
@@ -319,13 +319,13 @@ function actionListDailyCounts()
 	global $DB,$PAGE;
 	if (!userCan('adminUsers'))  throw new PolicyException();
 	$PAGE->title = 'Lista danych dot. posiłków';
-	
+
 	if (!isset($_GET['print']))
 		$PAGE->content .= '<a class="right" href="?print">wersja do druku</a>';
-	
+
 	$DB->query('SELECT COUNT(*) FROM w1_users u
 		WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
-			AND u.staybegin IS NULL');				
+			AND u.staybegin IS NULL');
 	$PAGE->content .= 'Jadących, którzy nie określili czasu pobytu: '. $DB->fetch();
 	$PAGE->content .= ' (patrz <a href="listPersonalData">lista danych personalnych</a>)<br/>';
 	$PAGE->content .= '<i>nocleg</i> := wlicza tych, którzy przyjechali na kolację,<br/>
@@ -335,7 +335,7 @@ function actionListDailyCounts()
 	$PAGE->content .= '<table class="bordered" style="width:auto">';
 	$PAGE->content .= '<thead><tr><th>dzień</th>';
 	$starttime = strtotime('2011/08/08 00:00');
-	$mealhours = array(9=>'śniadanie', 14=>'obiad', 19=>'kolacja');	
+	$mealhours = array(9=>'śniadanie', 14=>'obiad', 19=>'kolacja');
 	foreach ($mealhours as $meal)
 		$PAGE->content .= '<th>'. $meal .'</th>';
 	$PAGE->content .= '<th>nocleg</th></tr></thead>';
@@ -349,17 +349,28 @@ function actionListDailyCounts()
 				WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
 					AND u.staybegin<=$1 AND u.stayend>=$1
 					AND u.isselfcatered=0',
-					$i*24+$h);				
+					$i*24+$h);
 			$PAGE->content .= '<td>'. $DB->fetch() .'</td>';
 		}
 		$DB->query('SELECT COUNT(*) FROM w1_users u
 			WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
 				AND u.staybegin<=$1 AND u.stayend>$1
 				AND u.isselfcatered=0',
-				$i*24+19);				
-		$PAGE->content .= '<td>'. $DB->fetch() .'</td>';				
+				$i*24+19);
+		$PAGE->content .= '<td>'. $DB->fetch() .'</td>';
 
 		$PAGE->content .= '</tr>';
+	}
+	$PAGE->content .= '</table>';
+
+	$tshirtsizes = array('XS','S','M','L','XL','XXL');
+	$PAGE->content .= '<h4>Rozmiary koszulek</h4><table class="bordered" style="width:auto">';
+	foreach ($tshirtsizes as $t)
+	{
+		$DB->query('SELECT COUNT(*) FROM w1_users u
+			WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid AND r.role=\'jadący\')
+				AND u.tshirtsize=$1', $t);
+			$PAGE->content .= '<tr><td>'. $t .'</td><td>'. $DB->fetch() .'</td></tr>';
 	}
 	$PAGE->content .= '</table>';
 }
