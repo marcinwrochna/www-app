@@ -1,6 +1,11 @@
 #!/usr/bin/python
+# Run this script to merge all (.gif or .png) icons from icons/ into one .png.
+# This is to avoid making many request when loading all the small icons.
+#
+# Files icons.png and icons_png.css will be created.
+# Include the css in your html and instead of background and width/height use 
+# <span class='iconname_png icon'></span> for icons/iconname.png
 
-# for f in *.png *.gif ; do echo `echo $f | tr \. \_ `:$f; done > icon_map.txt
 # This work is licensed under the Creative Commons Attribution 3.0 United 
 # States License. To view a copy of this license, visit 
 # http://creativecommons.org/licenses/by/3.0/us/ or send a letter to Creative
@@ -11,15 +16,16 @@ import Image
 import re
 import time
 
+iconDir='icons/'
 iconMap=[]
-for filename in os.listdir('.'):
+for filename in os.listdir(iconDir):
 	m=re.match('(.*)\.(gif|png)',filename)
 	if m and m.group(1)!='master':
 		iconMap.append([m.group(1)+'_'+m.group(2),m.group(0)])
 iconMap = sorted(iconMap)
 print iconMap
 
-images = [Image.open(filename) for cssClass, filename in iconMap]
+images = [Image.open(iconDir + filename) for cssClass, filename in iconMap]
 
 print "%d images will be combined." % len(images)
 
@@ -46,12 +52,12 @@ for count, image in enumerate(images):
     print "added."
 print "done adding icons."
 
-print "saving master.gif...",
-master.save('master.gif', transparency=0 )
+print "saving icons.gif...",
+master.save('icons.gif', transparency=0 )
 print "saved!"
 
-print "saving master.png...",
-master.save('master.png')
+print "saving icons.png...",
+master.save('icons.png')
 print "saved!"
 
 
@@ -61,7 +67,7 @@ cssTemplate = '''.%s{background-position:0 %dpx;width:%dpx;height:%dpx;}
 for format in ['png','gif']:
 	print 'saving icons_%s.css...' % format,
 	iconCssFile = open('icons_%s.css' % format ,'w')
-	iconCssFile.write('''.icon{background-image:url(master.%s?%f);}'''%(format,time.time()))
+	iconCssFile.write('''.icon{background-image:url(icons.%s?%f);}'''%(format,time.time()))
 	for count, pair in enumerate(iconMap):
 		cssClass, filename = pair
 		w,h=images[count].size 

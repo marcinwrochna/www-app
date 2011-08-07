@@ -5,8 +5,8 @@
 	Defined:
 		constant DEBUG - 0 for nothing, 1 for E_STRICT, 2 for superglobal dump
 		class KnownException - for explicitely called exceptions.
-		class DbException - the same, with db_last_error() appended
-		class PolicyException - throwed at privilege escalation attempts 
+		class DbException - the same, with $DB->last_error() appended
+		class PolicyException - throwed at privilege escalation attempts
 		errorHandler(), errorParse() - passed to set_exception_handler()
 			and set_error_handler(), will send errors to my email.
 		dumpSuperGlobals() - returns a description of $_GET,$_POST,$_SESSION,$_SERVER
@@ -17,12 +17,12 @@ function initErrors()
 	if (isset($_GET['debug']))  $_SESSION['debug'] = $_GET['debug'];
 	if (isset($_SESSION['debug']) && $_SESSION['debug']>0)  define('DEBUG', $_SESSION['debug']);
 	else define('DEBUG', 0);
-	
+
 	if (DEBUG>=1)  error_reporting(E_ALL | E_STRICT);
 	else  error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_USER_ERROR);
 	ini_set("display_errors", 1);
 	ini_set("display_startup_errors", 1);
-	
+
 	set_error_handler('errorHandler');
 	set_exception_handler('errorHandler');
 }
@@ -105,8 +105,8 @@ function errorParse($errno, $errstr='', $errfile='', $errline='', &$logMessage=n
 	$server = '';
 	foreach ($_SERVER as $name => $value)
 		$server .= json_encode($name) ." :\t". json_encode($value) ."\n";
-	
-	if (isset($logMessage))  $logMessage = 
+
+	if (isset($logMessage))  $logMessage =
 	"	===WWW $err===
 		'$errstr'
 		zapytanie: {$_SERVER['REQUEST_URI']}
@@ -126,14 +126,14 @@ function errorParse($errno, $errstr='', $errfile='', $errline='', &$logMessage=n
 	$errstr = nl2br($errstr);
 	$trace  = nl2br($trace);
 
-	$report = 
+	$report =
 	"<div class=\"errorReport\">
-		<h1 style='font-size: 140%; margin-bottom:0;'>Błąd</h1>
-		<div>Przepraszamy, na serwisie wystąpił błąd, administrator został powiadomiony.<br/>$errstr</div><br />
+		<h1 style='font-size: 140%; margin-bottom:0;'>". _('Error') ."</h1>
+		<div>". _('Oops, we\'re sorry, something exploded. Our team of kittens is working on the problem.') ."<br/>$errstr</div><br />
 	";
 	if (DEBUG)  $report.=
 	"
-		<a onclick=\"getElementById('errorDetails').style.display='block';\" style='margin:10px; border: 1px solid #aaa'>Pokaż szczegóły</a><br />
+		<a onclick=\"getElementById('errorDetails').style.display='block';\" style='margin:10px; border: 1px solid #aaa'>Show details</a><br />
 		<div id='errorDetails' style='margin:10px; padding:5px; border: 1px solid #aaa; line-height:150%; display:none'>
 			<b>typ: </b>$err<br/>
 			<b>zapytanie: </b> {$_SERVER['REQUEST_URI']} <br />
@@ -156,12 +156,12 @@ function errorHandler($errno, $errstr='', $errfile='', $errline='')
 	if (!is_object($errno))
 	{
 		if ($errno & error_reporting())
-		  throw new ErrorException($errstr, $errno, $errno, $errfile, $errline); 
+		  throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
 		else  return;
 	}
 
 	try
-	{ 
+	{
 		if ($errno->getCode() & error_reporting())
 		{
 			$level = ob_get_level();
@@ -175,7 +175,7 @@ function errorHandler($errno, $errstr='', $errfile='', $errline='')
 	}
 	catch (Exception $e)
 	{
-		echo 'Błąd wewnątrz handlera: <pre>'.$e->getMessage().'</pre> on line '.$e->getLine();
+		echo 'Error within handler: <pre>'.$e->getMessage().'</pre> on line '.$e->getLine();
 	}
 }
 
@@ -214,15 +214,17 @@ class DbException extends KnownException
 	function __construct($s, $n=E_USER_ERROR)
 	{
 		global $DB;
-		$s .= ' <h4>Baza danych</h4><pre>'. $DB->last_error() .'</pre>';
+		$s .= ' <h4>Database</h4><pre>'. $DB->last_error() .'</pre>';
 		parent::__construct($s,$n);
 	}
 }
 
 class PolicyException extends KnownException
 {
-	function __construct($s='Brak uprawnień', $n=E_USER_ERROR)
+	function __construct($s=null, $n=E_USER_ERROR)
 	{
+		if (is_null($s))
+			$s = _('Access forbidden.');
 		parent::__construct($s,$n);
 	}
 }
@@ -258,11 +260,6 @@ function dumpSuperGlobals()
 		if (is_array($value))  $result .= $name .'=>'. htmlspecialchars(implode(',',$value)) .',<br/>';
 		else   $result .= $name .'=>'. htmlspecialchars($value) .',<br/>';
 	}
-	
-	return $result;
-}
 
-function debug($s)
-{
-	throw new KnownException("Debug:<br/>\n". json_encode($s));
+	return $result;
 }

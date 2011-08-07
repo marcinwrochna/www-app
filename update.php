@@ -1,18 +1,19 @@
 <?php
 	/* update.php
 	*/
-	
+
 function setVersion($v)
 {
 	global $PAGE, $DB;
 	$DB->options['version']->update(array('value' => $v));
 	logUser('auto update', $v);
-	$PAGE->addMessage('Aplikacja właśnie została z\'update\'owana do wersji '. $v);
+	$PAGE->addMessage(sprintf(_('Application database has just been updated to version %d.'), $v));
 }
 
 function insertPermission($role, $action)
 {
-	db_query("INSERT INTO table_role_permissions VALUES('$role','$action')");
+	global $DB;
+	$DB->query("INSERT INTO table_role_permissions VALUES('$role','$action')"); // TODO rewrite;
 }
 
 global $DB;
@@ -60,7 +61,7 @@ switch ($version)
 		db_query('INSERT INTO table_user_roles SELECT uid, \'tutor\' FROM table_users WHERE roles&2>0');
 		db_query('INSERT INTO table_user_roles SELECT uid, \'kadra\' FROM table_users WHERE roles&4>0');
 		db_query('INSERT INTO table_user_roles SELECT uid, \'uczestnik\' FROM table_users');
-		
+
 		db_query('INSERT INTO table_role_permissions VALUES(\'admin\',\'editProfile\')');
 		db_query('INSERT INTO table_role_permissions VALUES(\'owner\',\'editProfile\')');
 		db_query('INSERT INTO table_role_permissions VALUES(\'admin\',\'listPublicWorkshops\')');
@@ -81,17 +82,17 @@ switch ($version)
 		db_query('INSERT INTO table_role_permissions VALUES(\'admin\',\'listAllWorkshops\')');
 		db_query('INSERT INTO table_role_permissions VALUES(\'admin\',\'editOptions\')');
 		db_query('INSERT INTO table_role_permissions VALUES(\'admin\',\'showLog\')');
-		
+
 		db_query('INSERT INTO table_options VALUES(\'newUserRoles\',\'role nowych użytkowników\',
 			\'uczestnik\',\'text\')');
-	
+
 		//db_query('INSERT INTO table_role_permissions VALUES(\'uczestnik\',\'signUpForWorkshop\')');
 		insertPermission('uczestnik', 'signUpForWorkshop');
 		insertPermission('admin','showWorkshopParticipants');
 		insertPermission('owner','showWorkshopParticipants');
 		setVersion(6);
 	case(6):
-		db_query('ALTER TABLE table_users ADD COLUMN gender varchar(20)');		
+		db_query('ALTER TABLE table_users ADD COLUMN gender varchar(20)');
 		db_query('CREATE TABLE table_tasks(
 			wid int,
 			tid int,
@@ -99,8 +100,8 @@ switch ($version)
 			inline int
 		)');
 		insertPermission('admin','editTasks');
-		insertPermission('akadra','editTasks');		
-		setVersion(7);		
+		insertPermission('akadra','editTasks');
+		setVersion(7);
 	case(7):
 		insertPermission('kadra','createWorkshop');
 		setVersion(8);
@@ -137,7 +138,7 @@ switch ($version)
 	case(12):
 		//db_query('DELETE FROM table_user_roles AS r WHERE r.role=\'uczestnik\' AND EXISTS(
 		//	SELECT * FROM table_user_roles AS q WHERE r.uid=q.uid AND q.role=\'akadra\')');
-		db_query('ALTER TABLE table_users ADD COLUMN proponowanyreferat text');		
+		db_query('ALTER TABLE table_users ADD COLUMN proponowanyreferat text');
 		setVersion(13);
 	case(13):
 		db_query('CREATE TABLE table_task_solutions
@@ -151,13 +152,13 @@ switch ($version)
 				feedback text,
 				comment text
 			)'
-		);		
+		);
 		db_query('ALTER TABLE table_workshops ADD COLUMN tasks_comment text');
 		setVersion(14);
 	case(14):
 		insertPermission('uczestnik', 'sendTaskSolution');
-		db_query('ALTER TABLE table_workshop_user ADD COLUMN admincomment text');		
-		db_query('ALTER TABLE table_workshop_user ADD COLUMN points int');		
+		db_query('ALTER TABLE table_workshop_user ADD COLUMN admincomment text');
+		db_query('ALTER TABLE table_workshop_user ADD COLUMN points int');
 		setVersion(15);
 	case(15):
 		db_query('ALTER TABLE table_task_solutions DROP COLUMN comment');
@@ -165,24 +166,24 @@ switch ($version)
 		db_query('ALTER TABLE table_task_solutions ADD COLUMN status int');
 		db_query('ALTER TABLE table_task_solutions ADD COLUMN grade varchar(255)');
 		db_query('UPDATE table_task_solutions SET status=1');
-		setVersion(16);	
-	case(16):	
+		setVersion(16);
+	case(16):
 		db_query('ALTER TABLE table_task_solutions ADD COLUMN notified int');
 		setVersion(17);
 	case(17):
 		db_query('ALTER TABLE table_users ADD COLUMN isselfcatered int');
 		setVersion(18);
 	case(18):
-		insertPermission('jadący', 'editAdditionalInfo');	
+		insertPermission('jadący', 'editAdditionalInfo');
 		db_query('ALTER TABLE table_users ADD COLUMN pesel varchar(30)');
 		db_query('ALTER TABLE table_users ADD COLUMN address varchar(255)');
 		db_query('ALTER TABLE table_users ADD COLUMN staybegin int');
 		db_query('ALTER TABLE table_users ADD COLUMN stayend int');
 		db_query('ALTER TABLE table_users ADD COLUMN tshirtsize varchar(30)');
-		db_query('ALTER TABLE table_users ADD COLUMN comments varchar(255)');		
+		db_query('ALTER TABLE table_users ADD COLUMN comments varchar(255)');
 		setVersion(19);
 	case(19):
-		db_query('ALTER TABLE table_users ADD COLUMN telephone varchar(255)');		
+		db_query('ALTER TABLE table_users ADD COLUMN telephone varchar(255)');
 		setVersion(20);
 	case(20):
 		db_query('UPDATE table_workshop_user SET participant=4 WHERE participant=1
@@ -194,7 +195,7 @@ switch ($version)
 		// Urgh, uid should have been: (manually fixed)
 		//	UPDATE w1_workshop_user SET participant=4 WHERE participant=1
 		//	AND EXISTS(SELECT * FROM w1_user_roles ur WHERE w1_workshop_user.uid=ur.uid AND role='kadra')
-		setVersion(22);	
+		setVersion(22);
 	case(22):
 		db_query('ALTER TABLE table_users ADD COLUMN parenttelephone varchar(255)');
 		db_query('ALTER TABLE table_users ADD COLUMN gatherplace varchar(255)');
@@ -208,12 +209,12 @@ switch ($version)
 		db_query('ALTER TABLE table_users ADD PRIMARY KEY (uid)');
 		db_query('ALTER TABLE table_workshop_domain ADD PRIMARY KEY (wid,domain)');
 		db_query('ALTER TABLE table_workshops ADD PRIMARY KEY (wid)');*/
-		//db_query('ALTER TABLE table_workshop_user ADD PRIMARY KEY (wid,uid)');		
-		//db_query('ALTER TABLE table_test ADD PRIMARY KEY (id)');		
-		setVersion(24);	
+		//db_query('ALTER TABLE table_workshop_user ADD PRIMARY KEY (wid,uid)');
+		//db_query('ALTER TABLE table_test ADD PRIMARY KEY (id)');
+		setVersion(24);
 	case (24):
-		insertPermission('admin', 'showCorrelation');	
-		setVersion(25);	
+		insertPermission('admin', 'showCorrelation');
+		setVersion(25);
 	case(25):
 		//$DB->query('ALTER TABLE table_users ADD UNIQUE(login)');
 		//$DB->query('ALTER TABLE table_users ADD UNIQUE(email)');
@@ -222,8 +223,8 @@ switch ($version)
 			enumParticipantStatus('lecturer')->id);
 		foreach (enumSubject() as $subjectId => $subjectItem)
 			$DB->query('UPDATE table_workshop_domain SET domain=$2 WHERE domain=$1',
-				$subjectItem->description, $subjectId);			
-		setVersion(27);	
+				$subjectItem->description, $subjectId);
+		setVersion(27);
 	case(27):
 		insertPermission('admin', 'autoQualifyForWorkshop');
 		insertPermission('kadra', 'autoQualifyForWorkshop');
@@ -245,7 +246,7 @@ switch ($version)
 		setVersion(29);
 	case(29):
 		insertPermission('admin', 'viewTutoringApplications');
-		insertPermission('tutor', 'viewTutoringApplications');		
+		insertPermission('tutor', 'viewTutoringApplications');
 		setVersion(30);
 	case(30):
 		//insertPermission('admin', 'impersonate');
@@ -264,13 +265,13 @@ switch ($version)
 			'type' => 'int'
 		);
 		setVersion(32);
-	case(32):		
+	case(32):
 		/*$DB->query('INSERT INTO table_editions VALUES (7, \'WWW7\')');
 		$DB->query('CREATE TABLE table_edition_user (edition int, uid int, qualified int, lecturer int)');
 		$DB->query('ALTER TABLE table_edition_user ADD PRIMARY KEY (edition, uid)');
 		$DB->query('INSERT INTO table_edition_user (SELECT 6, uid, 0, 0 FROM table_users)');*/
 		$DB->query('UPDATE table_edition_user SET qualified=
-			(SELECT count(*) FROM table_user_roles ur WHERE ur.uid=uid AND ur.role=\'jadący\')');		
+			(SELECT count(*) FROM table_user_roles ur WHERE ur.uid=uid AND ur.role=\'jadący\')');
 		$DB->query('UPDATE table_edition_user SET lecturer=
 			(SELECT count(*) FROM table_user_roles ur WHERE ur.uid=uid AND ur.role=\'akadra\')');
 			/*(SELECT count(*) FROM table_workshops w, table_workshop_user wu WHERE w.wid=wu.wid AND wu.uid=eu.uid
@@ -284,7 +285,7 @@ switch ($version)
 		$DB->query('ALTER TABLE table_workshops ADD COLUMN edition int');
 		$DB->query('UPDATE table_workshops SET edition=6');
 		$DB->query('DELETE FROM table_role_permissions WHERE action=\'signUpForWorkshop\' AND role=\'registered\'');
-		insertPermission('kadra', 'signUpForWorkshop');		
+		insertPermission('kadra', 'signUpForWorkshop');
 		setVersion(35);
 	case(35):
 		$DB->query('DELETE FROM table_user_roles WHERE role=\'uczestnik\'');
@@ -295,11 +296,11 @@ switch ($version)
 	case(37):
 		$DB->query('UPDATE table_edition_user SET qualified=1 WHERE uid IN
 			(SELECT wu.uid FROM table_workshop_user wu, table_workshops w
-				WHERE w.wid=wu.wid AND w.edition=$1 AND wu.participant=$2 
+				WHERE w.wid=wu.wid AND w.edition=$1 AND wu.participant=$2
 				AND w.status>=$3 ORDER BY w.wid
 			)',
 			getOption('currentEdition'), enumParticipantStatus('lecturer')->id, enumBlockStatus('ok')->id);
-		setVersion(38);	
+		setVersion(38);
 	case(38):
 		$DB->query('DELETE FROM table_user_roles WHERE role=\'akadra\'');
 		$DB->query('INSERT INTO table_user_roles (SELECT uid, \'akadra\' AS role FROM table_edition_user
@@ -307,7 +308,7 @@ switch ($version)
 		setVersion(39);
 	case(39):
 		$DB->query('ALTER TABLE table_users ADD COLUMN lastmodification int');
-		$DB->query('UPDATE table_users SET lastmodification = 
+		$DB->query('UPDATE table_users SET lastmodification =
 			(SELECT MAX(l.time) FROM w1_log l WHERE l.type=\'user edit2\' AND l.uid=w1_users.uid)');
 		setVersion(40);
 	case(40):
@@ -319,4 +320,11 @@ switch ($version)
 		$DB->query('UPDATE table_users SET comments = tmp');
 		$DB->query('ALTER TABLE table_users DROP column tmp');
 		setVersion(41);
+	case(41):
+		$DB->query('ALTER TABLE table_users DROP COLUMN roles');
+		$DB->query('DELETE FROM table_user_roles WHERE role=\'\'');
+		insertPermission('uczestnik', 'editMotivationLetter');
+		setVersion(42);
+	case(42):
+
 }

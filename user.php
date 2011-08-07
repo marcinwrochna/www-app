@@ -1,24 +1,27 @@
 <?php
 /*
-	user.php handles users,sessions,authors,rights
-	Included in common.php
-	Defined:			
-		initUser() - initialize global $USER
-		actionLogout, actionLogin
-		addLoginMenuBox(), addUserMenuBox()
+ *	user.php handles users, sessions, rights.
+ *	Logged in state is kept in $_SESSION['user_id'].
+ *	Included in common.php
+ *
+ *	Defined:
+ *		initUser() - initializes the global $USER assoc containing the current user's most used data.
+ *		getUser($uid) - returns a $USER assoc containing uid,name,login,logged,gender,email,roles.
+ *		actionLogout(), actionLogin()
+ *		addLoginMenuBox(), addUserMenuBox()
 		actionRegister()
-		
+
 		actionChangePassword, actionPasswordReset, actionPasswordResetForm
 		actionEditProfile, handleEditProfileForm
 
-		actionShowQualificationStatus
-		actionEditMotivationLetter		
+		actionEditMotivationLetter
 		actionEditAdditionalInfo, handleEditAdditionalInfoForm
-	Security warning:
-		If user has cookies disabled, session_id, thus access,
-		can be sniffed through REFERER_URI.
-		Listening to network traffic is in no way made harder.
-*/
+ *	Security warning:
+ *		If user has cookies disabled, session_id, thus access,
+ *		can be sniffed through REFERER_URI.
+ *		Listening to network traffic is in no way made harder.
+ */
+// TODO document and cleanup (table_user columns (preferowany_referat, polish names,...), roles).
 define('USER_ROOT', -1);
 define('USER_ANONYMOUS', -2);
 
@@ -26,79 +29,92 @@ require_once('user/profile.php');
 require_once('user/admin.php');
 require_once('user/utils.php');
 
-function initUser($impersonating = false)
-{			
+/* Initializes the global $USER with the current user's commonly used data.
+ * If $_GET['impersonate'] is set, first log in normally, check rights,
+ * then return the impersonated $USER. */
+function initUser()
+{
 	unset($GLOBALS['USER']);
-	global $USER, $DB, $PAGE;
-	
-	if ($impersonating === false)
-		$uid = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : USER_ANONYMOUS;
-	else
-		$uid = $impersonating;
-	
-	if ($uid == USER_ANONYMOUS)
-		$USER = array(
-			'uid' => USER_ANONYMOUS,
-			'name' => 'Anonim',
-			'login' => 'anonymous',
-			'roles' => array('public'),	
-			'gender' => 'm'
-		);
-	else	
-	{
-		$USER = $DB->users[$uid]->assoc('uid,name,login,logged,gender,email');
-		$roles = $DB->query('SELECT role FROM table_user_roles WHERE uid=$1', $uid);
-		$USER['roles'] = $roles->fetch_column();
-		$USER['roles'][] = 'registered';
-		$USER['roles'][] = 'public';
-	}
-	
-	if ($impersonating === false && isset($_GET['impersonate']))
+	global $USER, $DB;
+	$uid = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : USER_ANONYMOUS;
+	$USER = getUser($uid);
+	if (isset($_GET['impersonate']))
 	{
 		if (!userCan('impersonate'))  throw new PolicyException();
-		initUser(intval($_GET['impersonate']));
-		global $USER;
+		$USER = getUser(intval($_GET['impersonate']));
 		$USER['impersonatedBy'] = $uid;
 	}
 }
 
+/* Get a $USER assoc containing uid,name,login,logged,gender,email,roles. */
+function getUser($uid)
+{
+	global $DB, $PAGE;
+	if ($uid == USER_ANONYMOUS)
+		return array(
+			'uid' => USER_ANONYMOUS,
+			'name' => _('Anonym'),
+			'login' => 'anonymous',
+			'roles' => array('public'),
+			'gender' => 'm'
+		);
+
+	if (!isset($DB->users[$uid]))
+		throw new KnownException(sprintf(_('User #%d doesn\'t exist'), $uid));
+
+	$user = $DB->users[$uid]->assoc('uid,name,login,logged,gender,email');
+	$roles = $DB->query('SELECT role FROM table_user_roles WHERE uid=$1', $uid);
+	$user['roles'] = $roles->fetch_column();
+	$user['roles'][] = 'registered';
+	$user['roles'][] = 'public';
+	return $user;
+}
+
 function actionLogout()
 {
+	global $PAGE, $USER;
 	unset($_SESSION['user_id']);
-	global $PAGE;
-	$PAGE ->addMessage('Pomyślnie wylogowano.', 'success');
-	initUser();
+	$USER = getUser(USER_ANONYMOUS);
+	$PAGE->addMessage(_('Logged out.'), 'success');
 }
 
 function actionLogin()
-{	
-	global $DB, $PAGE;
-	$query = 'SELECT uid FROM table_users WHERE (login=$1 OR email=$1) AND password=$2 AND confirm=0';
-	$result = $DB->query($query, $_POST['login'], passHash($_POST['password']));
+{
+	global $DB, $PAGE, $USER;
+	$result = $DB->query(
+		'SELECT uid FROM table_users
+		 WHERE (login=$1 OR email=$1) AND password=$2',
+		$_POST['login'], passHash($_POST['password'])
+	);
 	if (!count($result))
 	{
 		unset($_SESSION['user_id']);
-		$PAGE->addMessage('Błędny login lub hasło.', 'userError');
-		actionHomepage();
-		return;
+		$PAGE->addMessage(_('Wrong username/e-mail or password.'), 'userError');
+		return callAction('homepage');
 	}
-	
-	$_SESSION['user_id'] = intval($result->fetch());	
-	initUser();
-	global $USER;
-	
+
+	$uid = intval($result->fetch());
+	if ($DB->users[$uid]->get('confirm'))
+	{
+		unset($_SESSION['user_id']);
+		$PAGE->addMessage(_('This account hasn\'t been confirmed yet. Check your mailbox.'), 'userError');
+		return callAction('homepage');
+	}
+	$_SESSION['user_id'] = $uid;
+	$USER = getUser($uid);
+
 	// Check if logged for first time
-	if (!$USER['logged'])  
+	if (!$USER['logged'])
 	{
 		logUser('user register');
-		$PAGE->addMessage('Napisz teraz coś o sobie.', 'instruction');			
-		actionEditProfile();
-	}		
-	else 
-		actionHomepage();
+		$PAGE->addMessage(_('Welcome! Tell us something about yourself.'), 'instruction');
+		callAction('editProfile');
+	}
+	else
+		callAction('homepage');
 	$USER['logged'] = time();
-	$DB->users[$USER['uid']] = array('logged' => $USER['logged']);
-	$PAGE->addMessage('Pomyślnie zalogowano', 'success');
+	$DB->users[$USER['uid']]->update(array('logged' => $USER['logged']));
+	$PAGE->addMessage(_('Successfully logged in.'), 'success');
 }
 
 function addLoginMenuBox()
@@ -110,180 +126,179 @@ function addLoginMenuBox()
 			<form method="post" action="login">
 					<input class="inputText" type="text" name="login"/><br/>
 					<input class="inputText"  type="password" name="password"/><br/>
-					<input class="inputButton"  type="submit" value="Zaloguj"/><br/>
-					<a href="register">zarejestruj się</a><br/>
-					<a href="passwordReset">zapomniałem/am hasła</a>				
+					<input class="inputButton"  type="submit" value="{{Log in}}"/><br/>
+					<a href="register">{{sign up}}</a><br/>
+					<a href="passwordReset">{{forgot password?}}</a>
 			</form>
 		</div>
 	<?php
-	$PAGE->menu .= $template->finish();
+	$PAGE->menu .= $template->finish(true);
 }
 
 function addUserMenuBox()
 {
 	global $USER, $PAGE, $DB;
-	$items = array(
-		array('profil',         'editProfile',             'user-green.png', userCan('editProfile',$USER['uid'])),
-		array('list motywacyjny',   'showQualificationStatus', 'qual.png'           ),
-		array('dodatkowe dane', 'editAdditionalInfo',      'page-white-edit.png')
-	);
+
+	$items = parseTable('
+		ACTION               => tTITLE;            ICON;
+		editProfile          => profile;           user-green.png;
+		editMotivationLetter => motivation letter; qual.png;
+		editAdditionalInfo   => additional info;   page-white-edit.png;
+	');
+	$items['editProfile']['perm'] = userCan('editProfile', $USER['uid']);
+
 	$custom = '';
 	if (isset($USER['impersonatedBy']))
-		$custom .= str_replace('%', gender('y','a',$DB->users[$USER['impersonatedBy']]->get('gender')),
-			'Jesteś teraz zalogowan%<br/> jako inna osoba. <a href="..">[wróć]</a>');
-		
+	{
+		$custom .= genderize(_('You are now logged in as another person.'), $DB->users[$USER['impersonatedBy']]->get('gender'));
+		$custom .= ' <a href="..">['. _('return') .']</a>';
+	}
+
 	$logout = getIcon('poweroff.png');
-	$logout = '<a class="right" href="logout" '. getTipJS('wyloguj') .'>'. $logout .'</a>';
-	$PAGE->addMenuBox($USER['name'] .'&nbsp;', $items, $custom . $logout);	
+	$logout = '<a class="right" href="logout" '. getTipJS(_('Log out')) .'>'. $logout .'</a>';
+	$PAGE->addMenuBox($USER['name'] .'&nbsp;', $items, $custom . $logout);
 }
 
 function actionRegister()
 {
-	$inputs = array(
-		array('text', 'login', 'login'),
-		array('password', 'password', 'hasło'),
-		array('password', 'password_repeat', 'powtórz hasło'),
-		array('text', 'name', 'imię i nawisko'),
-		array('text', 'email', 'email')
+	global $DB, $PAGE;
+	$PAGE->title = _('Create your account');
+	$form = new Form(parseTable('
+		NAME            => TYPE;     tDESCRIPTION;    VALIDATION;
+		login           => text;     username;        charset(name digit),length(4 20);
+		password        => password; password;        length(3 200);
+		password_repeat => password; retype password; equal(password);
+		name            => text;     full name;       charset(name),length(4 60);
+		email           => text;     e-mail;          email;
+	'));
+	$form->custom = _('All fields are required. '.
+		'Your e-mail will only be visible to signed-in users.<br/>'.
+		'One account should correspond to one person '.
+		'(e.g. don\'t create an account for another lecturer).<br/>');
+
+	if (!$form->submitted())
+		return print $form->getHTML();
+
+	$values = $form->fetchAndValidateValues();
+	$DB->query('SELECT COUNT(*) FROM table_users WHERE login=$1', $values['login']);
+	$form->assert($DB->fetch_int() === 0, _('This login is already taken.'));
+	$DB->query('SELECT COUNT(*) FROM table_users WHERE email=$1', $_POST['email']);
+	$form->assert($DB->fetch_int() === 0, _('This email address is already registered. '.
+		'If you didn\'t receive an email with confirmation, check your spam or').
+		' <a href="reportBug">'. _('report a bug') .'</a>.');
+	if (!$form->valid)
+		return print $form->getHTML();
+
+	$confirmKey = rand(100000,999999);
+
+	$DB->users[]= array(
+		'login' => $values['login'],
+		'password' => passHash($values['password']),
+		'name' => $values['name'],
+		'email' => $values['email'],
+		'confirm' => $confirmKey,
+		'registered' => time(),
+		'logged' => 0
 	);
-	
-	global $PAGE;	
-	$PAGE->title = 'Zarejestruj się';
-	$form = new Form($inputs, 'registerForm');
-	$form->custom = 'Wszystkie pola są obowiązkowe. Email będzie widoczny tylko dla
-		zarejestrowanych.<br/>Jedno konto powinno odpowiadać jednej osobie.<br/>';
-	$PAGE->content .= $form->getHTML();
+	$uid = $DB->users->lastValue();
+
+	$link = 'http://'. $_SERVER['HTTP_HOST'] . ABSOLUTE_PATH_PREFIX ."registerConfirm%28$confirmkey%29";
+	$mail = sprintf(_('A new user account has been created on %s using this e-mail address.\n'.
+		'To confirm your registration, open the following link:\n%s\n\n'.
+		'(If you didn\'t sign up, just ignore this email.)\n'),
+			$_SERVER['HTTP_HOST'], $link);
+	sendMail(_('New user account'), $mail, array(array($values['name'],$values['email'])));
+	$PAGE->addMessage(_('Your account has been successfully created. '.
+		'Now, click the link you received in an e-mail to confirm.<br/>'.
+		'(If not, wait 15 minutes and check your spam.)'), 'success');
 }
 
 function actionRegisterConfirm($confirmkey)
 {
 	global $DB, $PAGE;
 	if (!is_numeric($confirmkey) || $confirmkey<2)
+		$PAGE->addMessage(_('The link you opened doesn\'t contain the confirmation number. '.
+		'Please copy the whole link from the e-mail you received.'), 'userError');
+	else
 	{
-		$PAGE->addMessage('Wpisany link nie zawiera numerku, skopiuj cały link z maila.', 'userError');	
-		return;
+		$DB->query('UPDATE table_users SET confirm=0 WHERE confirm=$1', intval($confirmkey));
+		$PAGE->addMessage(_('Your registration has been successfully finished. Please log in.'), 'success');
 	}
-	$DB->query('UPDATE table_users SET confirm=0 WHERE confirm=$1', $confirmkey);
-	$PAGE->addMessage('Pomyślnie dokończono rejestrację. Możesz się teraz zalogować.', 'success');
-	return;
 }
 
-function actionRegisterForm()
+function actionEditMotivationLetter()
 {
-	global $DB, $PAGE;
-	$PAGE->title = 'Rejestracja';
-	
-	$correct = true;				
-	assertOrFail(strlen(trim($_POST['login'])),    'Login jest pusty.', $correct);
-	assertOrFail(strlen(trim($_POST['password'])), 'Hasło jest puste.', $correct);
-	assertOrFail(validEmail($_POST['email']), 'Podany email nie jest poprawny.', $correct);		
-	assertOrFail($_POST['password'] === $_POST['password_repeat'], 'Hasło nie zgadza się z powtórzeniem.', $correct);
-		
-	$DB->query('SELECT COUNT(*) FROM table_users WHERE login=$1', $_POST['login']);
-	assertOrFail($DB->fetch_int() === 0, 'Login już jest w użyciu.', $correct);
-		
-	$DB->query('SELECT COUNT(*) FROM table_users WHERE email=$1', $_POST['email']);
-	assertOrFail($DB->fetch_int() === 0, 'Podany adres email już jest zarejestrowany. Jeżeli nie masz
-		maila z potwierdzeniem,	sprawdź spam lub <a href="reportBug">zgłoś problem</a>.',
-		$correct);
-	
-	if (!$correct)
-	{
-		actionRegister();
-		return;
-	}
-	
-	$confirmkey = rand(100000,999999);
-	
-	$DB->users[]= array(
-		'login' => htmlspecialchars($_POST['login']),
-		'password' => passHash($_POST['password']),
-		'name' => htmlspecialchars($_POST['name']),
-		'email' => $_POST['email'],
-		'confirm' => $confirmkey,
-		'registered' => time(),
-		'logged' => 0,
-		'roles' => 0
-	);
-	$uid = $DB->users->lastValue();
-
-	$roles = explode(',',getOption('newUserRoles'));
-	foreach ($roles as $role)
-		$DB->user_roles[]= array('uid'=>$uid, 'role'=>trim($role));
-			
-	$link = 'http://'. $_SERVER['HTTP_HOST'] . ABSOLUTE_PATH_PREFIX ."registerConfirm($confirmkey)";
-	$mail = "Zarejestrowano nowe konto na ". $_SERVER['HTTP_HOST'].	" używając tego emaila.\n".
-			"Aby potwierdzić, otwórz poniższy link:\n".
-			$link ."\n".
-			"Jeśli nie wiesz o co chodzi, po prostu usuń tego maila.\n";
-	sendMail("Nowe konto", $mail, array(array($_POST['name'],$_POST['email'])));
-	$PAGE->addMessage('Pomyślnie utworzono nowe konto. Kliknij teraz w link
-		otrzymany przez email by dokończyć rejestrację.<br/>W razie braku
-		zaczekaj 15 minut i sprawdź spam.', 'success');
-}
-
-
-function actionShowQualificationStatus()
-{
-	if (!userCan('showQualificationStatus'))  throw new PolicyException();
+	if (!userCan('editMotivationLetter'))  throw new PolicyException();
 	global $USER, $PAGE, $DB;
-	$PAGE->title = 'List motywacyjny';
+	$PAGE->title = _('Motivation letter');
 	if (!assertProfileFilled())  return;
-		
-	$inputs = array(
-		array('type'=>'richtextarea', 'name'=>'motivationletter', 'description'=>
-				'Napisz ('. getOption('motivationLetterWords') .'-300 słów)<br/>
-				1. Czego oczekuję od Warsztatów?<br/>
-				2. Jakie są moje zainteresowania naukowe?<br/>'),
-		array('type'=>'textarea', 'name'=>'proponowanyreferat', 'description'=>
-			'Proponowany temat referatu<br/>
-			<small>W przypadku dużej liczby dobrych zgłoszeń istotna będzie
-		chęć wygłoszenia krótkiego (15 min.) referatu. Jeśli masz pomysł na
-		taki referat - opisz go w zgłoszeniu, jeśli chciałbyś coś opowiedzieć,
-		ale nie masz konkretnego pomysłu - opisz możliwie dokładnie swoje
-		zainteresowania, a postaramy się zasugerować Ci temat do
-		zreferowania.</small>')
-	);
-		
+
+	$inputs = parseTable('
+		NAME               => TYPE;
+		motivationletter   => richtextarea;
+	');
+	$inputs['motivationletter']['description'] = sprintf(_(
+			'Write (in %d - 300 words)<br/>'.
+			'1. What do you expect from these workshops?<br/>'.
+			'2. What are your interests in science?<br/>'.
+			'3. (Optional) Would you like to make a short (15 min.) presentation?<br/>'.
+			'<small>Tell us something about a topic you would choose, or (if you have no good idea)<br/>'.
+			'describe as precisely as possible what would you suggest you\'d like to talk about.</br>'.
+			'(This will be taken into account in case we get many good applications).</small>'),
+		getOption('motivationLetterWords'));
 	$form = new Form($inputs);
 
 	if ($form->submitted())
 	{
-		$DB->users[$USER['uid']]->update($form->fetchValues());
-		$PAGE->addMessage('Pomyślnie zapisano list motywacyjny.', 'success');
-		logUser('user edit3');		
+		$values = $form->fetchAndValidateValues();
+		if ($form->valid)
+		{
+			$DB->users[$USER['uid']]->update($values);
+			$PAGE->addMessage(_('Your motivation letter has been saved.'), 'success');
+			logUser('user edit3');
+		}
 	}
-	
+
 	$form->values = $DB->users[$USER['uid']]->assoc($form->getColumns());
-	$form->submitValue = 'Zapisz';
-	$PAGE->content .= $form->getHTML();
+	return print $form->getHTML();
 }
 
 function actionEditAdditionalInfo($uid = null)
 {
 	global $USER, $DB, $PAGE;
-	if (!userCan('editAdditionalInfo') && !userCan('adminUsers'))  throw new PolicyException();
-	$admin = true;
-	if (is_null($uid) || $uid == $USER['uid'])
+	$admin = !is_null($uid) && $uid != $USER['uid'];
+	if ($admin)
 	{
-		$uid = intval($USER['uid']);
-		$admin = false;
-		if (!in_array('registered', $USER['roles']))  throw new PolicyException();
+		if (!userCan('adminUsers'))  throw new PolicyException();
+		$uid = intval($uid);
 	}
 	else
 	{
-		$uid = intval($uid);
-		if (!userCan('adminUsers'))  throw new PolicyException();
+		if (!userCan('editAdditionalInfo'))  throw new PolicyException();
+		$uid = intval($USER['uid']);
 	}
-	
-	$tshirtsizes = array('XS','S','M','L','XL','XXL');
-	$tshirtsizes = array_combine($tshirtsizes, $tshirtsizes);	
-	
+
+	$inputs = parseTable('
+		NAME            => TYPE;     tDESCRIPTION;                                         VALIDATION
+		pesel           => text;     PESEL number;                                         length(0 11),char(digit);
+		address         => textarea; address <small>(for the insurance)</small>;           ;
+		telephone       => text;     telephone;                                            longer(6);
+		parenttelephone => text;     telephone to your parents/carers;                     ;
+		staybegin       => select;   staying time: <span class="right">from</span>;        int;  default=>19;
+		stayend         => select;                     <span class="right">to</span>;      int;  default=>249;
+		gatherplace     => select;   I\'ll join the gathering at;                          ;     default=>none;
+		isselfcatered   => checkbox; accomodation and meals;                               ;
+		tshirtsize      => select;   preferred t-shirt size;                               ;     default=>L;
+		comments        => textarea; comments (e.g. vegetarian);                           ;
+	');
+	if (in_array('kadra', $USER['roles']))
+		unset($inputs['parenttelephone']);
+
 	$starttime = strtotime('2011/08/08 00:00');
-	$mealhours = array(9=>'śniadanie', 14=>'obiad', 19=>'kolacja');
+	$mealhours = array(9=>_('breakfast'), 14=>_('dinner'), 19=>_('supper'));
 	$stayoptions = array();
-	// Warsztaty mają 11 dni [0..10].
-	// Dzień zero zaczyna się chyba od kolacji, dzień 10 kończy na śniadaniu.
+	// Workshops have 11 days [0..10].
+	// The 0th days begins late, with a supper, the 10th day ends early, with a breakfast.
 	$stayoptions[19] = strftime("%e. (%a)", $starttime+19*60*60);
 	for ($i=1; $i<10; $i++)
 		foreach ($mealhours as $h=>$meal)
@@ -292,52 +307,42 @@ function actionEditAdditionalInfo($uid = null)
 			$starttime+($i*24+$h)*60*60);
 	}
 	$stayoptions[10*24+9] = strftime("%e. (%a)", $starttime+(10*24+9)*60*60);
-	
-	$gatherPlaceOptions = array('warszawa'=>'Warszawa','olsztyn'=>'Olsztyn','none'=>'we własnym zakresie');
-	
-	$inputs = array(		
-		array('description'=>'PESEL', 'name'=>'pesel', 'type'=>'text'),
-		array('description'=>'adres zameldowania <small>(do ubezpieczenia)</small>', 'name'=>'address', 'type'=>'textarea'),
-		array('description'=>'telefon', 'name'=>'telephone', 'type'=>'text'),
-		array('description'=>'telefon do rodziców/opiekunów', 'name'=>'parenttelephone', 'type'=>'text'),
-		array('description'=>'termin przyjazdu: <span class="right">od</span>', 'name'=>'staybegin',
-			'type'=>'select', 'options'=>$stayoptions, 'default'=>19,      'filter'=>'int'),
-		array('description'=>'                  <span class="right">do</span>', 'name'=>'stayend',
-			'type'=>'select', 'options'=>$stayoptions, 'default'=>10*24+9, 'filter'=>'int'),
-		array('description'=>'miejsce zbiórki', 'name'=>'gatherplace','type'=>'select',
-			'options'=>$gatherPlaceOptions, 'default'=>'none'),
-		array('description'=>'nocleg i wyżywienie', 'name'=>'isselfcatered',
-			'type'=>'checkbox', 'text'=>'we własnym zakresie <small '.
-				getTipJS('dotyczy np. mieszkańców Olsztyna') .'>[?]</small>'),
-		array('description'=>'preferowany rozmiar koszulki', 'name'=>'tshirtsize', 'type'=>'select',
-			'options'=>$tshirtsizes, 'other'=>'', 'default'=>'L'),
-		array('description'=>'uwagi dodatkowe (np. wegetarianie)', 'name'=>'comments', 'type'=>'textarea'),		
-	);	
-	
+
+	$inputs['staybegin']['options'] = $stayoptions;
+	$inputs['stayend']['options']   = $stayoptions;
+	$inputs['gatherplace']['options'] = array('warszawa'=>_('Warsaw PKP'),'olsztyn'=>_('Olsztyn PKP'),'none'=>_('I\'ll arrive on my own.'));
+	$tshirtsizes = array('XS','S','M','L','XL','XXL');
+	$inputs['tshirtsize']['options'] = array_combine($tshirtsizes, $tshirtsizes);;
+	$inputs['isselfcatered']['text'] = _('on my own') .
+		'<small '. getTipJS(_('applies to Olsztyn residents, for example')) .'>[?]</small>';
+
+
 	$form = new Form($inputs);
-	
+
 	if ($form->submitted() && !$admin)
 	{
-		$values = $form->fetchValues();
-		$values['lastmodification'] = time();
-		$DB->users[$uid]->update($values);
-		$PAGE->addMessage('Pomyślnie zapisano dane.', 'success');
-		logUser('user edit2', $uid);		
+		$values = $form->fetchAndValidateValues();
+		if ($form->valid)
+		{
+			$values['lastmodification'] = time();
+			$DB->users[$uid]->update($values);
+			$PAGE->addMessage(_('Saved.'), 'success');
+			logUser('user edit2', $uid);
+		}
 	}
-	
-	$columns = $form->getColumns();
-	$columns .= ',name';
-	$r = $DB->users[$uid]->assoc($columns);
+
+	$r = $DB->users[$uid]->assoc($form->getColumns() .',name');
 	if (is_null($r['tshirtsize']))  $r['tshirtsize'] = 'L';
-	
-	$PAGE->title = 'Dodatkowe dane';
-	if ($admin)  $PAGE->title = $r['name'] .' - dodatkowe dane';	
-	
+
+	$PAGE->title = _('Additional info');
+	if ($admin)  $PAGE->title = $r['name'] .' - '. $PAGE->title;
+
 	if (userCan('adminUsers'))
-		$PAGE->headerTitle = getUserHeader($uid, $r['name'], 'editAdditionalInfo'); 	
-		
+		$PAGE->headerTitle = getUserHeader($uid, $r['name'], 'editAdditionalInfo');
+
 	$form->values = $r;
 	$form->columnWidth = '25%';
-	$form->submitValue = $admin ? null : 'Zapisz';		
-	$PAGE->content .= $form->getHTML();			
+	if ($admin)
+		$form->submitValue = null;
+	return print $form->getHTML();
 }

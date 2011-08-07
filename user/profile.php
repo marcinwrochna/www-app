@@ -4,189 +4,196 @@
  */
 
 function actionChangePassword()
-{	
-	global $USER, $PAGE, $DB;
-	if (!in_array('registered', $USER['roles']))  throw new PolicyException();
-	$PAGE->title = 'Zmień hasło';
-	$form = new Form(array(
-		array('password', 'oldpassword', 'stare hasło'),
-		array('password', 'newpassword', 'nowe hasło'),
-		array('password', 'newpassword_repeat', 'powtórz hasło')
-	), 'changePasswordForm');
-	$form->submitValue = 'Zmień';
-	$PAGE->content .= $form->getHTML();
-}
-
-function actionChangePasswordForm()
 {
 	global $USER, $PAGE, $DB;
-	if (!in_array('registered', $USER['roles']))  throw new PolicyException();	
-	$PAGE->title = 'Zmieniono hasło';
-	
+	if (!in_array('registered', $USER['roles']))  throw new PolicyException();
+	$PAGE->title = _('Password change');
+	$form = new Form(parseTable('
+		NAME                => TYPE;     tDESCRIPTION;    VALIDATION;
+		oldpassword         => password; old password;    ;
+		newpassword         => password; new password;    length(3 200);
+		newpassword_repeat  => password; type new password again; equal(newpassword);
+	'));
+	//return var_dump($form->rows);
+
+	if (!$form->submitted())
+		return print $form->getHTML();
+
+	$values = $form->fetchAndValidateValues();
 	$pass = $DB->users[$USER['uid']]->get('password');
-	$correct = true;				
-	assertOrFail($pass == passHash($_POST['oldpassword']),
-		'Stare hasło się nie zgadza.', $correct);
-	assertOrFail($_POST['newpassword'] == $_POST['newpassword_repeat'],
-		'Nowe hasło nie zgadza się z powtórzeniem.', $correct);
-		
-	if ($correct)
-	{
-		$DB->users[$USER['uid']]->update(array('password' => passHash($_POST['newpassword'])));
-		$PAGE->addMessage('Pomyślnie zmieniono hasło', 'success');
-		logUser('user pass change');
-		actionEditProfile();
-	}
-	else  actionChangePassword();
+	$form->assert($pass === passHash($values['oldpassword']), _('Old password doesn\'t match.'));
+	if (!$form->valid)
+		return print $form->getHTML();
+
+	$DB->users[$USER['uid']]->update(array('password' => passHash($values['newpassword'])));
+	$PAGE->addMessage(_('Password succesfully changed.'), 'success');
+	logUser('user pass change');
+	callAction('editProfile');
 }
 
 function actionPasswordReset()
 {
-	global $PAGE;
-	$PAGE->title = 'Resetuj hasło';	
-	$PAGE->content .= 'Wpisz swój login lub email - dostaniesz wiadomość z nowym hasłem.';
-	$form = new Form(array(
-		array('text', 'login', 'login'),
-		array('text', 'email', 'email'),
-	), 'passwordResetForm');
-	$PAGE->content .= $form->getHTML();
-}
-
-function actionPasswordResetForm()
-{
 	global $USER, $PAGE, $DB;
-	$PAGE->title = 'Zresetowano hasło';
-	$PAGE->headerTitle = '';
-	
+	$PAGE->title = _('Password reset');
+	echo _('Type your username or e-mail address. You\'ll recevie a message with a new password.');
+	$form = new Form(parseTable('
+		NAME   => TYPE; tDESCRIPTION; VALIDATION;
+		login  => text; username;     char(name digit);
+		email  => text; e-mail;       email;
+	'));
+
+	if (!$form->submitted())
+		return print $form->getHTML();
+
+	$values = $form->fetchAndValidateValues();
 	$r = $DB->query('SELECT uid,email,login FROM table_users WHERE login=$1 OR email=$2',
-		$_POST['login'], $_POST['email']);
-		
-	if (!count($r))
-	{
-		$PAGE->addMessage('Nie znaleziono takiego użytkownika.', 'userError');		
-		return actionPasswordReset();
-	}	
-		
+		$values['login'], $values['email']);
+
+	$form->assert(count($r), _('No account found with such login/e-mail.'));
+	if (!$form->valid)
+		return print $form->getHTML();
+
 	list($uid, $address, $login) = $r->fetch_vector();
 	logUser('pass reset', $uid);
 	$password = substr(sha1(uniqid('prefix', true)),0,10);
-	
-	$mail = "Zresetowano Ci hasło na http://". $_SERVER['HTTP_HOST'] . ABSOLUTE_PATH_PREFIX ."\n".
-		"login: $login\n".
-		"email: $address\n".
-		"hasło: $password\n".
-		"(hasło ma 10 znaków hex)\n\n".		
-		"Jeśli nie wiesz o co chodzi, zgłoś nadużycie\n".
-		"http://". $_SERVER['HTTP_HOST'] . ABSOLUTE_PATH_PREFIX ."reportBug\n";
-	sendMail('Nowe hasło', $mail, $address);
+
+	$message = sprintf(_(
+			'Your password at %s has been reset.\n'.
+			'username: %s\ne-mail:  %s\npassword: %s\n'.
+			'(the password has 10 hex characters)\n\n'.
+			'If you don\'t know what this is about, report abuse:\n%s\n'
+		),
+		'http://'. $_SERVER['HTTP_HOST'] . ABSOLUTE_PATH_PREFIX,
+		$login, $address, $password,
+		'http://'. $_SERVER['HTTP_HOST'] . ABSOLUTE_PATH_PREFIX .'reportBug\n'
+	);
+	sendMail(_('New password'), $message, $address);
 	$DB->users[$uid]->update(array('password'=>passHash($password)));
-	$PAGE->addMessage('Wysłano nowe hasło na maila.', 'success');	
+	$PAGE->addMessage(_('An e-mail message with the new password has been sent.'), 'success');
 }
 
 function actionEditProfile($uid = null)
 {
 	global $USER, $PAGE, $DB;
 	$currentEdition = getOption('currentEdition');
-	$admin = true;
-	if (is_null($uid))
+	// Edit my own profile or admin-edit someone other's profile:
+	$admin = !is_null($uid);
+	if ($admin)
 	{
-		$uid = intval($USER['uid']);
-		$admin = false;
-		if (!in_array('registered', $USER['roles']))  throw new PolicyException();
+		if (!userCan('adminUsers'))  throw new PolicyException();
+		$uid = intval($uid);
+		if (!isset($DB->users[$uid]))
+			throw new KnownException(_('User not found.'));
+		$name = $DB->users[$uid]->get('name');
+		$PAGE->title = $name. ' - '. _('profile');
+		$PAGE->headerTitle = getUserHeader($uid, $name, 'editProfile');
 	}
 	else
 	{
-		$uid = intval($uid);
-		if (!userCan('adminUsers'))  throw new PolicyException();
+		$uid = intval($USER['uid']);
+		//if (!userCan('editProfile', $uid))  throw new PolicyException();
+		$admin = false;
+		$PAGE->title = _('Your profile');
 	}
-		
-	$maturaYearOptions = getMaturaYearOptions();
-	
-	$genderOptions = array('m' => 'męski', 'f' => 'żeński');
-	$rolesOptions = array(
-		'admin'=>'Admin',
-		'tutor'=>'Tutor',
-		'jadący'=>'Jadąc'. gender('y','a',$DB->users[$uid]->get('gender'))
+
+	if (userCan('impersonate', $uid) && ($uid != $USER['uid']))
+		echo '<a href="impersonate('. $uid .')/" '.
+			getTipJS(_('Executes everything as if you were logged in as that person.')) .'>'.
+			_('impersonate'). '</a>';
+
+	$nadmin = $admin ? 'false' : 'true'; // Non-admins can only read some values.
+	$inputs = parseTable("
+		NAME            => TYPE;          tDESCRIPTION;            bREADONLY; VALIDATION;
+		registered      => timestamp;     registered;              true;      ;
+		logged          => timestamp;     last login;              true;      ;
+		name            => text;          full name;               $nadmin;   char(name),length(3 70);
+		login           => text;          username;                $nadmin;   char(name digit),length(4 20);
+		email           => text;          e-mail;                  $nadmin;   email;
+		password        => custom;        password;                true;      ;
+		gender          => select;        grammatical gender;      false;     ;
+		role            => select;        role in current edition; $nadmin;   ;              notdb;
+		roles           => checkboxgroup; other roles;             $nadmin;   ;              notdb;
+		school          => text;          school/university;       false;     ;
+		maturayear      => select;        graduation year;         false;     int;           other;
+		skadwieszowww   => text;          how do you know WWW?;    false;     ;
+		zainteresowania => richtextarea;  interests;               false;     ;
+	");
+	$inputs['password']['default'] = '<a href="changePassword">'. _('change') .'</a>';
+	if ($admin)
+		unset($inputs['password']);
+	else
+	{
+		unset($inputs['registered']);
+		unset($inputs['logged']);
+	}
+	$inputs['gender']['options'] = array('m' => _('masculine'), 'f' => _('feminine'));
+	$inputs['role']['options'] = array(
+		'none'=> _('None'),
+		'uczestnik'=> _('Candidate'),
+		'auczestnik'=> _('Qualified participant'),
+		'kadra'=> _('Lecturer'),
+		'akadra'=> _('Qualified lecturer'),
 	);
-	$roleOptions = array(
-		'none'=>'Nikt',
-		'uczestnik'=>'Uczestnik',
-		'auczestnik'=>'Zakwalifikowany uczestnik',
-		'kadra'=>'Kadra',
-		'akadra'=>'Zakwalifikowana kadra',
+	$inputs['roles']['options'] = array(
+		'admin'=> _('Admin'),
+		'tutor'=> _('Tutor'),
+		//'jadący'=> genderize(_('Qualified'), $DB->users[$uid]->get('gender'))
 	);
-	
-	$impersonate = '<a href="impersonate('. $uid .')/" '.
-		getTipJS('wykonuje wszystko dokładnie, jakby Cię zalogować jako ta osoba') .'>impersonuj</a>';
-		
-	$schoolsAutoCompleteData = $DB->query('SELECT school FROM table_users WHERE school IS NOT NULL
-		GROUP BY school HAVING count(*)>1 ORDER BY count(*) DESC')->fetch_column();
-		
-	$inputs = array(
-		array('custom',       'impersonate',  '', 'custom' => $impersonate, 'hidden'=>!$admin),
-		array('timestamp',    'registered',     'rejestracja',        true, 'hidden'=>!$admin),
-		array('timestamp',    'logged',         'ostatnie logowanie', true, 'hidden'=>!$admin),
-		array('text',         'name',           'imię i nazwisko',    !$admin),
-		array('text',         'login',          'login',              !$admin),
-		array('text',         'email',          'email',              !$admin),
-		array('custom',       'password',       'hasło',              true, 'hidden'=>$admin, 'default'=>'<a href="changePassword">zmień</a>'),
-		array('select',       'gender',         'rodzaj gramatyczny', 'options'=>$genderOptions),
-		array('select',       'role',           'rola w obecnej edycji', !$admin, 'options'=>$roleOptions, 'notdb'=> true),
-		array('checkboxgroup','roles',          'role',               'options'=>$rolesOptions, 'hidden'=>!$admin),
-		array('text',         'school',         'szkoła/kierunek studiów', 'autocomplete'=>$schoolsAutoCompleteData),
-		array('select',       'maturayear',     'rocznik (ściślej: rok zdania matury)', 'options'=>$maturaYearOptions, 'other'=>''),
-		array('text',         'skadwieszowww',  'skąd wiesz o WWW?'),
-		array('richtextarea', 'zainteresowania','zainteresowania'),
-		//array('checkbox',     'isselfcatered',  'nocleg i wyżywienie', 'text'=>'we własnym zakresie <small '. getTipJS('dotyczy np. mieszkańców Olsztyna') .'>[?]</small>')
-	);	
-			
-	$action = 'editProfile';
-	if ($admin)  $action .= "($uid)";
-	$form = new Form($inputs, $action);
-	
+	$inputs['school']['autocomplete'] = $DB->query('SELECT school FROM table_users WHERE school IS NOT NULL
+		GROUP BY school HAVING count(*)>1 ORDER BY count(*) DESC LIMIT 150')->fetch_column();
+	$inputs['maturayear']['options'] = getMaturaYearOptions();
+
+	$form = new Form($inputs);
+	$form->columnWidth = '35%';
+
 	if ($form->submitted())
 	{
-		$values = $form->fetchValues();
-		$values['maturayear'] = intval($values['maturayear']);
-		$role = $values['role'];
-		unset($values['role']);
-		$DB->users[$uid]->update($values);		
-		if ($admin)
+		$values = $form->fetchAndValidateValues();
+		if ($form->valid)
 		{
-			if (isset($_POST['roles']) && is_array($_POST['roles'])) //test for empty checkboxGroup
-				$roles = $_POST['roles'];
-			
-			if ($role == 'none')
-				$DB->edition_user($currentEdition, $uid)->delete();
-			else
+			// Update roles (in table_user_roles and table_edition_user.{lecturer,qualified}.
+			if ($admin)
 			{
-				$value = array(
-					'qualified' => in_array($role, array('auczestnik', 'akadra')) ? 1 : 0,
-					'lecturer' => in_array($role, array('kadra', 'akadra')) ? 1 : 0
-				);
-				$roles[]= $value['lecturer'] ? 'kadra' : 'uczestnik';
-				if ($role == 'akadra')  $roles[]='akadra';
-				
-				if ($DB->edition_user($currentEdition, $uid)->count())
-					$DB->edition_user($currentEdition, $uid)->update($value);
-				else 
+				$role = $values['role'];
+				unset($values['role']);
+				$roles = array();
+				if (isset($_POST['roles']) && is_array($_POST['roles'])) //test for empty checkboxGroup
+					$roles = $_POST['roles'];
+
+				if ($role == 'none')
+					$DB->edition_user($currentEdition, $uid)->delete();
+				else
 				{
-					$value['edition'] = $currentEdition; $value['uid'] = $uid;
-					$DB->edition_user[]= $value;
+					$value = array(
+						'qualified' => in_array($role, array('auczestnik', 'akadra')) ? 1 : 0,
+						'lecturer' => in_array($role, array('kadra', 'akadra')) ? 1 : 0
+					);
+					$roles[]= $value['lecturer'] ? 'kadra' : 'uczestnik';
+					if ($role == 'akadra')  $roles[]='akadra';
+
+					if ($DB->edition_user($currentEdition, $uid)->count())
+						$DB->edition_user($currentEdition, $uid)->update($value);
+					else
+					{
+						$value['edition'] = $currentEdition;
+						$value['uid'] = $uid;
+						$DB->edition_user[]= $value;
+					}
 				}
+
+				$DB->query('DELETE FROM table_user_roles WHERE uid=$1', $uid);
+				foreach ($roles as $role)
+					$DB->user_roles[]= array('uid'=>$uid,'role'=>$role);
 			}
-			
-			$DB->query('DELETE FROM table_user_roles WHERE uid=$1', $uid);
-			foreach ($roles as $role)
-				$DB->user_roles[]= array('uid'=>$uid,'role'=>$role);
+			$DB->users[$uid]->update($values);
+			$PAGE->addMessage(_('Saved.'), 'success');
+			logUser('user edit', $uid);
 		}
-		$PAGE->addMessage('Pomyślnie zmieniono profil.', 'success');
-		logUser('user edit', $uid);
 	}
-	
-	$form->values = $DB->users[$uid]->assoc($form->getColumns().',confirm');
+
+	$form->values = $DB->users[$uid]->assoc($form->getColumns() .',"confirm"');
 	$roles = $DB->query('SELECT role FROM table_user_roles WHERE uid=$1', $uid);
-	$form->values['roles'] = $roles->fetch_column();
+	$form->values['roles'] = array_intersect($roles->fetch_column(), array_keys($inputs['roles']['options']));
 	$row = $DB->edition_user($currentEdition, $uid);
 	if (!$row->count())
 		$form->values['role'] = 'none';
@@ -198,32 +205,28 @@ function actionEditProfile($uid = null)
 	if ($admin)
 	{
 		if ($form->values['confirm'] > 0)
-			$form->values['logged'] = 'użytkownik nie potwierdził maila';
+			$form->values['logged'] = _('the user hasn\'t confirmed his e-mail yet');
 		else if ($form->values['logged'] == 0)
-			$form->values['logged'] = 'użytkownik jeszcze się nie logował';
+			$form->values['logged'] = _('the user hasn\'t logged in yet');
 	}
-	
-	$name = $DB->users[$uid]->get('name');
-	if ($admin)  $PAGE->title = $name. ' - profil';
-	else $PAGE->title = 'Twój profil';
-	if (userCan('adminUsers'))
-		$PAGE->headerTitle = getUserHeader($uid, $name, 'editProfile');
-	$form->submitValue = 'Zapisz';
-	$form->columnWidth = '35%';
-	$PAGE->content = $form->getHTML();
+
+	return print $form->getHTML();
 }
 
+// Returns an array of 9 most probable graduation years.
 function getMaturaYearOptions()
 {
+	// I decided not to use the text descriptions anymore, they're imprecise and confusing.
+	// (so this table's values are not actually used).
 	$maturaOptions = array('3. gimnazjum ', '1. klasa liceum','2. klasa liceum ', '3. klasa liceum',
 		'I rok studiów', 'II  rok studiów', 'III rok studiów', 'IV rok studiów', 'V rok studiów');
 	$date = getdate();
-	$year = $date['year']+3; // Pierwszy element $maturaOptions ma maturę za 3 lata.
-	if ($date['mon']>=9)  $year++; // Od 1 września w "nowej" klasie. (może powinno być wcześniej?)
+	$year = $date['year']+3; // The first element of $maturaOptions graduates in 3 years.
+	if ($date['mon']>=9)  $year++; // We consider the 1st of September to be the threshold (should we?).
 	$maturaYearOptions = array();
 	foreach ($maturaOptions as $i=>$opt)
 	{
-		$maturaYearOptions[strval($year)] = "$opt ($year)";
+		$maturaYearOptions[$year] = $year; // ." ($opt)";
 		$year--;
 	}
 	return $maturaYearOptions;

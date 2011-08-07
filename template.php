@@ -2,12 +2,11 @@
 /*
 	template.php
 	Included in common.php, uploader/ubr.php
-	Defines:		
+	Defines:
 		parseUserHTML() - should be called for all user-created text
 			replaces [tex] tags with appropriate images,
 			it should purify the text to prevent XSS attacks.
-		showMessage() - shorthand for displaying short messages on top of page
-		
+
 		class SimpleTemplate - widely used simple output buffer redirecting and parsing class
 			Usage:
 				$template = new SimpleTemplate(array('varname' => 'value'));
@@ -24,8 +23,8 @@
 				<?php
 				echo $template->finish();
 		class Page extends SimpleTemplate - used as global $PAGE
-				
-		
+
+
 		getTipJS($tip) - returns a " onmouseout=... onmouseover=... " string.
 		getIcon($name, $tip=false, $href=false) - returns an icon from images/icons/, with optionally a tip and <a href>.
 		getButton($title, $href, $icon=false) - returns a big fat button.
@@ -36,34 +35,34 @@ class SimpleTemplate
 {
 	public $variables;
 	private $cleaned = false;
-	
+
 	function __construct($templateVariables = array())
-	{		
+	{
 		$this->variables = $templateVariables;
 		ob_start();
 	}
-	
+
 	public function __isset($name)
 	{
 		return array_key_exists($name, $this->variables);
 	}
-	
+
 	public function __get($name)
 	{
 		if (!array_key_exists($name, $this->variables))
 			$this->variables[$name] = '';
 		return $this->variables[$name];
 	}
-	
+
 	public function __set($name, $value)
 	{
 		$this->variables[$name] = $value;
 	}
-	
-	function finish()
+
+	function finish($translate = false)
 	{
-		if ($this->cleaned)  return 'Błąd parsera.';
-		
+		if ($this->cleaned)  return 'Parser error - already flushed.';
+
 		$names = array();
 		$values = array();
 		foreach ($this->variables as $name => $value)
@@ -72,8 +71,31 @@ class SimpleTemplate
 			$names[]= "%$name%";
 			$values[]= $value;
 		}
+
 		$this->cleaned = true;
-		return str_replace($names, $values, ob_get_clean());
+		$s = ob_get_clean();
+		if ($translate)
+		{
+			$result = '';
+			$length = strlen($s);
+			$offset = 0;
+			while (($p = strpos($s, '{{', $offset)) !== false)
+			{
+				$result .= substr($s, $offset, $p - $offset);
+				$offset = strpos($s, '}}', $p);
+				if ($offset === false)
+					return 'Parser error - unfinished translate string.';
+				$result .= gettext(substr($s, $p + 2, $offset - $p - 2));
+				$offset += 2;
+				if ($offset > $length)
+					break; // strpos would issue a warning otherwise.
+			}
+			$result .= substr($s, $offset);
+		}
+		else
+			$result = $s;
+
+		return str_replace($names, $values, $result);
 	}
 
 	function __destruct()
@@ -84,7 +106,6 @@ class SimpleTemplate
 
 function parseUserHTML($html) {
 	// TODO high: prevent XSS attacks with HTMLPurifier.
-	
 	// Parse [tex]code[/tex] into <img src="pathtorenderer.cgi?code"/>.
 	preg_match_all("#\[tex\](.*?)\[/tex\]#si",$html,$tex_matches);
 	for ($i=0; $i < count($tex_matches[0]); $i++) {
@@ -97,19 +118,20 @@ function parseUserHTML($html) {
 		$img = "<img src='$url' alt='formuła latexa' align='absmiddle'/>";
 		$html = substr_replace($html, $img,$pos,$len);
 	}
-	
+
 	// TODO see why TinyMCE includes html-escaped comment tags with MS Word stuff.
 	$offset = 0;
 	while (($pos = strpos($html, '&lt;!--', $offset)) !== false)
 	{
-		$end = strpos($html, '--&gt;', $pos+2);		
+		$end = strpos($html, '--&gt;', $pos+2);
+		global $PAGE;
 		if ($end === false)
-			showMessage('Nie znaleziono zamykającego elementu w wklejeniu z Worda.', 'exception');
+			$PAGE->addMessage('Nie znaleziono zamykającego elementu w wklejeniu z Worda.', 'exception');
 		$end += strlen('--&gt;');
 		$html = substr_replace($html, '', $pos, $end-$pos);
 		$offset = $pos;
 	}
-	
+
 	return $html;
 }
 
@@ -140,11 +162,22 @@ function getButton($title, $href, $icon=false)
 	return "<a class='button' href='$href'>$button</a>";
 }
 
+// Return's string with $1 replaced with first argument, $2 with 2nd and so on.
+function format($string /* ... */)
+{
+	$args = func_get_args();
+	array_shift($args);
+	foreach ($args as $i => $arg)
+		$string = str_replace('$'. ($i+1), $arg, $string);
+	return $string;
+}
+
 // Typical usage: formatAssoc('Name: %name%, ...', $DB->fetch_assoc())
+// TODO deprecate formatAssoc? Only used twice.
 function formatAssoc($string, $assoc)
 {
 	$names = array();
-	$values = array();	
+	$values = array();
 	foreach ($assoc as $name => $value)
 	{
 		$names[]= "%$name%";
@@ -164,4 +197,33 @@ function alternate()
 	while(!(list($key,$val) = each($array)))
 		reset($array);
 	return $val;
+}
+
+function buildTableHTML($rows, $headers = null)
+{
+	echo '<table class="bordered" style="width:auto">';
+	if ($headers)
+	{
+		echo'<thead><tr>';
+		foreach ($headers as $h)
+			echo '<th>'. $h .'</th>';
+		echo '</tr></thead>';
+	}
+	echo '<tbody>';
+	foreach ($rows as $row)
+	{
+		echo '<tr class="'. alternate('even', 'odd') .'">';
+		if ($headers)
+			foreach ($headers as $key => $h)
+				if (array_key_exists($key, $row))
+		{
+			echo '<td>'. $row[$key] .'</td>';
+			unset($row[$key]);
+		}
+		foreach ($row as $key => $value)
+				echo '<td>'. $value .'</td>';
+
+		echo '</tr>';
+	}
+	echo '</tbody></table>';
 }

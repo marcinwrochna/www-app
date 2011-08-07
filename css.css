@@ -6,7 +6,7 @@ me
 hr.antifloat {
 	display: block;
 	clear: both;
-	margin: 0; 
+	margin: 0;
 	height: 1px;
 	margin-bottom: -3px;
 	visibility: hidden;
@@ -87,7 +87,7 @@ body {
 	float: left;
 	overflow: hidden;
 	/*font-size: 0.9em;*/
-	line-height: 1.5em; 
+	line-height: 1.5em;
 	text-align: left;
 	margin: 0.5em 0;
 }
@@ -271,7 +271,7 @@ table.tasks td {
 	margin-top: 5px;
 	margin-bottom: -8px;
 }
-.tabs a { 
+.tabs a {
 	border: 1px #D0CFCC solid;
 	padding: 0 2px;
 	text-decoration: none;
@@ -308,3 +308,5 @@ table.bordered td { color: black; }
 /* .todoList .enabled { list-style-image: url('images/icons/arrow-small.gif'); } */
 .todoList .todo { background-color: #FFE; list-style-image: url('images/icons/arrow-small.gif');}
 .todoList .done { background-color: #EFE; list-style-image: url('images/icons/checkmark.gif');}
+
+.formError li { background-color: #FFE0E9; color: #000; }

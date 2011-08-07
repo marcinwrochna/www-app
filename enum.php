@@ -4,9 +4,10 @@
  * Requires PHP 5.2?: eval, ArrayAccess, IteratorAggregate, ArrayObject
  */
 require_once('utils.php');
- 
+// TODO translate, po-parse parseTables and templates.
+
 class Enum implements ArrayAccess, IteratorAggregate
-{	
+{
 	private static $enumTypes = array();
 	public static function define($enumName, array $items, $default)
 	{
@@ -15,16 +16,16 @@ class Enum implements ArrayAccess, IteratorAggregate
 		'{ return Enum::get(\''. $enumName .'\', $i); }';
 		eval($function);
 	}
-	
-	public static function get($enumName, $id = null)
+
+	public static function get($enumName, $keyOrId = null)
 	{
-		if (is_null($id))
+		if (is_null($keyOrId))
 			return self::$enumTypes[$enumName];
-		if (is_numeric($id))
+		if (is_numeric($keyOrId))
 			foreach(self::$enumTypes[$enumName] as $enumItem)
-				if ($enumItem->id == $id)
-					return $enumItem;					
-		return self::$enumTypes[$enumName][$id];		
+				if ($enumItem->id == $keyOrId)
+					return $enumItem;
+		return self::$enumTypes[$enumName][$keyOrId];
 	}
 
 	private $items;
@@ -32,11 +33,11 @@ class Enum implements ArrayAccess, IteratorAggregate
 	private function __construct(array $items, $default)
 	{
 		$this->items = array();
-		foreach($items as $id=>$item)
-		{
-			$this->items[$id]= new EnumItem($item, $id);
-		}
-		$this->default = new EnumItem($default, 'default');
+		foreach($items as $key => $item)
+			$this->items[$key]= new EnumItem($item);
+		$default['key'] = 'default';
+		$default['id']  = -1;
+		$this->default = new EnumItem($default);
 	}
 	public function offsetGet($offset)
 	{
@@ -50,7 +51,7 @@ class Enum implements ArrayAccess, IteratorAggregate
 	public function exists($offset) { return isset($this->items[$offset]); }
 	public function offsetUnset($offset)  { throw new KnownException('Undefined operation'); }
 	public function getIterator()  { return new ArrayIterator($this->items); }
-	
+
 	public function assoc($keyColumn, $valColumn)
 	{
 		$a = array();
@@ -62,91 +63,73 @@ class Enum implements ArrayAccess, IteratorAggregate
 
 class EnumItem extends ArrayObject
 {
-	private $id;
-	public function __construct($items, $id)
+	public function __construct($items)
 	{
-		$this->id = $id;
 		parent::__construct($items, ArrayObject::ARRAY_AS_PROPS);
 	}
 	public function inArray($enumIds)
 	{
 		foreach ($enumIds as $enumId)
-			if ($enumId == $this->id)
+			if ($enumId == $this->key)
 				return true;
 		return false;
 	}
 }
 
-// '% ' zamienione na 'y'/'a'/'ych', '%ś' zamienione na 'eś'/'aś'
-Enum::define('participantStatus', 
-	applyDefaultHeaders(
-		array('id','description','canResign', 'icon', 'explanation'),
-		array(
-			'none'         => array(0, 'niezapisan%',         false, '',                'Nie jesteś zapisan% na te warsztaty.'),
-			'candidate'    => array(1, 'wstępnie zapisan%',   true , 'tick-yellow.png', 'Jesteś zapisan% (wstępnie; pamiętaj o zadaniach kwalifikacyjnych).'),
-			'rejected'     => array(2, 'nie spełnia wymagań', false, 'cross.png',       'Nie spełnił%ś wymagań.'),
-			'accepted'     => array(3, 'zakwalifikowan%',     false, 'tick.png',        'Zakwalifikował%ś się.'),
-			'autoaccepted' => array(4, 'zapisan% (kadra)',    true , 'tick.png',        'Jesteś zapisan% (zakwalifikowany jako kadra).'),
-			'lecturer'     => array(5, 'prowadząc%',          false, 'user-green.png',  'Prowadzisz te warsztaty.')
-		)		
-	),
+Enum::define('participantStatus',
+	parseTable('
+		KEY          => #ID; tDESCRIPTION;                  bCAN_RESIGN; ICON;            tEXPLANATION;
+		none         => 0;   unassociated;                  false;       ;                You aren\'t signed up for this workshop block.;
+		candidate    => 1;   applied;                       true;        tick-yellow.png; You signed up for this workshop block (remember about qualification).;
+		rejected     => 2;   didn\'t meet the requirements; false;       cross.png;       You didn\'t meet the requirements.;
+		accepted     => 3;   qualified;                     false;       tick.png;        You have been qualified to this workshop block.;
+		autoaccepted => 4;   signed up (staff);             true;        tick.png;        You signed up for this workshop block (qualified as a staff member).;
+		lecturer     => 5;   lecturer;                      false;       user-green.png;  You are a lecturer to this workshop block.;
+	'),
 	array('description'=>'???', 'canResign'=>false)
 );
 
-Enum::define('blockStatus', 
-	applyDefaultHeaders(
-		array('id', 'decision', 'status'),
-		array(
-			'new'        => array(0, 'nowe',               'nie rozpatrzono'     ),
-			'undetailed' => array(1, 'prośba o szczegóły', 'prośba o szczegóły'  ),
-			'rejected'   => array(2, 'słabe',              'wstępnie rozpatrzono'),
-			'ok'         => array(3, 'ujdzie',             'wstępnie rozpatrzono'),
-			'great'      => array(4, 'świetne',            'wstępnie rozpatrzono')
-		)
-	),
-	array('decision'=>'nieznany', 'status'=>'nieznany')
+Enum::define('blockStatus',
+	parseTable('
+		KEY        => #ID; tDECISION;          tSTATUS;
+		new        => 0;   new;                to be considered;
+		undetailed => 1;   details requested;  details requested;
+		rejected   => 2;   poor;               initially considered;
+		ok         => 3;   ok;                 initially considered;
+		great      => 4;   great;              initially considered;
+	'),
+	array('decision'=>_('unknown'), 'status'=>_('unknown'))
+	//TODO merge blockStatus:{ok,great} into :accepted
 );
 
 Enum::define('blockType',
-	applyDefaultHeaders(
-		array('id', 'short', 'description'),
-		array(
-			'lightLecture' => array(0, 'luźny',     'luźny wykład'),
-			'workshop'     => array(1, 'warsztaty', 'warsztaty'   )
-		)
-	),
+	parseTable('
+		KEY          => #ID; tSHORT;    tDESCRIPTION;
+		lightLecture => 0;   light;     light lecture;
+		workshop     => 1;   workshop;  workshop block;
+	'),
 	array('description'=>'???')
 );
 
-Enum::define('subject', 
-	applyDefaultHeaders(
-		array('icon', 'description', 'orderWeight'),
-		array(
-			'mathematics' => array('m',  'matematyka',             -1),
-			'cs_theory'   => array('it', 'informatyka teoretyczna', 2),
-			'cs_practice' => array('ip', 'informatyka praktyczna',  4),		
-			'physics'     => array('f',  'fizyka',                  8),
-			'astronomy'   => array('a',  'astronomia',             16)
-		)
-	),
-	array('description'=>'???')	
+Enum::define('subject',
+	parseTable('
+		KEY         => ICON; tDESCRIPTION;                #ORDER_WEIGHT;
+		mathematics => m;    mathematics;                 -1;
+		cs_theory   => it;   computer science (theory);    2;
+		cs_practice => ip;   computer science (practice);  4;
+		physics     => f;    physics;                      8;
+		astronomy   => a;    astronomy;                   16;
+	'),
+	array('description'=>'???')
 );
 
-Enum::define('solutionStatus', 
-	applyDefaultHeaders(
-		array('id', 'description', 'icon'),
-		array(
-			'none'     => array(0, 'brak',                 'solution-none.gif'),
-			'new'      => array(1, 'czeka na sprawdzenie', 'solution-new.gif'),
- 			'returned' => array(2, 'do poprawy',           'solution-returned.gif'),
- 			'graded'   => array(3, 'ocenione',             'solution-graded.gif')
- 		)
- 	),
+Enum::define('solutionStatus',
+	parseTable('
+		KEY      => #ID; tDESCRIPTION;            ICON;
+		none     => 0;   none;                    solution-none.gif;
+		new      => 1;   to be checked;           solution-new.gif;
+ 		returned => 2;   returned for correction; solution-returned.gif;
+ 		graded   => 3;   graded;                  solution-graded.gif;
+ 	'),
  	array('description' => '???')
 );
-
-function actionEnumTest()
-{
-	global $PAGE;	
-	$PAGE->content .= enumWorkshopStatus('zong')->decision;
-}

@@ -1,7 +1,7 @@
 <?php
 /*
-	index.php shows the article/attachment/image pointed by the url query.
-	Includes: common.php, html.php
+ * index.php includes pretty much everything and
+ * calls the appropriate action, parsing the GET.
 */
 
 require_once('common.php');
@@ -13,40 +13,66 @@ require_once('page.php');
 require_once('form.php');
 require_once('user.php');
 $PAGE = new Page();
-include_once('update.php'); // apply updates
-
-initUser();
-
-require_once('warsztaty.php');
+include_once('update.php'); // Apply updates.
+initUser(); // initializes the $USER global.
+require_once('workshop.php');
 require_once('plan.php');
 include_once('tutoring.php');
 
-try
+function callAction($action, $args = array(), $redirect = true)
 {
-	$action = isset($_GET['action']) ? $_GET['action'] : 'homepage';
+	global $PAGE;
+	if ($redirect)
+	{
+		$_SESSION['pageMessages'] = $PAGE->topContent;
+		header('HTTP/1.1 303 See Other');
+		header('Location: http://'. $_SERVER['HTTP_HOST'] . ABSOLUTE_PATH_PREFIX .
+			$action .'('. implode(';', $args) .')');
+		exit;
+	}
+
 	$action = 'action'. ucfirst($action);
-	$args = isset($_GET['args']) ? explode(';', $_GET['args']) : array();
 	if (is_callable($action))
 		call_user_func_array($action, $args);
 	else
 		throw new KnownException('Nieznana akcja.');
-	
-	$PAGE->menu .= addSiteMenuBox();
-	if (in_array('registered', $USER['roles']))
-		$PAGE->menu .= addUserMenuBox();
+}
+
+try
+{
+	// If redirected - restore messages.
+	if (!empty($_SESSION['pageMessages']))
+	{
+		$PAGE->topContent .= $_SESSION['pageMessages'];
+		unset($_SESSION['pageMessages']);
+	}
+
+	// Example URL:                                     http://server/doSomething(a;b)
+	// .htaccess (apache mod_rewrite) translates it to: action=doSomething&args=a;b
+	// We then call the function:                       actionDoSomething(a,b)
+	// and put it's output in $PAGE->content.
+	$action = isset($_GET['action']) ? $_GET['action'] : 'homepage';
+	$args = empty($_GET['args']) ? array() : explode(';', $_GET['args']);
+	$buffer = new SimpleTemplate(); // Catch echo'ed things into buffer.
+	callAction($action, $args, false);
+	$PAGE->content .= $buffer->finish();
+
+	/* Menu */
+	addSiteMenuBox();
+	if (userIs('registered'))
+		addUserMenuBox();
 	else
-		$PAGE->menu .= addLoginMenuBox();
-	$PAGE->menu .= addWarsztatyMenuBox();
-	// $PAGE->menu .= addTutoringMenuBox();
-	$PAGE->menu .= addAdminMenuBox();		
+		addLoginMenuBox();
+	addWarsztatyMenuBox();
+	//addTutoringMenuBox();
+	addAdminMenuBox();
 }
 catch (PolicyException $e)
 {
+	$buffer->finish();
 	$PAGE->content = '';
 	$PAGE->topContent = '';
-	showMessage($e->getMessage(), 'exception');
+	$PAGE->addMessage($e->getMessage(), 'exception');
 }
-	
-echo $PAGE->finish();
 
-//logVisitor('index', $fid);
+echo $PAGE->finish();

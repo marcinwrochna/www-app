@@ -1,10 +1,4 @@
 <?php
-
-function writeMTime($f)
-{
-	echo ABSOLUTE_PATH_PREFIX . $f .'?'. filemtime($f);
-}
-
 class Page extends SimpleTemplate
 {
 	function __construct()
@@ -12,37 +6,37 @@ class Page extends SimpleTemplate
 		parent::__construct();
 		$this->head = '';
 		$this->title = '';
-		$this->menu = ''; 
-		$this->content = ''; 
+		$this->menu = '';
+		$this->content = '';
 		$this->topContent = '';
 		$this->js = '';
 		$this->jsOnLoad = '';
 	}
-	
-	function finish()
-	{		
+
+	function finish($translated = false)
+	{
 		header('Content-Language: pl');
-		header('Content-Type: text/html; charset=UTF-8'); 		
+		header('Content-Type: text/html; charset=UTF-8');
 		// Too frequent version changes make things incompatible. Must-revalidate.
 		// May be changed to something less expensive later.
 		header('Cache-Control: private, s-maxage=0, max-age=0, must-revalidate');
 		header('Last-Modified: '. gmdate("D, d M Y H:i:s", time()) .' GMT');
-		
+
 		if (DEBUG>=2) $this->content .= dumpSuperGlobals();
-		
+
 		$this->latexPath = 'http://'. $_SERVER['HTTP_HOST'] . '/cgi-bin/mimetex.cgi';
 		$this->uploadGetter = 'http://'. $_SERVER['HTTP_HOST'] . '/uploader/getfile.php';
-		
+
 		if (!isset($this->headerTitle))
 			$this->headerTitle = '<h2>'. $this->title .'</h2>';
-			
+
 		if (!isset($_GET['print']))
-			include('html.php'); 			
+			include('html.php');
 		else
 			$this->printableHTML();
 		return parent::finish();
 	}
-	
+
 	function addMessage($text, $type='unknown')
 	{
 		$icons = array(
@@ -58,10 +52,10 @@ class Page extends SimpleTemplate
 			$src = ABSOLUTE_PATH_PREFIX .'images/fatcow/32/'. $icons[$type];
 			$text = "<img src='$src' alt='$type'/>$text";
 		}
-		
-		$this->topContent .= "<div class='contentBox message'>$text</div>";		
+
+		$this->topContent .= "<div class='contentBox message'>$text</div>";
 	}
-	
+
 	// $items is an array of menu items: each as an associative array or
 	// 	a vector with 'title','action','icon'[,'perm'] values respectively.
 	function addMenuBox($title, $items, $custom='')
@@ -70,17 +64,16 @@ class Page extends SimpleTemplate
 		$menuItems = '';
 		foreach($items as $item)
 		{
-			$item = applyDefaultKeys($item, array('title','action','icon','perm'));
 			if (!isset($item['perm']))
 				$item['perm'] = userCan($item['action']);
 			if (!$item['perm'])
 				continue;
 			$count++;
-			$item['icon'] = getIcon($item['icon']);
+			$item['icon'] = empty($item['icon']) ? '' : getIcon($item['icon']);
 			$menuItems .= formatAssoc('<li>%icon% <a href="%action%">%title%</a></li>', $item);
-		}			
+		}
 		if (!$count)  return '';
-		
+
 		$params = array('title'=>$title,'items'=>$menuItems,'custom'=>$custom);
 		$template = new SimpleTemplate($params);
 		?>
@@ -92,7 +85,7 @@ class Page extends SimpleTemplate
 		<?php
 		$this->menu .= $template->finish();
 	}
-	
+
 	function printableHTML()
 	{
 		?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -112,11 +105,4 @@ class Page extends SimpleTemplate
 			</html>
 		<?php
 	}
-}
-
-// DEPRECATED, use $PAGE->addMessage instead
-function showMessage($text, $type='unknown')
-{
-	global $PAGE;
-	$PAGE->addMessage($text, $type);	
 }

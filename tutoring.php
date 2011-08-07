@@ -6,29 +6,33 @@
 		buildTutoringBox()
 		actionMyTutorial()
 */
+// TODO review, translate, ..
 
 function addTutoringMenuBox()
 {
 	global $USER, $PAGE;
-	$PAGE->addMenuBox('Tutorial', array(
-		array('twoje podanie', 'editTutoringApplication', 'application-my.png', userCan('editProfile',$USER['uid'])),
-		array('lista podań',   'viewTutoringApplications', 'application-list.png'),
-	));
+	$items = parseTable('
+		ACTION                   => tTITLE;        ICON;
+		editTutoringApplication  => twoje podanie; application-my.png;
+		viewTutoringApplications => lista podań;   application-list.png;
+	');
+	$items['editTutoringApplication']['perm'] = userCan('editProfile',$USER['uid']);
+	$PAGE->addMenuBox('Tutorial', $items);
 }
 
 function actionEditTutoringApplication()
 {
 	global $DB, $USER, $PAGE;
-	if (!userCan('editTutoringApplication'))  throw new PolicyException();	
+	if (!userCan('editTutoringApplication'))  throw new PolicyException();
 	if (!assertProfileFilled())  return;
 
 	$user = $DB->users[$USER['uid']]->assoc('podanieotutora,tutoruid');
-	
+
 	if (empty($user['podanieotutora']))  $status = 'brak podania';
 	else if ($user['tutoruid'] == USER_ANONYMOUS)  $status = 'oczekuje...';
 	else $status = getName($user['tutoruid']) .' jest twoim tutorem :)';
 	$PAGE->content .= '<b>status</b>: '. $status .'<br/>';
-		
+
 	$PAGE->title = 'Podanie o tutora';
 	$form = new Form(array(
 		array('richtextarea', 'podanieotutora',
@@ -46,7 +50,7 @@ function actionEditTutoringApplication()
 function actionEditTutoringApplicationForm()
 {
 	global $DB,$USER,$PAGE;
-	if (!userCan('editTutoringApplication'))  throw new PolicyException();		
+	if (!userCan('editTutoringApplication'))  throw new PolicyException();
 	$application = trim($_POST['podanieotutora']);
 	if (empty($_POST['podanieotutora']))  $application = NULL;
 	$DB->users[$USER['uid']]->update(array(
@@ -62,13 +66,13 @@ function actionViewTutoringApplications()
 {
 	global $DB,$USER,$PAGE;
 	if (!userCan('viewTutoringApplications'))  throw new PolicyException();
-	
+
 	$users = $DB->query('SELECT uid,name,email,podanieotutora,tutoruid  FROM table_users
 		WHERE podanieotutora IS NOT NULL  ORDER BY uid');
-	
+
 	global $PAGE;
 	$PAGE->title = 'Lista podań o tutora';
-	
+
 	if (!count($users))  $PAGE->content .= 'brak podań';
 	else
 	{
@@ -87,11 +91,11 @@ function actionViewTutoringApplication($uid)
 {
 	global $DB,$USER,$PAGE;
 	if (!userCan('viewTutoringApplications', $uid))  throw new PolicyException();
-	
-	$uid = intval($uid);	
+
+	$uid = intval($uid);
 	$user = $DB->users[$uid]->assoc('school,maturayear,podanieotutora,zainteresowania,tutoruid');
 	$user['badge'] = getUserBadge($uid, true);
-	
+
 	global $PAGE;
 	$PAGE->title = 'Podanie o tutora';
 	$template = new SimpleTemplate($user);
@@ -116,10 +120,10 @@ function actionViewTutoringApplication($uid)
 function actionConsiderTutoringApplication($uid, $agree)
 {
 	global $DB,$USER,$PAGE;
-	if (!userCan('viewTutoringApplications'))  throw new PolicyException();	
+	if (!userCan('viewTutoringApplications'))  throw new PolicyException();
 	$uid = intval($uid);
 	if ($agree === 'false')  $agree = false;
-	
+
 	$currentTutor = $DB->users[$uid]->get('tutoruid');
 	if ($agree && ($currentTutor != USER_ANONYMOUS))
 	{
@@ -133,7 +137,7 @@ function actionConsiderTutoringApplication($uid, $agree)
 			'userError');
 		return actionViewTutoringApplication($uid);
 	}
-			
+
 	$DB->users[$uid]->update(array('tutoruid' => ($agree ? $USER['uid'] : USER_ANONYMOUS)));
 	$PAGE->addMessage('Pomyślnie '. ($agree ? 'za' : 'wy') .'rejestrowano Cię jako tutora.', 'success');
 	logUser('tutor '. ($agree ? 'become' : 'resign'), $uid);

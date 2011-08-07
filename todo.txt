@@ -1,70 +1,79 @@
+user/admin.php - review, translate
+tasks.php - review, translate
+// tutoring.php - review, translate
+
+user.php - document
+
+tasks.php role=kadra to edition_user.lecturer=1
+update.php 	rewrite insert.
+
+polish names in db [large scan], unused db fields (proponowany_referat, lecturer, proposer_uid, ...)
+move some user columns to edition_user (Arrivaltime in particular)
+dynamize edition data (start, end, meals, ....);
+publish git (code.google.com/hosting/createProject / ewentualnie gitHub?)
+doxygen
+sort by last name [easy]
+parseUserHTML() - use HTMLPurifier, apply this function everywhere [security scan]
+redesign workshop info, signup/out buttons in particular.
+installation - at least describe.
+check translations.
+
+cleanup roles
+merge blockStatus:{ok,great} into :accepted
+summary.php <- plan.php, user/admin.php
+redesign workshops.php
+----------------------------------------------------
+language choice.
+don't send emails, just show, when impersonating (as when debugging) [minor]
+common.js: tipon() - cleanup and check y? [minor]
+revise logUser() messages, especially in tasks.
+replace in_array... with userIs('role');
+automatically validate 'select' to contain one of the options.
+log impersonations [easy minor]
+
+
+in actionEditWorkshop 'Minął termin zgłaszania propozycji' could be automatic.
+in actionEditWorkshop make url in JS when title changes: http://warsztatywww.wikidot.com/www7:tytul-warsztatow
+
 Top priority:
-check update: uploader/ubr.php s/db_insert/$DB->users_insert/
-nieznana akcja: 500.shtml
-coś z /tinymce
 Signup/Resign button rights are inconsistent.
-There's a sick amount of w1_users_login_key indexes in local pgdb
 upversion notify.php, tasks, check everything.
 Forms shouldn't be sent when POST is empty. (workaround in actionEditWorkshopForm)
 
 Zlecone:
-- sortowanie po nazwisku (lub chociaż po imieniu) tabelek wypluwanych przez aplikację
-- zliczanie rozmiarów koszulek
 - eksport danych w jakimś sensownym formacie (może da się podpiąć pod Googledocs API?)
-
-Zlecalne:
-do parseUserHTML() dodać HTMLPurifier'a
-common.js: tipon() - wyczyścić i sprawdzić y
-loguj czy i kto impersonuje, jeśli ustawiono $USER['impersonatedBy'] (log.php::logUser(), dodatkowa kolumna do DB i wyświetlanie w logu)
-podczas impersonowania maile wyświetlaj zamiast wysyłać
-dodać do DB->users kolumnę "surname", uaktualnianą przy zmianie "name",
-	która by ułatwiała i przyspieszała sortowanie po nazwisku (obecnie regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\'))
-in actionEditWorkshop 'Minął termin zgłaszania propozycji' could be automatic.
-in actionEditWorkshop make url in JS when title changes: http://warsztatywww.wikidot.com/www7:tytul-warsztatow
-
-
-zapłacono
-show profile: CV + warsztaty, punkty
+- "zapłacono" checkbox
 
 tinymce <code> (task solution - at least indentation)
-sprawdzać łączny czas trwania warsztatów 9*2*2+2 (+info, krótsze pobyty)?
 ==Zadania kwalifikacyjne==
-add to user todo checklists
-email notifications
+email notifications, zmiana zadań kwalifikacyjnych, warning?
 feedback latex?
-zmiana zadań kwalifikacyjnych, warning?
-add some logs and log filtering
 add role instead of lack of 'uczestnik' role (e.g. rights to autoQualifyForWorkshop).
 ustalić normalizację punktów (jest 0..20, 0..6, 0..400. Proponuję więc 0..100 :P)
 'nocleg i wyżywienie we własnym zakresie' kind of makes no sense in profile,
 	maybe 'zamierzam = poprowadzić warsztaty | robić zadania kwalifikacyjne | przychodzić z Olsztyna'
 
 --bugs
-ie6 fixed height?!? // May have been fixed after google IE fix scripts change. If not, try css:zoom:1 (compare szykujpieluchy.pl)
+ie6 fixed height?!? // May have been fixed after google-IE-fix scripts change. If not, try css:zoom:1 (compare szykujpieluchy.pl)
 see why TinyMCE includes html-escaped comment tags with MS Word stuff.
 
 ---Technical
 ---- Ongoing (mostly done, except for tasks.php and tutoring)
-worshops.php: cleanup the js field, change handleEditWorkshopForm to actionEditWorkshopForm (unless $form->getValues())
 .htaccess - href="?action=abc&amp;param=x" should be href="abc(x)". Test IE6.
 transfer lists of constants to enum.php
-change db_() to $DB->
-change showMessage() to $PAGE->addMessage()
 change <form> to new Form()
-move lecturer db-column to participant=enumParticiapntStatus('lecturer')
+move lecturer db-column to participant=enumParticipantStatus('lecturer')
 checkUserCanEditTasks() seems stupid
-the whole app is one big XSS hole.
 
-change templates to '<?php if (): ?>\n something \n<?php endif;?>' syntax where applicable.
 change to $class = alternate('even','odd');
 -- Cleanup after the big changes
 ALTER TABLE table_workshop_user DROP COLUMN lecturer;
 $DB->options['domains']->delete();
-grep -i deprecated 
+grep -i deprecated
 remove form.php backwards compatibility
 
 --- Waiting
-fix <tr>-less <thead>s (they're not w3c-compliant, I thought the syntax was <table><thead><th></th></thead><tr><td></td></tr></table>, it's not)
+fix <tr>-less <thead>s (they're not w3c-compliant, I thought the syntax was <table><thead><th></th></thead><tr><td></td></tr></table>, it's not, shoulde be <table><thead><tr><th></th></tr></thead><tbody><tr><td></td></tr></tbody></table> )
 co to jest id="theform"?
 when creating emails, change $email to either $content or $address or something, because it's misleading
 check perms in task solution forms
@@ -76,11 +85,6 @@ change to only one subject?
 Split showWorkshop into tabs (propsition, zapisani [i|,] kwalifikacja, edit), split warsztaty.php,tasks.php
 
 -- Ideas
-if(Form::submitted() and function_exists($action .'Form'))?
-school/univ autocomplete (zlecalne?)
-add lecturers when creating workshop
-buildMenuBox perm=true redundant?
 give kadra possibility to impersonate Tester (zlecalne?)
 better SELECT, DB_Slice?
-callAction, automatically log action(param). auto check permissions?
 make the app more open - publish lists, user profiles, ...
