@@ -201,12 +201,25 @@ function alternate()
 
 function buildTableHTML($rows, $headers = null)
 {
-	echo '<table class="bordered" style="width:auto">';
+	echo '<table style="width:auto">';
 	if ($headers)
 	{
 		echo'<thead><tr>';
 		foreach ($headers as $h)
-			echo '<th>'. $h .'</th>';
+		{
+			echo '<th>';
+			if (is_array($h))
+			{
+				if (!empty($h['order']))
+					echo '<a href="?order='. htmlspecialchars(urlencode($h['order'])) .'">';
+				echo $h['description'];
+				if (!empty($h['order']))
+					echo '</a>';
+			}
+			else
+				echo $h;
+			echo '</th>';
+		}
 		echo '</tr></thead>';
 	}
 	echo '<tbody>';

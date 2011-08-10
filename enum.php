@@ -69,6 +69,8 @@ class EnumItem extends ArrayObject
 	}
 	public function inArray($enumIds)
 	{
+		if (!is_array($enumIds))
+			$enumIds = func_get_args();
 		foreach ($enumIds as $enumId)
 			if ($enumId == $this->key)
 				return true;
@@ -80,9 +82,9 @@ Enum::define('participantStatus',
 	parseTable('
 		KEY          => #ID; tDESCRIPTION;                  bCAN_RESIGN; ICON;            tEXPLANATION;
 		none         => 0;   unassociated;                  false;       ;                You aren\'t signed up for this workshop block.;
-		candidate    => 1;   applied;                       true;        tick-yellow.png; You signed up for this workshop block (remember about qualification).;
+		candidate    => 1;   candidate;                     true;        tick-yellow.png; You signed up for this workshop block (remember about qualification).;
 		rejected     => 2;   didn\'t meet the requirements; false;       cross.png;       You didn\'t meet the requirements.;
-		accepted     => 3;   qualified;                     false;       tick.png;        You have been qualified to this workshop block.;
+		accepted     => 3;   accepted;                      false;       tick.png;        You have been accepted for this workshop block.;
 		autoaccepted => 4;   signed up (staff);             true;        tick.png;        You signed up for this workshop block (qualified as a staff member).;
 		lecturer     => 5;   lecturer;                      false;       user-green.png;  You are a lecturer to this workshop block.;
 	'),

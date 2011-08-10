@@ -13,7 +13,7 @@ function setVersion($v)
 function insertPermission($role, $action)
 {
 	global $DB;
-	$DB->query("INSERT INTO table_role_permissions VALUES('$role','$action')"); // TODO rewrite;
+	$DB->role_permissions[]= array('role' => $role, 'action' => $action);
 }
 
 global $DB;
@@ -326,5 +326,76 @@ switch ($version)
 		insertPermission('uczestnik', 'editMotivationLetter');
 		setVersion(42);
 	case(42):
+		$DB->query('UPDATE table_users SET motivationletter = motivationletter || \'<p><h4>Proponowany referat</h4>\' || proponowanyreferat || \'</p>\'');
+		$DB->query('ALTER TABLE table_users DROP COLUMN proponowanyreferat');
+		setVersion(43);
+	case(43):
+		$DB->query('ALTER TABLE table_users ADD COLUMN ordername varchar(255)');
+		$DB->query('UPDATE table_users SET ordername=regexp_replace(name,\'(.*)\ ([^\ ]+)\',\'\\\\2\ \\\\1\ \')');
+		$DB->query('UPDATE table_users SET ordername=ordername || uid');
+		setVersion(44);
+	case(44):
+		$DB->query('ALTER TABLE table_workshops ADD COLUMN subjects_order integer');
+		$DB->query('UPDATE table_workshops SET subjects_order=domain_order');
+		$DB->query('ALTER TABLE table_workshops DROP COLUMN domain_order');
+		setVersion(45);
+	case(45):
+		//$DB->query('ALTER TABLE table_workshops DROP COLUMN proposer_uid');
+		//$DB->query('ALTER TABLE table_workshop_user DROP COLUMN lecturer');
+		$DB->query('ALTER TABLE table_workshop_domain DROP COLUMN level');
+		$DB->query('ALTER TABLE table_tasks DROP COLUMN inline');
 
+		$DB->query('ALTER TABLE table_users ADD COLUMN graduationyear integer');
+		$DB->query('UPDATE table_users SET graduationyear=maturayear');
+		$DB->query('ALTER TABLE table_users DROP COLUMN maturayear');
+		$DB->query('ALTER TABLE table_users ADD COLUMN interests text');
+		$DB->query('UPDATE table_users SET interests=zainteresowania');
+		$DB->query('ALTER TABLE table_users DROP COLUMN zainteresowania');
+		$DB->query('ALTER TABLE table_users ADD COLUMN howdoyouknowus text');
+		$DB->query('UPDATE table_users SET howdoyouknowus=skadwieszowww');
+		$DB->query('ALTER TABLE table_users DROP COLUMN skadwieszowww');
+		$DB->query('ALTER TABLE table_users ADD COLUMN tutorapplication text');
+		$DB->query('UPDATE table_users SET tutorapplication=tutorapplication');
+		$DB->query('ALTER TABLE table_users DROP COLUMN tutorapplication');
+		setVersion(46);
+	case(46):
+		// Oh, postgres supports renames, how nice :P
+		$DB->query('ALTER TABLE table_workshop_domain RENAME TO table_workshop_subjects');
+			$DB->query('ALTER INDEX table_workshop_domain_pkey RENAME TO table_workshop_subjects_pkey');
+			$DB->query('ALTER SEQUENCE w1_workshop_domain_wid_seq RENAME TO table_workshop_subjects_wid_seq');
+		$DB->query('ALTER TABLE table_workshop_subjects RENAME COLUMN domain TO subject');
+		$DB->query('ALTER TABLE table_edition_user RENAME TO table_edition_users');
+			$DB->query('ALTER INDEX table_edition_user_pkey RENAME TO table_edition_users_pkey');
+		$DB->query('ALTER TABLE table_workshop_user RENAME TO table_workshop_users');
+			$DB->query('ALTER INDEX table_workshop_user_pkey RENAME TO table_workshop_users_pkey');
+		$DB->query('ALTER TABLE table_edition_users ADD COLUMN staybegintime int');
+		$DB->query('UPDATE table_edition_users eu SET staybegintime = (SELECT staybegin FROM table_users u WHERE eu.uid=u.uid)');
+		$DB->query('ALTER TABLE table_edition_users ADD COLUMN stayendtime int');
+		$DB->query('UPDATE table_edition_users eu SET stayendtime = (SELECT stayend FROM table_users u WHERE eu.uid=u.uid)');
+		$DB->query('UPDATE table_edition_users eu SET staybegintime = staybegintime*60*60+$1 WHERE edition=7', strtotime('2011/08/08 00:00'));
+		$DB->query('UPDATE table_edition_users eu SET stayendtime = stayendtime*60*60+$1 WHERE edition=7', strtotime('2011/08/08 00:00'));
+		$DB->query('UPDATE table_edition_users eu SET staybegintime = staybegintime*60*60+$1 WHERE edition=6', strtotime('2010/08/19 00:00'));
+		$DB->query('UPDATE table_edition_users eu SET stayendtime = stayendtime*60*60+$1 WHERE edition=6', strtotime('2010/08/19 00:00'));
+		$DB->query('ALTER TABLE table_edition_users ADD COLUMN isselfcatered int');
+		$DB->query('UPDATE table_edition_users eu SET isselfcatered = (SELECT isselfcatered FROM table_users u WHERE eu.uid=u.uid)');
+		$DB->query('ALTER TABLE table_edition_users ADD COLUMN isselfcatered int');
+		$DB->query('UPDATE table_edition_users eu SET isselfcatered = (SELECT isselfcatered FROM table_users u WHERE eu.uid=u.uid)');
+		$DB->query('ALTER TABLE table_users DROP COLUMN isselfcatered');
+		$DB->query('ALTER TABLE table_edition_users ADD COLUMN lastmodification int');
+		$DB->query('UPDATE table_edition_users eu SET lastmodification = (SELECT lastmodification FROM table_users u WHERE eu.uid=u.uid)');
+		$DB->query('ALTER TABLE table_users DROP COLUMN lastmodification');
+		$DB->query('ALTER TABLE table_users DROP COLUMN staybegin');
+		$DB->query('ALTER TABLE table_users DROP COLUMN stayend');
+		setVersion(47);
+	case(47):
+		$DB->query('DELETE FROM w1_options WHERE name=\'newUserRoles\'');
+		$DB->query('DELETE FROM w1_options WHERE name=\'domains\'');
+		$DB->query('UPDATE w1_options SET description=\'current workshop edition\' WHERE name=\'currentEdition\'');
+		$DB->query('UPDATE w1_options SET description=\'database version\' WHERE name=\'version\'');
+		$DB->query('UPDATE w1_options SET description=\'min of motivation letter words\' WHERE name=\'motivationLetterWords\'');
+		$DB->query('UPDATE w1_options SET description=\'main page top content\' WHERE name=\'homepage\'');
+		$DB->query('UPDATE w1_options SET description=\'accessToken to gmail account <small><a href="fetchGmailOAuthAccessToken">[reauthorize]</a></small>\' WHERE name=\'gmailOAuthAccessToken\'');
+		$DB->query('UPDATE w1_options SET description=\'gmail account used to send e-mails\' WHERE name=\'gmailOAuthEmail\'');
+		setVersion(48);
+	case(48):
 }

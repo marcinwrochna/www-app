@@ -127,7 +127,7 @@ function addLoginMenuBox()
 					<input class="inputText" type="text" name="login"/><br/>
 					<input class="inputText"  type="password" name="password"/><br/>
 					<input class="inputButton"  type="submit" value="{{Log in}}"/><br/>
-					<a href="register">{{sign up}}</a><br/>
+					<a href="register">{{create account}}</a><br/>
 					<a href="passwordReset">{{forgot password?}}</a>
 			</form>
 		</div>
@@ -202,6 +202,12 @@ function actionRegister()
 	);
 	$uid = $DB->users->lastValue();
 
+	// ordername of 'Tom Marvolo Riddle' is 'Riddle Tom Marvolo 666'.
+	$nameParts = explode(' ', $values['name']);
+	array_unshift($nameParts, array_pop($nameParts));
+	$nameParts[]= $uid;
+	$DB->users[$uid]->update(array('ordername' => implode(' ', $nameParts)));
+
 	$link = 'http://'. $_SERVER['HTTP_HOST'] . ABSOLUTE_PATH_PREFIX ."registerConfirm%28$confirmkey%29";
 	$mail = sprintf(_('A new user account has been created on %s using this e-mail address.\n'.
 		'To confirm your registration, open the following link:\n%s\n\n'.
@@ -266,6 +272,7 @@ function actionEditMotivationLetter()
 function actionEditAdditionalInfo($uid = null)
 {
 	global $USER, $DB, $PAGE;
+	$edition = getOption('currentEdition');
 	$admin = !is_null($uid) && $uid != $USER['uid'];
 	if ($admin)
 	{
@@ -277,6 +284,8 @@ function actionEditAdditionalInfo($uid = null)
 		if (!userCan('editAdditionalInfo'))  throw new PolicyException();
 		$uid = intval($USER['uid']);
 	}
+	if (!$DB->edition_users($edition, $uid)->count())
+		throw KnownException(_('You should first sign up as a participant or lecturer.'));
 
 	$inputs = parseTable('
 		NAME            => TYPE;     tDESCRIPTION;                                         VALIDATION
@@ -284,8 +293,8 @@ function actionEditAdditionalInfo($uid = null)
 		address         => textarea; address <small>(for the insurance)</small>;           ;
 		telephone       => text;     telephone;                                            longer(6);
 		parenttelephone => text;     telephone to your parents/carers;                     ;
-		staybegin       => select;   staying time: <span class="right">from</span>;        int;  default=>19;
-		stayend         => select;                     <span class="right">to</span>;      int;  default=>249;
+		staybegintime   => select;   staying time: <span class="right">from</span>;        int;
+		stayendtime     => select;                 <span class="right">to</span>;          int;
 		gatherplace     => select;   I\'ll join the gathering at;                          ;     default=>none;
 		isselfcatered   => checkbox; accomodation and meals;                               ;
 		tshirtsize      => select;   preferred t-shirt size;                               ;     default=>L;
@@ -299,17 +308,22 @@ function actionEditAdditionalInfo($uid = null)
 	$stayoptions = array();
 	// Workshops have 11 days [0..10].
 	// The 0th days begins late, with a supper, the 10th day ends early, with a breakfast.
-	$stayoptions[19] = strftime("%e. (%a)", $starttime+19*60*60);
-	for ($i=1; $i<10; $i++)
+	$format = "%e. (%a) %H:%M";
+	$firsttime = $starttime+(0*24+19)*60*60;
+	$stayoptions[$firsttime] = strftime($format, $firsttime);
+	for ($day=1; $day<10; $day++)
 		foreach ($mealhours as $h=>$meal)
 	{
-		$stayoptions[$i*24+$h] = strftime("%e. (%a) $meal",
-			$starttime+($i*24+$h)*60*60);
+		$time = $starttime+($day*24+$h)*60*60;
+		$stayoptions[$time] = strftime($format .' ('. $meal .')', $time);
 	}
-	$stayoptions[10*24+9] = strftime("%e. (%a)", $starttime+(10*24+9)*60*60);
+	$lasttime = $starttime+(10*24+9)*60*60;
+	$stayoptions[$lasttime] = strftime($format, $lasttime);
+	$inputs['staybegintime']['default'] = $firsttime;
+	$inputs['stayendtime']['default'] = $lasttime;
+	$inputs['staybegintime']['options'] = $stayoptions;
+	$inputs['stayendtime']['options']   = $stayoptions;
 
-	$inputs['staybegin']['options'] = $stayoptions;
-	$inputs['stayend']['options']   = $stayoptions;
 	$inputs['gatherplace']['options'] = array('warszawa'=>_('Warsaw PKP'),'olsztyn'=>_('Olsztyn PKP'),'none'=>_('I\'ll arrive on my own.'));
 	$tshirtsizes = array('XS','S','M','L','XL','XXL');
 	$inputs['tshirtsize']['options'] = array_combine($tshirtsizes, $tshirtsizes);;
@@ -319,20 +333,30 @@ function actionEditAdditionalInfo($uid = null)
 
 	$form = new Form($inputs);
 
+	$editionColumns = array('staybegintime','stayendtime','isselfcatered');
+
 	if ($form->submitted() && !$admin)
 	{
 		$values = $form->fetchAndValidateValues();
 		if ($form->valid)
 		{
-			$values['lastmodification'] = time();
+			$editionValues = array();
+			foreach ($editionColumns as $column)
+			{
+				$editionValues[$column] = $values[$column];
+				unset($values[$column]);
+			}
+			$editionValues['lastmodification'] = time();
 			$DB->users[$uid]->update($values);
+			$DB->edition_users($edition, $uid)->update($editionValues);
 			$PAGE->addMessage(_('Saved.'), 'success');
 			logUser('user edit2', $uid);
 		}
 	}
 
-	$r = $DB->users[$uid]->assoc($form->getColumns() .',name');
+	$r = $DB->users[$uid]->assoc('pesel,address,telephone,parenttelephone,gatherplace,tshirtsize,comments,name');
 	if (is_null($r['tshirtsize']))  $r['tshirtsize'] = 'L';
+	$r += $DB->edition_users($edition,$uid)->assoc(implode(',',$editionColumns));
 
 	$PAGE->title = _('Additional info');
 	if ($admin)  $PAGE->title = $r['name'] .' - '. $PAGE->title;

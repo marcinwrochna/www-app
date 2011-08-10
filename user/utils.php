@@ -23,9 +23,9 @@ function userCan($action, $owner=false)
 function assertProfileFilled($quiet = false)
 {
 	global $USER, $DB, $PAGE;
-	$user = $DB->users[$USER['uid']]->assoc('school,maturayear,zainteresowania');
+	$user = $DB->users[$USER['uid']]->assoc('school,graduationyear,interests');
 
-	if (empty($user['maturayear']) || empty($user['school']) || empty($user['zainteresowania']))
+	if (empty($user['graduationyear']) || empty($user['school']) || empty($user['interests']))
 	{
 		if (!$quiet)
 			$PAGE->addMessage(_('Fill in <a href="editProfile">your profile</a> first!'), 'userError');
@@ -74,6 +74,25 @@ function getUserBadge($uid, $email=false, $default='?')
 	$result = "$icon $name";
 	if ($email)  $result .= ' &lt;'. $DB->users[$uid]->get('email') .'&gt;';
 	return $result;
+}
+
+function getUserRoles($uid = null)
+{
+	global $DB, $USER;
+	if (is_null($uid))
+		$uid = $USER['uid'];
+	$DB->query('SELECT role FROM table_user_roles WHERE uid=$1', $uid);
+	$roles = $DB->fetch_column();
+	$r = $DB->query('SELECT lecturer, qualified FROM table_edition_users WHERE edition=$1 AND uid=$2',
+		getOption('currentEdition'), $uid);
+	if ($r->count())
+	{
+		$status = $DB->fetch_assoc();
+		$roles[]= ($status['lecturer']) ? 'lecturer' : 'candidate';
+		if ($status['qualified'])
+			$roles[]= 'qualified';
+	}
+	return $roles;
 }
 
 function passHash($password)

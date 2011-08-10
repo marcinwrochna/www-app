@@ -19,15 +19,15 @@ while (($row = $result->fetch_assoc()) !== false)
 	$count++;
 	$wid = intval($row['wid']);
 	$uid = intval($row['uid']);
-	
+
 	$address = array();
-	$r = $DB->query('SELECT u.name, u.email FROM table_users u, table_workshop_user wu
+	$r = $DB->query('SELECT u.name, u.email FROM table_users u, table_workshop_users wu
 		WHERE u.uid=wu.uid AND participant=$1 AND wid=$2',
 		enumParticipantStatus('lecturer')->id, $wid);
 	$r = $DB->fetch_all($r);
 	foreach ($r as $lecturer)
 		$address[]= array($lecturer['name'], $lecturer['email']);
-	
+
 	$workshop = $DB->workshops($wid)->get('title');
 	$user = $DB->users($uid)->assoc('name, login, email, gender');
 	$title = 'Rozwiązania zadań ('. $user['name'] .')';
@@ -46,13 +46,13 @@ while (($row = $result->fetch_assoc()) !== false)
 		$email .= "\n\n";
 	}
 	$DB->query('UPDATE table_task_solutions SET notified = 1 WHERE wid=$1 AND uid=$2 AND notified<1', $wid,$uid);
-	
+
 	sendMail($title, $email, $address);
 	$address = json_encode($address);
 	echo "Sent email to $address<br/>\n";
 }
 echo "$count emails in total.<br/>\n";
-	
+
 
 $result = $DB->query('SELECT wid,uid FROM table_task_solutions '.
 	'WHERE notified=2 GROUP BY wid,uid');
@@ -74,17 +74,17 @@ while (($row = $result->fetch_assoc()) !== false)
 	$r = $DB->fetch_all($r);
 	foreach ($r as $task)
 	{
-		$email .= "Zadanie ". $task['tid'] .". (". strftime('%a %T', $task['submitted']) .")\n";		
-		$email .= "status: ". EnumSolutionStatus($task['status'])->description ."\n";
+		$email .= "Zadanie ". $task['tid'] .". (". strftime('%a %T', $task['submitted']) .")\n";
+		$email .= "status: ". enumSolutionStatus($task['status'])->description ."\n";
 		$email .= "ocena: ". $task['grade'] ."\n";
 		$email .= "komentarz:\n". $task['feedback'];
 		$email .= "\n\n";
 	}
 	$DB->query('UPDATE table_task_solutions SET notified = 3 WHERE wid=$1 AND uid=$2 AND notified=2', $wid,$uid);
-	
+
 	sendMail($title, $email, $address);
 	$address = json_encode($address);
 	echo "Sent (grade) email to $address<br/>\n";
 }
 echo "$count (grade) emails in total.<br/>\n";
-	
+

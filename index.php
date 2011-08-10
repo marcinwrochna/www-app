@@ -21,13 +21,16 @@ include_once('tutoring.php');
 
 function callAction($action, $args = array(), $redirect = true)
 {
-	global $PAGE;
+	global $PAGE, $USER;
 	if ($redirect)
 	{
 		$_SESSION['pageMessages'] = $PAGE->topContent;
 		header('HTTP/1.1 303 See Other');
-		header('Location: http://'. $_SERVER['HTTP_HOST'] . ABSOLUTE_PATH_PREFIX .
-			$action .'('. implode(';', $args) .')');
+		$url = 'http://'. $_SERVER['HTTP_HOST'] . ABSOLUTE_PATH_PREFIX;
+		if (isset($USER['impersonatedBy']))
+			$url .= 'impersonate('. $USER['uid'] .')/';
+		$url .= $action .'('. implode(';', $args) .')';
+		header('Location: '. $url);
 		exit;
 	}
 

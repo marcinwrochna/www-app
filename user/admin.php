@@ -9,7 +9,7 @@ function addAdminMenuBox()
 	global $PAGE, $USER;
 	$items = parseTable('
 		ACTION           => tTITLE;                    ICON;
-		adminUsers       => admin users;               group.png;
+		adminUsers       => users;                     group.png;
 		listAllWorkshops => all workshops;             bricks.png;
 		showCorrelation  => correlations;              table.png;
 		editOptions      => settings;                  wrench.png;
@@ -33,78 +33,74 @@ function actionAdminUsers($filterBy = null)
 	global $USER, $DB, $PAGE;
 	if (!userCan('adminUsers'))  throw new PolicyException();
 
-	$roledefs = array(
-		'admin'     => array('Adm','administrator'),
-		'kadra'     => array('K','lecturer'),
-		'akadra'    => array('AK','qualified lecturer'),
-		'uczestnik' => array('u','uczestnik (nie kadra)'),
-		'tutor'     => array('T','tutor'),
-		'jadący'    => array('j','jadący')
-	);
+	$roledefs = parseTable('
+		ROLE   => tSHORT; tDESCRIPTION;
+		admin  => Adm;    administrator;
+		tutor  => T;      tutor;
+	');
 
-	$where = 'WHERE EXISTS (SELECT * FROM table_user_roles r WHERE r.uid=u.uid)';
-	if (isset($filterBy) && $filterBy == 'all')
-		$where = '';
-	if (isset($filterBy) && in_array($filterBy, array_keys($roledefs)))
-		$where = 'WHERE EXISTS (SELECT * FROM table_user_roles r
-			WHERE r.uid=u.uid AND r.role=\''. $filterBy .'\')';
+	$headers = parseTable('
+		COLUMN            => tDESCRIPTION; ORDER;
+		uid               => uid;          u.uid;
+		name              => full name;    u.ordername;
+		email             => e-mail;       u.email;
+		roles             => roles;	       rolecount DESC;
+		lecturer          => L;            eu.lecturer DESC;
+		qualified         => q;            eu.qualified DESC;
+		motivationletter  => letter;       length(u.motivationletter) DESC;
+	');
+	$headers['motivationletter']['description'] .=
+		'<small '. getTipJS(_('words in motivation letter')) .'>[?]</small>';
 
 
 	$PAGE->title = _('Users administration');
-	$template = new SimpleTemplate();
-	echo '<a href="adminUsers(all)" '.  getTipJS(_('By default, only users with a role are shown.')) .'>'.
-		_('all accounts'). '</a><br/>';
-
-	$users = $DB->query("SELECT u.uid, u.name, u.email, u.motivationletter, u.proponowanyreferat
-	                 FROM table_users u $where ORDER BY u.uid");
+	$users = $DB->query('
+		SELECT u.uid, u.name, u.email, eu.lecturer, eu.qualified, u.motivationletter,
+			(SELECT COUNT(*) FROM table_user_roles ur WHERE ur.uid=u.uid) AS rolecount
+		FROM table_users u, table_edition_users eu
+		WHERE eu.uid=u.uid AND eu.edition = '. getOption('currentEdition') .'
+		ORDER BY '. implode(',', getUpdatedOrder('users', $headers, 'u.ordername')));
 	$users = $users->fetch_all();
+
 	$mails = array();
 	foreach ($users as $row)
 		$mails[]= $row['name'] .' <'.$row['email'] .'>';
 	$mails = htmlspecialchars(implode(', ', $mails));
 	echo '<a href="mailto:'. $mails .'" '. getTipJS($mails) .'>'. _('"mailto:" link') .'</a><br/>';
 
-	?>
-	<table>
-	<tr>
-		<th>id</th><th>imię i nazwisko</th><th>e-mail</th><th>role</th>
-		<th>list <small <?php echo getTipJS('słów w liście motywacyjnym'); ?>>[?]</small></th>
-		<th>referat <small <?php echo getTipJS('znaków w prop. temacie referatu'); ?>>[?]</small></th>
-	</tr>
-	<?php
-		$class = 'even';
-		foreach ($users as $row)
-		{
-			$r = $DB->query('SELECT role FROM table_user_roles WHERE uid=$1 ORDER BY role', $row['uid']);
-			$row['roles'] = '';
-			foreach ($r->fetch_column() as $role)
-				if (!array_key_exists($role, $roledefs))
-					throw new KnownException(sprintf(_('Undefined role: %s.'), $role));
-				else
-					$row['roles'] .= "<a href='adminUsers($role)' ".
-						getTipJS($roledefs[$role][1]) .">".	$roledefs[$role][0] ."</a> ";
+	$rows = array();
+	foreach ($users as $row)
+	{
+		$row['roles'] = array();
+		$roles = getUserRoles($row['uid']);
+		foreach ($roles as $r)
+			if (array_key_exists($r, $roledefs))
+				$row['roles'][]= '<span '. getTipJS($roledefs[$r]['description']) .'>'.
+					$roledefs[$r]['short'] .'</span>';
+			//else
+			//	$row['roles'][]= $r;
+		$row['roles'] = implode(' ', $row['roles']);
+		unset($row['rolecount']);
+		/*$row['roles'] = '';
+		foreach ($r->fetch_column() as $role)
+			if (!array_key_exists($role, $roledefs))
+				throw new KnownException(sprintf(_('Undefined role: %s.'), $role));
+			else
+				$row['roles'] .= "<a href='adminUsers($role)' ".
+					getTipJS($roledefs[$role][1]) .">".	$roledefs[$role][0] ."</a> ";*/
 
-			$row['ml_words'] = str_word_count(strip_tags($row['motivationletter']));
-			$row['pr_chars'] = strlen($row['proponowanyreferat']);
-			$row['class'] = $class;
+		$row['motivationletter'] = str_word_count(strip_tags($row['motivationletter']));
+		if (!$row['motivationletter'])
+			$row['motivationletter'] = '';
+		$row['lecturer']  = $row['lecturer'] ? '<span '. getTipJS(_('lecturer')) .'>L</span>' : '';
+		$row['qualified'] = $row['qualified'] ? '<span '. getTipJS(_('qualified')) .'>q</span>' : '';
+		$row[]= '<a href="editProfile('. $row['uid'] .')">'. _('profile') .'</a>
+		         <a href="editUserStatus('. $row['uid'] .')">'. _('status') .'</a>
+		         <a href="editAdditionalInfo('. $row['uid'] .')">'. _('info'). '</a>';
 
-			$sub = new SimpleTemplate($row);
-			?><tr class='%class%'>
-				<td>%uid%</td><td>%name%</td><td>%email%</td><td>%roles%</td>
-				<td>%ml_words%</td><td>%pr_chars%</td>
-				<td>
-					<a href='editProfile(%uid%)'>edytuj</a>
-					<a href='editUserStatus(%uid%)'>status</a>
-					<a href='editAdditionalInfo(%uid%)'>dane</a>
-				</td>
-			</tr><?php
-			echo $sub->finish();
-
-			$class = ($class=='even')?'odd':'even';
-		}
-	?></table>
-	<?php
-	echo $template->finish();
+		$rows[]= $row;
+	}
+	buildTableHTML($rows, $headers);
 }
 
 
@@ -113,76 +109,76 @@ function actionEditUserStatus($uid)
 	global $DB, $PAGE;
 	if (!userCan('adminUsers'))  throw new PolicyException();
 	$uid = intval($uid);
+	$edition = getOption('currentEdition');
 
-	$user = $DB->users[$uid]->assoc('uid,login,name,email,school,maturayear,gender,'.
-	 'zainteresowania,motivationletter,proponowanyreferat');
-	$roles = $DB->query('SELECT role FROM table_user_roles WHERE uid=$1', $uid);
-	$user['roles'] = $roles->fetch_column();
-	$user['badge'] = getUserBadge($uid);
-	$user['maturayeartext'] = '('. $user['maturayear'] .')';
-	$maturaYearOptions = getMaturaYearOptions();
-	if (array_key_exists(strval($user['maturayear']), $maturaYearOptions))
-		$user['maturayeartext'] = $maturaYearOptions[$user['maturayear']];
-	$user['jadący'] = (array_search('jadący', $user['roles']) !== false) ? 'checked="checked"' : '';
-	$user['genderya'] = gender('y','a',$user['gender']);
+	$user = $DB->users[$uid]->assoc('uid,login,name,school,graduationyear,gender,'.
+	 'interests,motivationletter');
+	$user['badge'] = getUserBadge($uid, true);
 
-	$user['workshops'] = '<table>';
-	$workshops = $DB->query('
-		SELECT w.wid, w.title, w.duration, wu.*
-		FROM table_workshop_user wu, table_workshops w
-		WHERE w.edition=$1 AND w.wid=wu.wid AND uid=$2', getOption('currentEdition'), $uid);
-	foreach ($workshops as $row)
-	{
-		if ($row['lecturer'])
-			$row['status'] = genderize('prowadząc%', $user['gender']);
-		else
-			$row['status'] = genderize(enumParticipantStatus($row['participant'])->description, $user['gender']);
-		if (!empty($row['admincomment']))
-			$row['comment'] = '<a '. getTipJS($row['admincomment']) .'>(komentarz)</a>';
-		else
-			$row['comment'] = '';
-		$template = new SimpleTemplate($row);
-		?><tr>
-			<td><b><a href="showWorkshop(%wid%)">%title%</a></b></td>
-			<td><a href="showTaskSolutions(%wid%,%uid%)" title="szczegóły">%status%</a></td>
-			<td>%points%</td>
-			<td>%comment%</td>
-		</tr><?php
-		$user['workshops'] .= $template->finish();
-	}
-	$user['workshops'] .= '</table>';
-
-
-	$PAGE->title = $user['name'] . ' - kwalifikacja';
+	$PAGE->title = $user['name'] .' - '. _('qualification');
 	if (userCan('adminUsers'))
 		$PAGE->headerTitle = getUserHeader($uid, $user['name'], 'editUserStatus');
 	$template = new SimpleTemplate($user);
 	 ?>
-		<span class="left">%badge% (%login%) &nbsp; %email%</span>
-		<span class="right">%school% - %maturayeartext%</span><br/>
+		<span class="left">%badge% (%login%)</span>
+		<span class="right">%school% - ({{graduation year}}: %graduationyear%)</span><br/>
 
-		<h3 onclick='$("#zaint_sign").toggle(); $("#zaint").toggle("fast");'>
-			 <span id='zaint_sign'>+</span> Zainteresowania</h3>
-		<div class="descriptionBox" id="zaint" style="display:none">%zainteresowania%</div>
-		<h3>List motywacyjny</h3>
+		<h3 onclick='$("#interests_sign").toggle(); $("#interests").toggle("fast");' style='cursor: pointer'>
+			 <span id='interests_sign'>+</span> {{Interests}}</h3>
+		<div class="descriptionBox" id="interests" style="display:none">%interests%</div>
+		<h3>{{Motivation letter}}</h3>
 		<div class="descriptionBox">%motivationletter%</div>
-		<h3>Proponowany referat</h3>
-		%proponowanyreferat%
-		<h3>Warsztaty</h3>
-		%workshops%
-		<br/>
-
-		<form method="post" action="editUserStatusForm(%uid%)">
-			<h3 style="display: inline">Jadąc%genderya%</h3>
-			<input type="checkbox" name="jadący" value="1" %jadący%>
-			<input type="submit" name="submitted" value="zapisz" />
-		</form>
-	</form>
 	<?php
-	$PAGE->content .= $template->finish();
+	echo $template->finish(true);
+
+
+	echo '<h3>'. _('Workshops') . '</h3>';
+	echo '<table>';
+	$workshops = $DB->query('
+		SELECT w.wid, w.title, w.duration, wu.*
+		FROM table_workshop_users wu, table_workshops w
+		WHERE w.edition=$1 AND w.wid=wu.wid AND uid=$2', getOption('currentEdition'), $uid);
+	foreach ($workshops as $row)
+	{
+		$row['status'] = genderize(enumParticipantStatus($row['participant'])->description, $user['gender']);
+		$row['comment'] = '';
+		if (!empty($row['admincomment']))
+			$row['comment'] = '<a '. getTipJS($row['admincomment']) .'>('. _('comment'). ')</a>';
+		$template = new SimpleTemplate($row);
+		?><tr>
+			<td><b><a href="showWorkshop(%wid%)">%title%</a></b></td>
+			<td><a href="showTaskSolutions(%wid%,%uid%)" title="{{details}}">%status%</a></td>
+			<td>%points%</td>
+			<td>%comment%</td>
+		</tr><?php
+		echo $template->finish(true);
+	}
+	echo '</table>';
+	echo '<br/>';
+
+	$form = new Form();
+	$form->cssClass = 'inline';
+	$form->addRow('checkbox', 'qualified', '<h3>'. genderize(_('Qualified'), $user['gender']) .'</h3>');
+	if ($form->submitted())
+	{
+		$values = $form->fetchAndValidateValues();
+		$form->assert(
+			$DB->edition_users($edition, $uid)->count(),
+			_('The user didn\'t candidate as a participant nor lecturer.')
+		);
+		if ($form->valid)
+		{
+			$DB->edition_users($edition, $uid)->update($values);
+			logUser('set qualified '. ($values['qualified']?'1':'0'), $uid);
+			$PAGE->addMessage(_('Saved'), 'success');
+		}
+	}
+	$roles = getUserRoles($uid);
+	$form->values = array('qualified' => array_search('qualified', $roles) !== false);
+	echo $form->getHTML();
 }
 
-function actionEditUserStatusForm($uid)
+/*function actionEditUserStatusForm($uid)
 {
 	global $DB, $PAGE;
 	$uid = intval($uid);
@@ -193,21 +189,21 @@ function actionEditUserStatusForm($uid)
 	if (!$oldj && $newj)
 	{
 		$DB->user_roles[]= array('uid'=>$uid,'role'=>'jadący');
-		$DB->edition_user(getOption('currentEdition'), $uid)->update(array('qualified'=>1));
+		$DB->edition_users(getOption('currentEdition'), $uid)->update(array('qualified'=>1));
 		logUser('set jadący 1', $uid);
 		$PAGE->addMessage('Pomyślnie dodano do jadących.', 'success');
 	}
 	else if ($oldj && !$newj)
 	{
 		$DB->user_roles[array($uid,'jadący')]->delete();
-		$DB->edition_user(getOption('currentEdition'), $uid)->update(array('qualified'=>0));
+		$DB->edition_users(getOption('currentEdition'), $uid)->update(array('qualified'=>0));
 		logUser('set jadący 0', $uid);
 		$PAGE->addMessage('Pomyślnie usunięto z jadących.', 'success');
 	}
 	else
-		$PAGE->addMessage('Pozostawiono status.');
-	actionEditUserStatus($uid);
-}
+		$PAGE->addMessage('Pozostawiono niezmieniony status.');
+	callAction('editUserStatus', array($uid));
+}*/
 
 
 function getUserHeader($uid, $name, $action)
@@ -245,7 +241,7 @@ function actionListPersonalData()
 		$users = $DB->query('
 			SELECT u.name, u.email FROM table_users u
 			WHERE '. sqlUserIsQualified() .' AND u.pesel IS NULL AND u.telephone IS NULL
-			ORDER BY regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')
+			ORDER BY u.ordername
 		');
 		echo _('Persons who did not fill their data: ');
 		$emails = array();
@@ -265,7 +261,7 @@ function actionListPersonalData()
 		SELECT u.'. implode(', u.', array_keys($headers)) .'
 		FROM table_users u
 		WHERE '. sqlUserIsQualified() .'
-		ORDER BY u.pesel IS NULL AND u.telephone IS NULL DESC, regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')
+		ORDER BY u.pesel IS NULL AND u.telephone IS NULL DESC, u.ordername
 	');
 	buildTableHTML($rows, $headers);
 }
@@ -285,11 +281,11 @@ function actionListArrivalData($comments = true)
 	}
 
 	$headers = array(
-		'name'        => _('full name'),
-		'telephone'   => _('phone number'),
-		'staybegin'   => _('arrival'),
-		'stayend'     => _('departure'),
-		'gatherplace' => _('gathering'));
+		'name'          => _('full name'),
+		'telephone'     => _('phone number'),
+		'staybegintime' => _('arrival'),
+		'stayendtime'   => _('departure'),
+		'gatherplace'   => _('gathering'));
 		//parenttelephone?
 	if ($comments)
 	{
@@ -298,19 +294,19 @@ function actionListArrivalData($comments = true)
 	}
 
 	$users = $DB->query('
-		SELECT u.'. implode(',u.', array_keys($headers)) .' FROM table_users u
-		WHERE '. sqlUserIsQualified() .'
-		ORDER BY u.gatherplace DESC, u.staybegin, regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')
-	');
+		SELECT '. implode(',', array_keys($headers)) .'
+		FROM table_users u, table_edition_users eu
+		WHERE u.uid=eu.uid AND eu.edition=$1 AND eu.qualified>0
+		ORDER BY u.gatherplace DESC, eu.staybegintime, u.ordername
+	', getOption('currentEdition'));
 
 	$rows = array();
 	foreach ($users as $user)
 	{
-		$starttime = strtotime('2011/08/08 00:00');
-		if (!is_null($user['staybegin']))
-			$user['staybegin'] = strftime('%a %d. %H:00', $starttime + 3600*$user['staybegin']);
-		if (!is_null($user['stayend']))
-			$user['stayend']   = strftime('%a %d. %H:00', $starttime + 3600*$user['stayend']  );
+		if (!is_null($user['staybegintime']))
+			$user['staybegintime'] = strftime('%a %e. %H:%M', $user['staybegintime']);
+		if (!is_null($user['stayendtime']))
+			$user['stayendtime']   = strftime('%a %e. %H:%M', $user['stayendtime']  );
 		if (!is_null($user['lastmodification']))
 		{
 			$t = $user['lastmodification'];
@@ -334,16 +330,21 @@ function actionListDailyCounts()
 	global $DB,$PAGE;
 	if (!userCan('adminUsers'))  throw new PolicyException();
 	$PAGE->title = _('List of meal data');
+	$edition = getOption('currentEdition');
+	$starttime = strtotime('2011/08/08 00:00');
 
 	if (!isset($_GET['print']))
 		echo '<a class="right" href="?print">'. _('printable version') .'</a>';
 
-	$DB->query('SELECT COUNT(*) FROM w1_users u
-		        WHERE '. sqlUserIsQualified() .' AND (u.staybegin IS NULL OR u.stayend IS NULL)');
+	$DB->query('SELECT COUNT(*) FROM w1_edition_users
+		        WHERE edition=$1 AND qualified>0
+					AND (staybegintime IS NULL OR stayendtime IS NULL
+					     OR staybegintime < $2 OR stayendtime < $2)',
+				$edition, $starttime);
 	echo _('Number of qualified users who didn\'t specify their staying time: '). $DB->fetch();
 	echo ' ('. _('see') .' <a href="listPersonalData">'. _('list of personal data') .'</a>)<br/>';
 
-	$starttime = strtotime('2011/08/08 00:00');
+
 	$hours = array(3,9,14,19);
 	$headers = array(_('day'));
 	foreach ($hours as $h)
@@ -351,13 +352,15 @@ function actionListDailyCounts()
 	$rows = array();
 	for ($i=0; $i<=10; $i++) // Workshops have 11 days [0..10].
 	{
-		$row = array(strftime("%a %e.", $starttime+($i*24+9)*3600));
-		$query = 'SELECT COUNT(*) FROM w1_users u
-			      WHERE '. sqlUserIsQualified() .'
-			            AND u.staybegin<=$1 AND u.stayend>=$1
-			            AND u.isselfcatered=0';
+		$time = $starttime + $i*24*3600;
+		$row = array(strftime("%a %e.", $time+9*3600));
+		$query = 'SELECT COUNT(*) FROM w1_edition_users
+			      WHERE edition=$1 AND qualified > 0
+			            AND staybegintime<=$2 AND stayendtime>=$2
+			            AND isselfcatered=0
+			            ';
 		foreach ($hours as $h)
-			$row[]= $DB->query($query, $i*24+$h)->fetch();
+			$row[]= $DB->query($query, $edition, $time+$h*3600)->fetch();
 		$rows[]= $row;
 	}
 	buildTableHTML($rows, $headers);
@@ -375,6 +378,6 @@ function sqlUserIsQualified($edition = null)
 {
 	if (is_null($edition))
 		$edition = getOption('currentEdition');
-	return ' EXISTS (SELECT * FROM table_edition_user eu WHERE eu.uid=u.uid AND eu.qualified=1
+	return ' EXISTS (SELECT * FROM table_edition_users eu WHERE eu.uid=u.uid AND eu.qualified=1
 		AND eu.edition='. intval($edition) .') ';
 }

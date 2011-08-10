@@ -122,7 +122,7 @@ foreach ($poData as $s => $comments)
 }
 file_put_contents('tmp2.pot', $poOutput, FILE_APPEND);
 echo `msgcat tmp1.pot tmp2.pot > $outputFile`;
-//echo `rm tmp1.pot tmp2.pot`;
+echo `rm tmp1.pot tmp2.pot`;
 echo "Total: $total string found.\n";
 
 foreach ($languages as $lang)

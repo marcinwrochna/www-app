@@ -27,14 +27,14 @@ function actionListPublicWorkshops()
 
 	// Inform how many hours of workshops did the user sign up for.
 	$DB->query('SELECT SUM(w.duration)
-		FROM table_workshops w, table_workshop_user wu
+		FROM table_workshops w, table_workshop_users wu
 		WHERE w.status=$1 AND w.edition=$2 AND wu.wid=w.wid AND wu.uid=$3',
 		enumBlockStatus('great')->id, getOption('currentEdition'), $USER['uid']);
 	$sum = intval($DB->fetch());
 	if ($sum)
 	{
-		$msg = sprintf(genderize(_('You signed up for %d × 1,5 hours of workshops.')), $sum);
-		if ($sum>30)  $msg .= '<br/>'. _('Remember that WWW has approximately 36 × 1,5 hours in total.');
+		$msg = sprintf(genderize(_('You signed up for %d x 1,5 hours of workshops.')), $sum);
+		if ($sum>30)  $msg .= '<br/>'. _('Remember that WWW has approximately 36 x 1,5 hours in total.');
 		$PAGE->addMessage($msg, 'info');
 	}
 
@@ -50,7 +50,7 @@ function actionListOwnWorkshops()
 	global $USER, $PAGE;
 	if (!userCan('listOwnWorkshops'))  throw new PolicyException();
 	$PAGE->title = _('Your workshops');
-	$where = 'EXISTS (SELECT wu.uid FROM table_workshop_user wu WHERE wu.uid='. $USER['uid'].'
+	$where = 'EXISTS (SELECT wu.uid FROM table_workshop_users wu WHERE wu.uid='. $USER['uid'].'
 		AND wu.wid = w.wid AND wu.participant='. enumParticipantStatus('lecturer')->id .')';
 	listWorkshops('Own', $where,
 		array('wid','lecturers','title','type','subject','duration','status','participants'));
@@ -75,7 +75,7 @@ function listWorkshops($which, $where, $columns)
 		lecturers     => lecturers;       lecturers;
 		title         => title;           w.title;
 		type          => type;            w.type;
-		subject       => subjects;        w.domain_order;
+		subject       => subjects;        w.subjects_order;
 		duration      => duration [1.5h]; w.duration DESC;
 		status        => status;          w.status;
 		participants  => signups;         count_accepted DESC;
@@ -90,9 +90,9 @@ function listWorkshops($which, $where, $columns)
 	if (!isset($_SESSION['workshopOrder']))  $_SESSION['workshopOrder'] = array();
 	if (isset($_GET['order']) && $_GET['order'] =='lecturers')
 	{
-		$orderby[] = 'regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\')';
+		$orderby[] = 'u.ordername';
 		$from = ', table_users u';
-		$whereClauses[] = 'EXISTS (SELECT * FROM table_workshop_user wu
+		$whereClauses[] = 'EXISTS (SELECT * FROM table_workshop_users wu
 			WHERE w.wid=wu.wid AND u.uid=wu.uid
 				AND participant='. enumParticipantStatus('lecturer')->id .')';
 		$PAGE->addMessage(_('When sorting by lecturers, common workshops are shown repeatedly.'), 'info');
@@ -113,22 +113,22 @@ function listWorkshops($which, $where, $columns)
 	if (!empty($where))  $whereClauses[]= $where;
 	$whereClauses[]= 'w.edition='. intval(getOption('currentEdition'));
 	if (isset($_GET['subject']) && enumSubject()->exists($_GET['subject']))
-		$whereClauses[]= 'EXISTS (SELECT * FROM table_workshop_domain wd
-			WHERE wd.wid=w.wid AND wd.domain=\''. $_GET['subject'] .'\')';
+		$whereClauses[]= 'EXISTS (SELECT * FROM table_workshop_subjects ws
+			WHERE ws.wid=w.wid AND ws.subject=\''. $_GET['subject'] .'\')';
 	if (!empty($whereClauses))  $where = 'WHERE '. implode(' AND ', $whereClauses);
 	else $where = '';
 
 	/* SELECT (participant counts by status) */
 	$selectParticipants = '';
 	foreach(enumParticipantStatus() as $statusName => $status)
-		$selectParticipants .= '(SELECT COUNT(*) FROM table_workshop_user wu
+		$selectParticipants .= '(SELECT COUNT(*) FROM table_workshop_users wu
 			WHERE wu.wid=w.wid AND participant='. $status->id .') AS count_'. $statusName .',';
 
 
 	$workshops = $DB->query('
 		SELECT w.wid, w.title, w.status, w.type, w.duration, w.link,
 			'. $selectParticipants .'
-			(SELECT participant FROM table_workshop_user wu
+			(SELECT participant FROM table_workshop_users wu
 			 WHERE wu.wid=w.wid AND wu.uid=$1) AS participant
 		FROM table_workshops w'. $from .'
 		'. $where .'
@@ -158,8 +158,8 @@ function listWorkshops($which, $where, $columns)
 		$row['type'] = enumBlockType(intval($row['type']))->short;
 
 		$subjects = $DB->query('
-			SELECT domain FROM table_workshop_domain
-			WHERE wid=$1 ORDER BY domain', $row['wid'])->fetch_column();
+			SELECT subject FROM table_workshop_subjects
+			WHERE wid=$1 ORDER BY subject', $row['wid'])->fetch_column();
 		$row['subject'] = '';
 		foreach ($subjects as $subject)
 		{
@@ -198,7 +198,7 @@ function listWorkshops($which, $where, $columns)
 function getLecturers($wid)
 {
 	global $DB;
-	$lecturers = $DB->query('SELECT uid FROM table_workshop_user WHERE participant=$1 AND wid=$2',
+	$lecturers = $DB->query('SELECT uid FROM table_workshop_users WHERE participant=$1 AND wid=$2',
 		enumParticipantStatus('lecturer')->id, $wid);
 	return $lecturers->fetch_column();
 }
@@ -214,7 +214,7 @@ function actionShowWorkshop($wid = null)
 	$data['type'] = ucfirst(enumBlockType(intval($data['type']))->description);
 	$data['description'] = parseUserHTML($data['description']);
 
-	$participant = $DB->workshop_user[array('wid'=>$wid, 'uid'=>$USER['uid'])]->get('participant');
+	$participant = $DB->workshop_users[array('wid'=>$wid, 'uid'=>$USER['uid'])]->get('participant');
 	$participant = intval($participant);
 
 	// Lecturers list.
@@ -232,10 +232,10 @@ function actionShowWorkshop($wid = null)
 			':'. urlencode($data['title']);
 
 	// The subjects.
-	$subjects = $DB->query('SELECT domain FROM table_workshop_domain WHERE wid=$1', $wid);
+	$subjects = $DB->query('SELECT subject FROM table_workshop_subjects WHERE wid=$1', $wid);
 	$data['subjects'] = array();
 	foreach($subjects as $subject)
-		$data['subjects'][]= enumSubject($subject['domain'])->description;
+		$data['subjects'][]= enumSubject($subject['subject'])->description;
 	$data['subjects'] = implode(', ', $data['subjects']);
 
 	// Basic info.
@@ -309,7 +309,7 @@ function actionShowWorkshopTasks($wid)
 	$data['type'] = ucfirst(enumBlockType(intval($data['type']))->description);
 	$data['description'] = parseUserHTML($data['description']);
 	$lecturers = getLecturers($wid);
-	$participant = $DB->workshop_user[array('wid'=>$wid, 'uid'=>$USER['uid'])]->get('participant');
+	$participant = $DB->workshop_users[array('wid'=>$wid, 'uid'=>$USER['uid'])]->get('participant');
 	$participant = intval($participant);
 
 	$PAGE->title = $data['title'] .' - '. _('signups and tasks');
@@ -406,7 +406,6 @@ function actionEditWorkshop($wid)
 
 		$data = array(
 			'wid' => -1,
-			'proposer_uid' => $USER['uid'],
 			'title' => '',
 			'description' => '',
 			'status' => 'new',
@@ -424,8 +423,8 @@ function actionEditWorkshop($wid)
 		$data = $DB->workshops[$wid]->assoc('*');
 		$lecturers = getLecturers($wid);
 		$data['type'] = enumBlockType(intval($data['type']))->key;
-		$data['subjects'] = $DB->query('SELECT domain FROM table_workshop_domain WHERE wid=$1', $wid);
-		$data['subjects'] = $data['subjects']->fetch_column();
+		$DB->query('SELECT subject FROM table_workshop_subjects WHERE wid=$1', $wid);
+		$data['subjects'] = $DB->fetch_column();
 	}
 
 	foreach ($lecturers as $lecturer)
@@ -460,7 +459,7 @@ function submitEditWorkshopForm($wid, $values)
 		'type' => enumBlockType($values['type'])->id,
 		'duration' => ($values['type'] == 'lightLecture') ? 1 : intval($values['duration']),
 		'link' => trim($values['link']),
-		'domain_order' => empty($_POST['subjects']) ? 0 : subjectOrder($_POST['subjects'])
+		'subjects_order' => empty($_POST['subjects']) ? 0 : subjectOrder($_POST['subjects'])
 	);
 
 	if (empty($data['link']))  $data['link'] = null;
@@ -475,21 +474,21 @@ function submitEditWorkshopForm($wid, $values)
 		);
 		$DB->workshops[] = $data;
 		$wid = $DB->workshops->lastValue();
-		$DB->workshop_user[]= array('wid'=>$wid, 'uid'=>$USER['uid'],
+		$DB->workshop_users[]= array('wid'=>$wid, 'uid'=>$USER['uid'],
 			'participant'=>enumParticipantStatus('lecturer')->id);
 		if (!empty($_POST['subjects']))
 			foreach ($_POST['subjects'] as $d)
-				$DB->workshop_domain[]= array('wid'=>$wid, 'domain'=>$d, 'level'=>1);
+				$DB->workshop_subject[]= array('wid'=>$wid, 'subject'=>$d);
 		$PAGE->addMessage(_('Your proposal has been submitted.'), 'success');
 		logUser('workshop new', $wid);
 	}
 	else
 	{
 		$DB->workshops[$wid]->update($data);
-		$DB->query('DELETE FROM table_workshop_domain WHERE wid=$1', $wid);
+		$DB->query('DELETE FROM table_workshop_subjects WHERE wid=$1', $wid);
 		if (!empty($_POST['subjects']))
 			foreach ($_POST['subjects'] as $d)
-				$DB->workshop_domain[]= array('wid'=>$wid, 'domain'=>$d, 'level'=>1);
+				$DB->workshop_subjects[]= array('wid'=>$wid, 'subject'=>$d);
 		$PAGE->addMessage(_('Saved.'), 'success');
 		logUser('workshop edit', $wid);
 	}
@@ -518,7 +517,7 @@ function actionEditWorkshopLecturers($wid)
 	);
 	$inputs['lecturer']['autocomplete'] = $DB->query('
 		SELECT name FROM table_users u
-		WHERE EXISTS (SELECT * FROM table_edition_user eu
+		WHERE EXISTS (SELECT * FROM table_edition_users eu
 			WHERE eu.uid=u.uid AND eu.lecturer=1 AND eu.edition=$1)
 		ORDER BY name', getOption('currentEdition'))->fetch_column();
 
@@ -555,7 +554,7 @@ function actionRemoveWorkshopLecturer($wid, $uid, $confirm = false)
 	}
 	else
 	{
-		$DB->query('DELETE FROM table_workshop_user WHERE wid=$1 AND uid=$2', $wid, $uid);
+		$DB->query('DELETE FROM table_workshop_users WHERE wid=$1 AND uid=$2', $wid, $uid);
 		$PAGE->addMessage('Pomyślnie usunięto użytkownika z prowadzących.', 'success');
 	}
 	callAction('editWorkshopLecturers', array($wid));
@@ -566,7 +565,7 @@ function actionAddWorkshopLecturer($wid, $lecturer, $confirm = false)
 	global $USER, $DB, $PAGE;
 	$lecturers = getLecturers($wid);
 
-	/* Convert textual $lecturer to $uid (long and boring). */
+	/* Convert textual $lecturer to $uid (a long and boring part). */
 	if (is_numeric($lecturer))
 	{
 		$uid = intval($lecturer);
@@ -581,7 +580,7 @@ function actionAddWorkshopLecturer($wid, $lecturer, $confirm = false)
 			// Fuzzy match - find name with least levenshtein distance.
 			$names = $DB->query('
 				SELECT uid, name FROM table_users u
-				WHERE EXISTS (SELECT * FROM table_edition_user eu
+				WHERE EXISTS (SELECT * FROM table_edition_users eu
 					WHERE eu.uid=u.uid AND eu.lecturer=1 AND eu.edition=$1)
 				ORDER BY name', getOption('currentEdition'))->fetch_all();
 			$best = 100000;
@@ -601,7 +600,7 @@ function actionAddWorkshopLecturer($wid, $lecturer, $confirm = false)
 		$PAGE->addMessage(_('The user you selected already is a lecturer here.'), 'userError');
 	else
 	{
-		$DB->query('SELECT count(*) FROM table_workshop_user WHERE wid=$1 AND uid=$2', $wid, $uid);
+		$DB->query('SELECT count(*) FROM table_workshop_users WHERE wid=$1 AND uid=$2', $wid, $uid);
 		if ($DB->fetch() && ($confirm === false))
 		{
 			$PAGE->addMessage(
@@ -614,8 +613,8 @@ function actionAddWorkshopLecturer($wid, $lecturer, $confirm = false)
 		else
 		{
 			if ($confirm !== false)
-				$DB->query('DELETE FROM table_workshop_user WHERE wid=$1 AND uid=$2', $wid, $uid);
-			$DB->workshop_user[]= array('uid'=>$uid, 'wid'=>$wid,
+				$DB->query('DELETE FROM table_workshop_users WHERE wid=$1 AND uid=$2', $wid, $uid);
+			$DB->workshop_users[]= array('uid'=>$uid, 'wid'=>$wid,
 				'participant'=>enumParticipantStatus('lecturer')->id);
 			$PAGE->addMessage(_('Added user to lecturers.'), 'success');
 		}
@@ -633,9 +632,9 @@ function actionSignUpForWorkshop($wid)
 	if (userCan('autoQualifyForWorkshop'))  $participant = 'autoaccepted';
 	$participant = enumParticipantStatus($participant)->id;
 
-	$dbRow = $DB->workshop_user[array('wid'=>$wid,'uid'=>$USER['uid'])];
+	$dbRow = $DB->workshop_users[array('wid'=>$wid,'uid'=>$USER['uid'])];
 	if (!$dbRow->count())
-		$DB->workshop_user[] = array('wid'=>$wid,'uid'=>$USER['uid'], 'participant'=>$participant);
+		$DB->workshop_users[] = array('wid'=>$wid,'uid'=>$USER['uid'], 'participant'=>$participant);
 	else
 	{
 		if ($dbRow->get('participant') != enumParticipantStatus('none')->id)
@@ -652,7 +651,7 @@ function actionResignFromWorkshop($wid)
 {
 	global $USER, $DB, $PAGE;
 	$wid = intval($wid);
-	$dbRow = $DB->workshop_user[array('wid'=>$wid,'uid'=>$USER['uid'])];
+	$dbRow = $DB->workshop_users[array('wid'=>$wid,'uid'=>$USER['uid'])];
 	$participant = enumParticipantStatus(intval($dbRow->get('participant')));
 	if (!$participant->canResign)
 		throw new KnownException(_('Your can\'t resign from your status: '). $participant->description);
@@ -677,8 +676,8 @@ function actionRecountSubjectOrder()
 	$wids = $DB->query('SELECT wid FROM table_workshops')->fetch_column();
 	foreach ($wids as $wid)
 	{
-		$domains = $DB->query('SELECT domain FROM table_workshop_domain WHERE wid=$1', $wid);
-		$order = subjectOrder($domains->fetch_column());
-		$DB->workshops[$wid]->update(array('domain_order'=>$order));
+		$DB->query('SELECT subject FROM table_workshop_subjects WHERE wid=$1', $wid);
+		$order = subjectOrder($DB->fetch_column());
+		$DB->workshops[$wid]->update(array('subjects_order'=>$order));
 	}
 }

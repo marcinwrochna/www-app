@@ -1,90 +1,48 @@
-user/admin.php - review, translate
-tasks.php - review, translate
+notify.php - translate (emails- it requires we remember a user's language preference).
 // tutoring.php - review, translate
-
-user.php - document
-
-tasks.php role=kadra to edition_user.lecturer=1
-update.php 	rewrite insert.
-
-polish names in db [large scan], unused db fields (proponowany_referat, lecturer, proposer_uid, ...)
-move some user columns to edition_user (Arrivaltime in particular)
-dynamize edition data (start, end, meals, ....);
-publish git (code.google.com/hosting/createProject / ewentualnie gitHub?)
+== Showstoppers ==
+replace "kadra", "akadra", "jadący" with editions_users.{lectuter,qualified}
+publish git (code.google.com/hosting/createProject or maybe gitHub?)
 doxygen
-sort by last name [easy]
-parseUserHTML() - use HTMLPurifier, apply this function everywhere [security scan]
-redesign workshop info, signup/out buttons in particular.
+redesign workshop info, signup/out buttons in particular. "Signup/Resign button rights are inconsistent."
 installation - at least describe.
-check translations.
 
-cleanup roles
 merge blockStatus:{ok,great} into :accepted
 summary.php <- plan.php, user/admin.php
-redesign workshops.php
 ----------------------------------------------------
-language choice.
-don't send emails, just show, when impersonating (as when debugging) [minor]
-common.js: tipon() - cleanup and check y? [minor]
-revise logUser() messages, especially in tasks.
-replace in_array... with userIs('role');
-automatically validate 'select' to contain one of the options.
-log impersonations [easy minor]
-
-
-in actionEditWorkshop 'Minął termin zgłaszania propozycji' could be automatic.
-in actionEditWorkshop make url in JS when title changes: http://warsztatywww.wikidot.com/www7:tytul-warsztatow
-
-Top priority:
-Signup/Resign button rights are inconsistent.
-upversion notify.php, tasks, check everything.
-Forms shouldn't be sent when POST is empty. (workaround in actionEditWorkshopForm)
-
-Zlecone:
-- eksport danych w jakimś sensownym formacie (może da się podpiąć pod Googledocs API?)
-- "zapłacono" checkbox
-
-tinymce <code> (task solution - at least indentation)
-==Zadania kwalifikacyjne==
-email notifications, zmiana zadań kwalifikacyjnych, warning?
-feedback latex?
-add role instead of lack of 'uczestnik' role (e.g. rights to autoQualifyForWorkshop).
-ustalić normalizację punktów (jest 0..20, 0..6, 0..400. Proponuję więc 0..100 :P)
-'nocleg i wyżywienie we własnym zakresie' kind of makes no sense in profile,
-	maybe 'zamierzam = poprowadzić warsztaty | robić zadania kwalifikacyjne | przychodzić z Olsztyna'
-
---bugs
-ie6 fixed height?!? // May have been fixed after google-IE-fix scripts change. If not, try css:zoom:1 (compare szykujpieluchy.pl)
-see why TinyMCE includes html-escaped comment tags with MS Word stuff.
-
----Technical
----- Ongoing (mostly done, except for tasks.php and tutoring)
-.htaccess - href="?action=abc&amp;param=x" should be href="abc(x)". Test IE6.
-transfer lists of constants to enum.php
-change <form> to new Form()
-move lecturer db-column to participant=enumParticipantStatus('lecturer')
-checkUserCanEditTasks() seems stupid
-
-change to $class = alternate('even','odd');
--- Cleanup after the big changes
-ALTER TABLE table_workshop_user DROP COLUMN lecturer;
-$DB->options['domains']->delete();
-grep -i deprecated
-remove form.php backwards compatibility
-
---- Waiting
-fix <tr>-less <thead>s (they're not w3c-compliant, I thought the syntax was <table><thead><th></th></thead><tr><td></td></tr></table>, it's not, shoulde be <table><thead><tr><th></th></tr></thead><tbody><tr><td></td></tr></tbody></table> )
-co to jest id="theform"?
-when creating emails, change $email to either $content or $address or something, because it's misleading
+move hardcoded edition data to table_editions (start, end, meals, actionEditWorkshop's "deadline", ...)
+move columns from table_users to table_edition_users:  motivationletter, gatherplace, comments?
 check perms in task solution forms
-make email X-Sender tag (or lack of it) explicit in config.php:sendMail
-pg_prepare some statements?
-escape some fields (actually any user can set his school to an XSS attack-script), test with (at least) 'Abćđœ\\n+Plus%25 '. "\n" .'"DQuoted" O\'Brian &&amp; <Company>';
-change roles to sth more natural
-change to only one subject?
-Split showWorkshop into tabs (propsition, zapisani [i|,] kwalifikacja, edit), split warsztaty.php,tasks.php
 
--- Ideas
-give kadra possibility to impersonate Tester (zlecalne?)
+== Security ==
+parseUserHTML() - use HTMLPurifier, recheck if evrything applies either this or htmlspecialchars.
+Test aforementioned XSS-protection with (at least) 'Abćđœ\\n+Plus%25 '. "\n" .'"DQuoted" O\'Brian &&amp; <Company>';
+automatically validate 'select' to contain one of the options (unless 'other' is set, of course).
+CSRF protection in $form->submitted();
+
+== Features ==
+update tinymce
+language choice.
+"payed" checkbox
+log impersonations
+in actionEditWorkshop make url in JS when title changes: http://warsztatywww.wikidot.com/www7:tytul-warsztatow
+make printable tables through buildTableHTML
+export those tables to GoogleDocs API?
+tinymce <code> (for task solutions - at least handle indentation)
+make email X-Sender tag (or lack of it) explicit in email.php
+give the staff the possibility to impersonate a Tester user.
 better SELECT, DB_Slice?
 make the app more open - publish lists, user profiles, ...
+
+== Code style ==
+notifiy.php: change $email to either $content or $address, because it's misleading
+replace in_array... with userIs('role');
+rename table_workshop_user.participant? table_options->table_settings? table_edition_users.lecturer->islecturer, qualified->isqualified?
+transfer lists of constants to enum.php
+change <form> to new Form()
+checkUserCanEditTasks() seems stupid
+
+== Bugs ==
+ie6 weird global fixed height? // May have been fixed after google-IE-fix scripts change. If not, try css:zoom:1 (compare szykujpieluchy.pl)
+see why TinyMCE includes html-escaped comment tags with MS Word stuff.
+

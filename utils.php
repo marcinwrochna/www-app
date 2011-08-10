@@ -36,7 +36,7 @@ function addSiteMenuBox()
 	'));
 }
 
-function actionHomepage() // TODO translate.
+function actionHomepage()
 {
 	global $PAGE, $DB, $USER;
 	$PAGE->title = _('Main page');
@@ -44,7 +44,7 @@ function actionHomepage() // TODO translate.
 	echo getOption('homepage');
 
 	$currentEdition = getOption('currentEdition');
-	$row = $DB->edition_user($currentEdition, $USER['uid']);
+	$row = $DB->edition_users($currentEdition, $USER['uid']);
 	$didApplyAsLecturer = false;
 	$didApplyAsParticipant = false;
 	$didQualify = false;
@@ -83,7 +83,7 @@ function actionHomepage() // TODO translate.
 
 	// Check number of workshops signed up for.
 	$query = 'SELECT count(*)
-		FROM table_workshops w, table_workshop_user wu
+		FROM table_workshops w, table_workshop_users wu
 		WHERE w.wid=wu.wid AND w.edition=$1 AND wu.uid=$2 AND
 			(wu.participant>=$3) AND w.status>=$4';
 	$DB->query($query, $currentEdition, $USER['uid'],
@@ -96,8 +96,8 @@ function actionHomepage() // TODO translate.
 	$did['writeMotLetter']['done'] = ($words > getOption('motivationLetterWords'));
 	if (!$did['writeMotLetter']['done'] && $words)
 		$did['writeMotLetter']['commonText'] =
-			sprintf(_(' a longer motivation letter (you wrote %d < %d words)',
-				$words, getOption('motivationLetterWords')));
+			sprintf(_(' a longer motivation letter (you wrote %d < %d words)'),
+				$words, getOption('motivationLetterWords'));
 	// Check qualification tasks solved.
 	$DB->query($query, $currentEdition, $USER['uid'],
 		enumParticipantStatus('accepted')->id, enumBlockStatus('ok')->id);
@@ -143,7 +143,7 @@ function actionHomepage() // TODO translate.
 	// Check if any workshop block has been proposed.
 	$DB->query('
 		SELECT count(*)
-		FROM table_workshops w, table_workshop_user wu
+		FROM table_workshops w, table_workshop_users wu
 		WHERE w.wid=wu.wid AND w.edition=$1 AND wu.uid=$2 AND wu.participant=$3',
 		$currentEdition, $USER['uid'], enumParticipantStatus('lecturer')->id
 	);
@@ -152,7 +152,7 @@ function actionHomepage() // TODO translate.
 	// Check if any workshop block has been accepted.
 	/* $DB->query('
 		SELECT count(*)
-		FROM table_workshops w, table_workshop_user wu
+		FROM table_workshops w, table_workshop_users wu
 		WHERE w.wid=wu.wid AND w.edition=$1 AND wu.uid=$2 AND wu.participant=$3 AND w.status>=$4',
 		$currentEdition, $USER['uid'], enumParticipantStatus('lecturer')->id, enumBlockStatus('ok')->id
 	);
@@ -220,14 +220,14 @@ function applyForCurrentWorkshopEdition($lecturer)
 {
 	global $DB, $PAGE, $USER;
 
-	if ($DB->edition_user(getOption('currentEdition'), $USER['uid'])->count())
+	if ($DB->edition_users(getOption('currentEdition'), $USER['uid'])->count())
 	{
 		$PAGE->addMessage(_('You have already been signed up for this year\'s edition.'), 'userError');
-		actionHomepage();
+		callAction('homepage');
 		return;
 	}
 
-	$DB->edition_user[] = array(
+	$DB->edition_users[] = array(
 		'edition'   => getOption('currentEdition'),
 		'uid'       => $USER['uid'],
 		'qualified' => 0,
@@ -236,7 +236,7 @@ function applyForCurrentWorkshopEdition($lecturer)
 	$DB->user_roles[] = array('uid' => $USER['uid'], 'role' => $lecturer ? 'kadra' : 'uczestnik');
 	$USER['roles'][] = $lecturer ? 'kadra' : 'uczestnik';
 	$PAGE->addMessage(_('Signed you up for this year\'s edition.'), 'success');
-	actionHomepage();
+	callAction('homepage');
 }
 
 function actionReportBug()
@@ -332,7 +332,7 @@ function actionEditOptionsForm()
 				$DB->options[$name] = array('value' => $value);
 	$PAGE->addMessage(_('Saved settings.'), 'success');
 	logUser('admin setting');
-	actionEditOptions();
+	callAction('editOptions');
 }
 
 function actionDatabaseRaw()
@@ -466,6 +466,33 @@ function parseTable($description, $gettext = 'gettext')
 		$i++;
 	}
 	return $result;
+}
+
+function getUpdatedOrder($name, $headers, $default)
+{
+	$allowed = array();
+	foreach ($headers as $h)
+		if (!empty($h['order']))
+			$allowed[]= $h['order'];
+
+	$name = 'order_'. $name;
+	$order = array();
+	if (!empty($_GET['order']))
+		if (in_array($_GET['order'], $allowed))
+			$order[]= $_GET['order'];
+	if (isset($_SESSION[$name]))
+		foreach ($_SESSION[$name] as $o)
+			if (in_array($o, $allowed))
+				$order[]= $o;
+
+	while (count($order) > 4)
+		array_pop($order);
+
+	if (empty($order))
+		$order[]= $default;
+
+	$_SESSION[$name] = $order;
+	return $order;
 }
 
 function dbg($o)

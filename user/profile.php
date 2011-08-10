@@ -106,17 +106,17 @@ function actionEditProfile($uid = null)
 		NAME            => TYPE;          tDESCRIPTION;            bREADONLY; VALIDATION;
 		registered      => timestamp;     registered;              true;      ;
 		logged          => timestamp;     last login;              true;      ;
-		name            => text;          full name;               $nadmin;   char(name),length(3 70);
-		login           => text;          username;                $nadmin;   char(name digit),length(4 20);
+		name            => text;          full name;               $nadmin;   charset(name),length(3 70);
+		login           => text;          username;                $nadmin;   charset(name digit),length(3 20);
 		email           => text;          e-mail;                  $nadmin;   email;
 		password        => custom;        password;                true;      ;
 		gender          => select;        grammatical gender;      false;     ;
 		role            => select;        role in current edition; $nadmin;   ;              notdb;
 		roles           => checkboxgroup; other roles;             $nadmin;   ;              notdb;
 		school          => text;          school/university;       false;     ;
-		maturayear      => select;        graduation year;         false;     int;           other;
-		skadwieszowww   => text;          how do you know WWW?;    false;     ;
-		zainteresowania => richtextarea;  interests;               false;     ;
+		graduationyear  => select;        graduation year;         false;     int;           other;
+		howdoyouknowus  => text;          how do you know us?;     false;     ;
+		interests       => richtextarea;  interests;               false;     ;
 	");
 	$inputs['password']['default'] = '<a href="changePassword">'. _('change') .'</a>';
 	if ($admin)
@@ -141,7 +141,7 @@ function actionEditProfile($uid = null)
 	);
 	$inputs['school']['autocomplete'] = $DB->query('SELECT school FROM table_users WHERE school IS NOT NULL
 		GROUP BY school HAVING count(*)>1 ORDER BY count(*) DESC LIMIT 150')->fetch_column();
-	$inputs['maturayear']['options'] = getMaturaYearOptions();
+	$inputs['graduationyear']['options'] = getGraduationYearOptions();
 
 	$form = new Form($inputs);
 	$form->columnWidth = '35%';
@@ -151,7 +151,7 @@ function actionEditProfile($uid = null)
 		$values = $form->fetchAndValidateValues();
 		if ($form->valid)
 		{
-			// Update roles (in table_user_roles and table_edition_user.{lecturer,qualified}.
+			// Update roles (in table_user_roles and table_edition_users.{lecturer,qualified}.
 			if ($admin)
 			{
 				$role = $values['role'];
@@ -161,7 +161,7 @@ function actionEditProfile($uid = null)
 					$roles = $_POST['roles'];
 
 				if ($role == 'none')
-					$DB->edition_user($currentEdition, $uid)->delete();
+					$DB->edition_users($currentEdition, $uid)->delete();
 				else
 				{
 					$value = array(
@@ -171,13 +171,13 @@ function actionEditProfile($uid = null)
 					$roles[]= $value['lecturer'] ? 'kadra' : 'uczestnik';
 					if ($role == 'akadra')  $roles[]='akadra';
 
-					if ($DB->edition_user($currentEdition, $uid)->count())
-						$DB->edition_user($currentEdition, $uid)->update($value);
+					if ($DB->edition_users($currentEdition, $uid)->count())
+						$DB->edition_users($currentEdition, $uid)->update($value);
 					else
 					{
 						$value['edition'] = $currentEdition;
 						$value['uid'] = $uid;
-						$DB->edition_user[]= $value;
+						$DB->edition_users[]= $value;
 					}
 				}
 
@@ -185,6 +185,12 @@ function actionEditProfile($uid = null)
 				foreach ($roles as $role)
 					$DB->user_roles[]= array('uid'=>$uid,'role'=>$role);
 			}
+			// ordername of 'Tom Marvolo Riddle' is 'Riddle Tom Marvolo 666'.
+			$nameParts = explode(' ', $values['name']);
+			array_unshift($nameParts, array_pop($nameParts));
+			$nameParts[]= $uid;
+			$values['ordername'] = implode(' ', $nameParts);
+
 			$DB->users[$uid]->update($values);
 			$PAGE->addMessage(_('Saved.'), 'success');
 			logUser('user edit', $uid);
@@ -194,7 +200,7 @@ function actionEditProfile($uid = null)
 	$form->values = $DB->users[$uid]->assoc($form->getColumns() .',"confirm"');
 	$roles = $DB->query('SELECT role FROM table_user_roles WHERE uid=$1', $uid);
 	$form->values['roles'] = array_intersect($roles->fetch_column(), array_keys($inputs['roles']['options']));
-	$row = $DB->edition_user($currentEdition, $uid);
+	$row = $DB->edition_users($currentEdition, $uid);
 	if (!$row->count())
 		$form->values['role'] = 'none';
 	else
@@ -214,20 +220,20 @@ function actionEditProfile($uid = null)
 }
 
 // Returns an array of 9 most probable graduation years.
-function getMaturaYearOptions()
+function getGraduationYearOptions()
 {
 	// I decided not to use the text descriptions anymore, they're imprecise and confusing.
 	// (so this table's values are not actually used).
-	$maturaOptions = array('3. gimnazjum ', '1. klasa liceum','2. klasa liceum ', '3. klasa liceum',
+	$classOptions = array('3. gimnazjum ', '1. klasa liceum','2. klasa liceum ', '3. klasa liceum',
 		'I rok studiów', 'II  rok studiów', 'III rok studiów', 'IV rok studiów', 'V rok studiów');
 	$date = getdate();
-	$year = $date['year']+3; // The first element of $maturaOptions graduates in 3 years.
+	$year = $date['year']+3; // The first element of $classOptions graduates in 3 years.
 	if ($date['mon']>=9)  $year++; // We consider the 1st of September to be the threshold (should we?).
-	$maturaYearOptions = array();
-	foreach ($maturaOptions as $i=>$opt)
+	$graduationYearOptions = array();
+	foreach ($classOptions as $i=>$opt)
 	{
-		$maturaYearOptions[$year] = $year; // ." ($opt)";
+		$graduationYearOptions[$year] = $year; // ." ($opt)";
 		$year--;
 	}
-	return $maturaYearOptions;
+	return $graduationYearOptions;
 }

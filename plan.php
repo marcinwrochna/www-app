@@ -10,10 +10,10 @@ function actionShowCorrelation()
 	);
 	$workshops = $DB->fetch_all();
 
-	$PAGE->title = 'Macierz korelacji';
-	$PAGE->content .=  'Dla każdej pary warsztatów (z listy publicznych) wyświetlana jest liczba
-		\'jadących\' uczestników zakwalifikowanych na oba. Prowadzący i kadrowicze też się liczą.
-		Można wyróżnić minor główny klikając na wiersze.';
+	$PAGE->title = _('Correlation matrix');
+	$PAGE->content .=  _('For each pair of workshops the number of qualified users '.
+		'accepted for both is shown (including lecturers and staff).<br/>'.
+		'You can single out a principal minor by clicking on rows.');
 	$PAGE->content .=  '<table style="text-align:center;"><tr class="odd"><td></td><td></td>';
 	$class = 'third';
 	foreach($workshops as $w1)
@@ -29,13 +29,13 @@ function actionShowCorrelation()
 		$DB->query('
 			SELECT w.wid,w.title,
 				(SELECT COUNT(*) FROM w1_users u WHERE
-					EXISTS (SELECT * FROM w1_user_roles r WHERE u.uid=r.uid AND role=\'jadący\') AND
-					EXISTS (SELECT * FROM w1_workshop_user wu WHERE u.uid=wu.uid AND wu.wid=w.wid AND (lecturer>0 OR participant>=3)) AND
-					EXISTS (SELECT * FROM w1_workshop_user wu WHERE u.uid=wu.uid AND wu.wid=$1 AND (lecturer>0 OR participant>=3))) AS cnt
+					EXISTS (SELECT * FROM w1_edition_users eu  WHERE u.uid=eu.uid AND edition=$1 AND qualified>0) AND
+					EXISTS (SELECT * FROM w1_workshop_users wu WHERE u.uid=wu.uid AND wu.wid=w.wid AND participant>=$5) AND
+					EXISTS (SELECT * FROM w1_workshop_users wu WHERE u.uid=wu.uid AND wu.wid=$2 AND participant>=$5)) AS cnt
 			FROM table_workshops w
-			WHERE edition=$2 AND w.type=$3 AND w.status=$4
+			WHERE edition=$1 AND w.type=$3 AND w.status=$4
 			ORDER BY w.title',
-			$w['wid'], getOption('currentEdition'), enumBlockType('workshop')->id, enumBlockStatus('great')->id
+			getOption('currentEdition'), $w['wid'], enumBlockType('workshop')->id, enumBlockStatus('great')->id, enumParticipantStatus('accepted')->id
 		);
 
 		$PAGE->content .= '<tr class="'. $class .'" id="w'. $w['wid']. '">';

@@ -64,7 +64,7 @@ function actionShowLog()
 	?>
 		<div class="contentBox panel userLog">
 		<table>
-			<thead><th>{{when}}</th><th>{{who}}</th><th>{{what}}</th><th>{{which}}</th></thead>
+			<thead><tr><th>{{when}}</th><th>{{who}}</th><th>{{what}}</th><th>{{which}}</th></tr></thead>
 			%rows%
 		</table>
 		</div>

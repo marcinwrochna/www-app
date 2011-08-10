@@ -259,6 +259,7 @@ td .diagonal { border:1px #BBBBBB solid; margin: -3px; padding: 2px; }
 	padding: 2px 5px;
 	font-family: Tahoma;
 	font-size: 12px;
+	max-width: 70%;
 }
 
 table.tasks td {
@@ -310,3 +311,5 @@ table.bordered td { color: black; }
 .todoList .done { background-color: #EFE; list-style-image: url('images/icons/checkmark.gif');}
 
 .formError li { background-color: #FFE0E9; color: #000; }
+
+.inline * { display: inline; }

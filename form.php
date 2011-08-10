@@ -10,6 +10,7 @@ class Form
 	public $action = '';
 	public $rows = array();
 	public $values = array();
+	public $cssClass = null;
 	public $columnWidth = null;
 	public $custom = '';
 	public $submitValue = 'Save';
@@ -39,16 +40,17 @@ class Form
 	public function getHTML()
 	{
 		$params = array(
-			'action' => $this->action,
+			'action'      => $this->action,
+			'class'       => $this->cssClass ? 'class="'. $this->cssClass .'"' : '',
 			'columnWidth' => $this->columnWidth,
-			'custom' => $this->custom,
+			'custom'      => $this->custom,
 			'submitValue' => $this->submitValue,
-			'formid' => $this->getFormId(),
-			'rows' => generateFormRows($this->rows, $this->values),
+			'formid'      => $this->getFormId(),
+			'rows'        => generateFormRows($this->rows, $this->values),
 		);
 		$template = new SimpleTemplate($params);
 		?>
-			<form method="post" action="%action%" name="form" id="theform">
+			<form method="post" action="%action%" name="form" %class%>
 				<input type="hidden" name="formid" value="%formid%" />
 				<?php if (is_null($this->columnWidth)) : ?>
 					<table>
@@ -69,6 +71,7 @@ class Form
 
 	public function submitted()
 	{
+		// TODO Could add CSRF protection: just set $_SESSION['requestId'] and check it here.
 		return isset($_POST['formid']) && ($_POST['formid'] == $this->getFormId());
 	}
 
@@ -109,9 +112,6 @@ class Form
 					break;
 			}
 
-			if (isset($row['filter']) && ($row['filter'] == 'int')) // DEPRECATED.
-				$value = intval($value);
-
 			$values[$row['name']] = $value;
 		}
 		return $values;
@@ -119,7 +119,7 @@ class Form
 
 	public function getFormId()
 	{
-		return sha1($this->action);
+		return sha1($this->action . $this->getColumns());
 	}
 
 	public function fetchAndValidateValues()
@@ -331,7 +331,7 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 			}
 
 			if (!$foundSelected && $default && !isset($other))
-				$row .= "<option value='$default' selected='selected'>inne ($default)</option>";
+				$row .= "<option value='$default' selected='selected'>". _('other') ." ($default)</option>";
 
 			$row .= "</select></td>";
 			break;

@@ -12,7 +12,7 @@ function buildTaskList($wid)
 	$lecturers = getLecturers($wid);
 
 	$template = new SimpleTemplate();
-	echo '<h3>Zadania kwalifikacyjne</h3>';
+	echo '<h3>'. _('Qualification tasks') .'</h3>';
 
 	$taskComment = $DB->workshops[$wid]->get('tasks_comment');
 
@@ -20,20 +20,18 @@ function buildTaskList($wid)
 	{
 		echo '<span class="right">';
 		echo '<a '.
-			getTipJS('Możesz tu wpisać informacje dotyczące wszystkich zadań i nadsyłania
-				rozwiązań.<br/>Jeżeli nie będziesz w stanie sprawdzać rozwiązań przez jakiś
-				czas, koniecznie tu napisz!<br/>Jeśli Ci wygodniej, możesz np. załączyć
-				tu pdf-a z treścią wszystkich zadań.');
-		echo '>[co to?]</a> ';
-		echo getIcon('pencil.png', 'edytuj', "editTasksComment($wid)");
+			getTipJS(_('This is a place where you can add information concerning all tasks, how to '.
+				'submit solutions, etc. You may, for example, attach a pdf with all the tasks. '.
+				'If you won\'t be able to check tasks during some period, write about it here.'));
+		echo '>[?]</a> ';
+		echo getIcon('pencil.png', _('edit'), "editTasksComment($wid)");
 		echo '</span>';
 	}
 	echo '<div class="descriptionBox">'. parseUserHTML($taskComment) .'</div>';
 
-	$participant = $DB->workshop_user($wid, $USER['uid'])->get('participant');
-	$isParticipant = ($participant == enumParticipantStatus('candidate')->id) ||
-	                 ($participant == enumParticipantStatus('accepted')->id)  ||
-	                 ($participant == enumParticipantStatus('rejected')->id);
+	$participant = $DB->workshop_users($wid, $USER['uid'])->get('participant');
+	$participant = enumParticipantStatus(intval($participant));
+	$isParticipant = $participant->inArray('candidate', 'accepted', 'rejected');
 
 	echo '<table class="tasks">';
 	$tasks = $DB->query('SELECT * FROM table_tasks WHERE wid=$1 ORDER BY tid', $wid);
@@ -45,8 +43,8 @@ function buildTaskList($wid)
 		if (userCan('editTasks', $lecturers) && userCan('editWorkshop', $lecturers))
 		{
 			echo '<td>';
-			echo getIcon('plugin-edit.png', 'edytuj zadanie', 'editTask'. $params);
-			echo getIcon('plugin-delete.png', 'usuń zadanie', 'deleteTask'. $params);
+			echo getIcon('plugin-edit.png', _('edit task'), 'editTask'. $params);
+			echo getIcon('plugin-delete.png', _('delete task'), 'deleteTask'. $params);
 			echo '</td>';
 		}
 		if ($isParticipant && userCan('sendTaskSolution'))
@@ -58,21 +56,21 @@ function buildTaskList($wid)
 				$wid, $USER['uid'], $task['tid']);
 			$sol = $DB->fetch_assoc();
 
-			if ($sol === false)  echo 'wyślij';
+			if ($sol === false)  echo _('submit');
 			else  echo EnumSolutionStatus($sol['status'])->description;
 			echo ' ';
-			echo getIcon('arrow-right.png', 'twoje rozwiązanie', 'editSolution'. $params);
+			echo getIcon('arrow-right.png', _('your solution'), 'editSolution'. $params);
 			echo '</td>';
 		}
 		echo '</tr>';
 	}
 	if (userCan('editTasks', $lecturers) && userCan('editWorkshop', $lecturers))
 		echo '<tr><td colspan="2">'.
-			getButton('dodaj zadanie', "createTask($wid)", 'plugin-add.png').
+			getButton(_('add a task'), "createTask($wid)", 'plugin-add.png').
 			'</td></tr>';
 	echo '</table><br/>';
 	if (!userCan('editTasks', $lecturers) && userCan('editWorkshop', $lecturers))
-		echo '<i>Warsztaty czekają na wstępną akceptację</i>';
+		echo '<i>'. _('Your workshops await acceptance.') .'</i>';
 	return $template->finish();
 }
 
@@ -94,71 +92,47 @@ function actionEditTask($wid, $tid, $new = false)
 	if (!userCan('editTasks', $lecturers) || !userCan('editWorkshop', $lecturers))
 		throw new PolicyException();
 
-	$form = new Form(array(
-		array('readonly',     'title',       'warsztaty', 'default'=>$DB->workshops[$wid]->get('title')),
-		array('richtextarea', 'description', 'treść'),
-	));
-	$form->action = ($new?'create':'edit') ."TaskForm($wid;$tid)";
+	echo '<h4>'. $DB->workshops[$wid]->get('title') .'</h4>';
+	$form = new Form(parseTable('
+		NAME        => TYPE;         tDESCRIPTION;
+		description => richtextarea; the task;
+	'));
 
 	if ($new)
 	{
-		$PAGE->title = 'Nowe zadanie kwalifikacyjne';
+		$PAGE->title = _('New qualification task');
 		$form->values = array(
 			'wid' => $wid,
 			'tid' => $tid,
-			'description' => '',
-			'inline' => 1
+			'description' => ''
 		);
 	}
 	else
 	{
-		$PAGE->title = 'Edycja zadania kwalifikacyjnego';
+		$PAGE->title = _('Edit qualification task');
 		$form->values = $DB->tasks($wid,$tid)->assoc('*');
 	}
 
-	$form->submitValue = 'Zapisz';
-	$PAGE->content .= '<a class="back" href="showWorkshopTasks('. $wid .')">wróć</a>';
-	$PAGE->content .= $form->getHTML();
-}
+	echo '<a class="back" href="showWorkshopTasks('. $wid .')">' ._('back') .'</a>';
+	if (!$form->submitted())
+		return print $form->getHTML();
 
-function actionCreateTaskForm($wid, $tid)
-{
-	global $DB, $PAGE;
-	$wid = intval($wid);
-	$tid = intval($tid);
-	$lecturers = getLecturers($wid);
-	if (!userCan('editTasks', $lecturers) || !userCan('editWorkshop', $lecturers))
-		throw new PolicyException();
 
-	$DB->tasks[]= array(
-		'wid' => $wid,
-		'tid' => $tid,
-		'description' => $_POST['description'],
-		'inline' => 1
-	);
+	$values = $form->fetchAndValidateValues();
+	if (!$form->valid)
+		return print $form->getHTML();
 
-	logUser('task create', $wid);
-	$PAGE->addMessage('Pomyślnie utworzono zadanie', 'success');
-	actionEditTask($wid, $tid);
-}
-
-function actionEditTaskForm($wid, $tid)
-{
-	global $DB, $PAGE;
-	$wid = intval($wid);
-	$tid = intval($tid);
-
-	$lecturers = getLecturers($wid);
-	if (!userCan('editTasks', $lecturers) || !userCan('editWorkshop', $lecturers))
-		throw new PolicyException();
-
-	$DB->tasks($wid,$tid)->update(array(
-			'description' => $_POST['description'],
-			'inline' => 1
-	));
+	if ($new)
+		$DB->tasks[]= array(
+			'wid' => $wid,
+			'tid' => $tid,
+			'description' => $values['description']
+		);
+	else
+		$DB->tasks($wid,$tid)->update($values);
 	logUser('task edit', $wid);
-	$PAGE->addMessage('Pomyślnie zmieniono zadanie', 'success');
-	actionEditTask($wid, $tid);
+	$PAGE->addMessage('Saved.', 'success');
+	callAction('showWorkshopTasks', array($wid));
 }
 
 function actionDeleteTask($wid, $tid, $confirmed = false)
@@ -166,27 +140,26 @@ function actionDeleteTask($wid, $tid, $confirmed = false)
 	global $USER, $PAGE, $DB;
 	$wid = intval($wid);
 	$tid = intval($tid);
+	$lecturers = getLecturers($wid);
+	if (!userCan('editTasks', $lecturers) || !userCan('editWorkshop', $lecturers))
+		throw new PolicyException();
 
 	if (!$confirmed)
 	{
-		$PAGE->addMessage('Czy na pewno chcesz usunąć poniższe zadanie?<br/>'.
-		 	'<a class="button" href="deleteTask('. $wid .';'. $tid .';true)">Tak</a> '.
-		 	'<a class="button" href="showWorkshopTasks('. $wid .')">Anuluj</a>',
+		$PAGE->addMessage(_('Are you sure you want to delete the following task?'). '<br/>'.
+		 	'<a class="button" href="deleteTask('. $wid .';'. $tid .';true)">'. _('Yes') .'</a> '.
+		 	'<a class="button" href="showWorkshopTasks('. $wid .')">'. _('Cancel') .'</a>',
 		 	'warning');
-		 $PAGE->title = 'Usuwanie zadania';
+		 $PAGE->title = _('Task deletion');
 		 $description = $DB->tasks($wid,$tid)->get('description');
-		 $PAGE->content .= '<div class="contentBox">'. parseUserHTML($description) .'</div>';
+		 echo '<div class="contentBox">'. parseUserHTML($description) .'</div>';
 	}
 	else
 	{
-		$lecturers = getLecturers($wid);
-		if (!userCan('editTasks', $lecturers) || !userCan('editWorkshop', $lecturers))
-			throw new PolicyException();
-
 		$DB->tasks($wid,$tid)->delete();
-		$PAGE->addMessage('Usunięto zadanie.', 'success');
+		$PAGE->addMessage(sprintf(_('Task %d. deleted.'), $tid), 'success');
 		logUser('task delete', $wid);
-		actionShowWorkshopTasks($wid);
+		callAction('showWorkshopTasks', array($wid));
 	}
 }
 
@@ -196,14 +169,14 @@ function actionEditSolution($wid, $tid)
 	$wid = intval($wid);
 	$tid = intval($tid);
 
-	$participant = $DB->workshop_user($wid, $USER['uid'])->get('participant');
+	$participant = $DB->workshop_users($wid, $USER['uid'])->get('participant');
 	if (!$participant)  throw new PolicyException();
 	$isCandidate = ($participant == enumParticipantStatus('candidate')->id);
 
 	$task = $DB->tasks($wid, $tid)->assoc('*');
-	$DB->query("SELECT * FROM table_task_solutions
+	$DB->query('SELECT * FROM table_task_solutions
 		WHERE wid=$1 AND tid=$2 AND uid=$3
-		ORDER BY submitted DESC",
+		ORDER BY submitted DESC',
 		$wid, $tid, $USER['uid']
 	);
 	$solutions = $DB->fetch_all();
@@ -211,12 +184,13 @@ function actionEditSolution($wid, $tid)
 
 	if (!is_array($solutions) || empty($solutions))
 	{
-		$PAGE->title = 'Rozwiązanie zadania';
+		$PAGE->title = _('Task solution');
 		$data = array(
 			'wid' => $wid,
 			'tid' => $tid,
 			'uid' => $USER['uid'],
 			'submitted' => time(),
+			'solution' => NULL,
 			'grade' => NULL,
 			'feedback' => NULL,
 			'comment' => NULL
@@ -225,53 +199,48 @@ function actionEditSolution($wid, $tid)
 	}
 	else
 	{
-		$PAGE->title = 'Edycja rozwiązania';
+		$PAGE->title = _('Edit your solution');
 		$data = $solutions[0];
-		$feedback = 'status: '. EnumSolutionStatus($solutions[0]['status'])->description .'<br/>';
+		$feedback = _('status') .': '.  EnumSolutionStatus($solutions[0]['status'])->description .'<br/>';
 		if (!empty($solutions[0]['grade']))
-			$feedback .= 'ocena: '. htmlspecialchars($solutions[0]['grade']) .'<br/>';
+			$feedback .= _('grade') .': '. htmlspecialchars($solutions[0]['grade']) .'<br/>';
 		if (!empty($solutions[0]['feedback']))
-			$feedback .= 'komentarz: <div class="descriptionBox">'. htmlspecialchars($solutions[0]['feedback']) .'</div><br/>';
+			$feedback .= _('comment') .': <div class="descriptionBox">'. htmlspecialchars($solutions[0]['feedback']) .'</div><br/>';
 	}
 
-	$form = new Form(array(
-		array('richtextarea', 'solution', 'rozwiązanie &nbsp; <small>(edytor umożliwia załączanie plików)</small>'),
-	));
-	$form->action = "editSolutionForm($wid;$tid)";
-	$form->submitValue = 'Zapisz';
+
+	echo '<a class="back" href="showWorkshopTasks('. $wid .')">'. _('back') .'</a>';
+	echo sprintf(_('Task %d. from %s'), $tid,  '<b>'. $DB->workshops[$wid]->get('title') .'</b>') .'<br/>';
+	echo '<div class="descriptionBox">'. parseUserHTML($task['description']) .'</div>';
+	echo $feedback;
+	if (!$isCandidate)
+		return print _('solution') .' <div class="descriptionBox">'. $data['solution'] .'</div>';
+
+	$inputs = parseTable('
+		NAME     => TYPE;         tDESCRIPTION;
+		solution => richtextarea; solution;
+	');
+	$inputs['solution']['description'] .= ' &nbsp; <small>('. _('The editor allows you to attach files.') .')</small>';
+	$form = new Form($inputs);
 	$form->values = $data;
-
-	$PAGE->content .= '<a class="back" href="showWorkshopTasks('. $wid .')">wróć</a>';
-	$PAGE->content .= 'Zadanie '. $tid .' z <b>'. $DB->workshops[$wid]->get('title') .'</b><br/>';
-	$PAGE->content .= 'treść: <div class="descriptionBox">'. parseUserHTML($task['description']) .'</div>';
-	$PAGE->content .= $feedback;
-	if ($isCandidate)
-		$PAGE->content .= $form->getHTML();
-	else
-		$PAGE->content .= 'rozwiązanie <div class="descriptionBox">'. $data['solution'] .'</div>';
-}
-
-function actionEditSolutionForm($wid, $tid)
-{
-	global $DB, $USER, $PAGE;
-	$wid = intval($wid);
-	$tid = intval($tid);
-
-	$participant = $DB->workshop_user($wid, $USER['uid'])->get('participant');
-	if (!$participant)  throw new PolicyException();
+	if (!$form->submitted())
+		return print $form->getHTML();
+	$values = $form->fetchAndValidateValues();
+	if (!$form->valid)
+		return print $form->getHTML();
 
 	$DB->task_solutions[] = array(
 		'wid' => $wid,
 		'tid' => $tid,
 		'uid' => $USER['uid'],
 		'submitted' => time(),
-		'solution' => $_POST['solution'],
+		'solution' => $values['solution'],
 		'status' => 1,
 		'notified' => 0
 	);
-	$PAGE->addMessage('Pomyślnie zapisano rozwiązane.', 'success');
-	actionEditSolution($wid, $tid);
+	$PAGE->addMessage(_('Saved.'), 'success');
 	logUser('task solve', $wid);
+	callAction('editSolution', array($wid, $tid));
 }
 
 // Called by actionShowWorkshop
@@ -281,9 +250,9 @@ function buildParticipantList($wid)
 	$wid = intval($wid);
 	$template = new SimpleTemplate();
 	$DB->query('SELECT wu.uid, wu.participant, wu.points, u.gender
-		FROM table_workshop_user wu, table_users u
+		FROM table_workshop_users wu, table_users u
 		WHERE wu.uid=u.uid AND wu.wid=$1 AND wu.participant>0
-		ORDER BY regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\'), u.uid', $wid);
+		ORDER BY u.ordername, u.uid', $wid);
 	$participants = $DB->fetch_all();
 
 	$DB->query('SELECT tid FROM table_tasks WHERE wid=$1 ORDER BY tid', $wid);
@@ -297,27 +266,25 @@ function buildParticipantList($wid)
 	$countDescription = array();
 	foreach(enumParticipantStatus() as $statusName => $status)
 		if ($statusName != 'none' || $counts[$status->id])
-		$countDescription[]= str_replace('%','ych',$status->description) .': '. $counts[$status->id];
-				/*$row['participants'] .= '<a '. getTipJS($tip) .'>';
-				$row['participants'] .= ($row['count_accepted'] + $row['count_autoaccepted']) .'</a>';*/
+		$countDescription[]= str_replace('%','ych',$status->description) .': '. $counts[$status->id]; // TODO i18n polish plural -ych
 
 
-	echo '<h3 style="display:inline-block">Zapisani</h3>';
+	echo '<h3 style="display:inline-block">'. _('Signups') .'</h3>';
 	echo '<table class="right"><tr><td>'. implode('</td><td>', $countDescription) .'</td></tr></table><br/>';
+
 	echo '<table style="border-top: 1px black solid">';
-	echo '<thead><tr><th>uczestnik</th>';
+	echo '<thead><tr><th>'. _('participant') .'</th>';
 	foreach ($tasks as $tid)  echo "<th>$tid</th>";
-	echo '<th>punktów (0..6)</th><th>ogólnie</th></tr></thead><tbody>';
-	$kadra = array();
+	echo '<th>'. _('points') .' (0..6)</th><th>'. _('overall') .'</th></tr></thead><tbody>';
+	$staff = array();
 	foreach ($participants as $participant)
 	{
 		$uid = $participant['uid'];
 		$status = $participant['participant'];
-		if (count($DB->user_roles($uid, 'kadra'))) // TODO role=kadra to edition_user.lecturer=1
-		{
-			if ($status != enumParticipantStatus('lecturer')->id)
-				$kadra[$uid]= getUserBadge($uid);
-		}
+		if ($status == enumParticipantStatus('lecturer')->id)
+			; // Do nothing.
+		else if ($status == enumParticipantStatus('autoaccepted')->id)
+				$staff[$uid]= getUserBadge($uid);
 		else
 		{
 			echo '<tr class="'. alternate('even', 'odd') .'">';
@@ -326,25 +293,24 @@ function buildParticipantList($wid)
 			$r = $DB->query('SELECT tid,status FROM table_task_solutions
 				WHERE wid=$1 AND uid=$2 ORDER BY tid, submitted ASC', $wid, $uid);
 			$solutions = array();
-			foreach ($tasks as $tid)  $solutions[$tid] = EnumSolutionStatus('none')->id;
+			foreach ($tasks as $tid)  $solutions[$tid] = enumSolutionStatus('none')->id;
 			foreach ($r as $solution)  $solutions[$solution['tid']] = $solution['status'];
 			foreach ($tasks as $tid)
 			{
-				$s = EnumSolutionStatus($solutions[$tid]);
+				$s = enumSolutionStatus($solutions[$tid]);
 				echo '<td>'. getIcon($s->icon, $s->description) .'</td>';
 			}
 			echo '<td>'. $participant['points'] .'</td>';
-			$desc = EnumParticipantStatus($status)->description;
-			$desc = str_replace('%', gender('y','a', $participant['gender']), $desc);
-			$icon = getIcon('arrow-right.png',	'zobacz i oceń rozwiązania', "showTaskSolutions($wid;$uid)");
+			$desc = genderize(enumParticipantStatus($status)->description, $participant['gender']);
+			$icon = getIcon('arrow-right.png',	_('see & grade solutions'), "showTaskSolutions($wid;$uid)");
 			echo '<td>'. $desc .'<span class="right">'. $icon . '</span>';
 			echo '</td></tr>';
 		}
 	}
 
 	echo '</tbody></table>';
-	if (!empty($kadra))
-		echo 'z kadry: '. implode(', ', $kadra) . '<br/>';
+	if (!empty($staff))
+		echo _('from staff: '). implode(', ', $staff) . '<br/>';
 
 	return $template->finish();
 }
@@ -352,19 +318,15 @@ function buildParticipantList($wid)
 function actionShowPointsTable()
 {
 	global $DB, $PAGE;
-	$PAGE->title = 'Podsumowanie punktów';
-	$template = new SimpleTemplate();
+	$PAGE->title = _('Summary of points');
 	$DB->query('SELECT wu.uid, wu.wid, wu.participant, wu.points, w.title, u.name
-		FROM table_workshops w, table_workshop_user wu, table_users u
+		FROM table_workshops w, table_workshop_users wu, table_users u
 		WHERE wu.uid=u.uid AND w.edition=$1 AND wu.wid=w.wid AND wu.points IS NOT NULL
-		ORDER BY regexp_replace(u.name,\'.*\ ([^\ ]+)\',\'\\\\1\'), u.uid, wu.wid',
+		ORDER BY u.ordername, wu.wid',
 		getOption('currentEdition'));
 	$data = $DB->fetch_all();
 	if (empty($data))
-	{
-		$PAGE->content .= 'Brak danych (nikt nikogo nie ocenił w tej edycji).';
-		return;
-	}
+		return print 'No data (noone was graded yet).';
 
 	$dataByUid = array();
 	$titles = array();
@@ -404,12 +366,10 @@ function actionShowPointsTable()
 	echo '</tbody></table>';
 
 
-	echo '<table><thead><tr><th>#</th><th>tytuł</th></thead><tbody>';
+	echo '<table><thead><tr><th>#</th><th>'. _('title') .'</th></thead><tbody>';
 	foreach ($titles as $wid => $title)
 		echo "<tr><td>$wid</td><td>$title</td></tr>";
 	echo '</tbody></table>';
-
-	$PAGE->content .= $template->finish();
 }
 
 function actionEditTasksComment($wid)
@@ -417,27 +377,28 @@ function actionEditTasksComment($wid)
 	global $DB, $PAGE, $USER;
 	$wid = intval($wid);
 	checkUserCanEditTasks($wid);
-	$PAGE->title = 'Komentarz do zadań'; //$DB->workshops[$wid]->get('title');
-	$form = new Form(array(
-		array('richtextarea', 'tasks_comment',
-			'Możesz tu wpisać informacje dotyczące wszystkich zadań i nadsyłania
-			rozwiązań.<br/>Jeżeli nie będziesz w stanie sprawdzać rozwiązań przez jakiś
-			czas, koniecznie tu napisz!<br/>Jeśli Ci wygodniej, możesz np. załączyć
-			tu pdf-a z treścią wszystkich zadań.')
-	));
-	$form->action = "editTasksCommentForm($wid)";
-	$form->values = array('tasks_comment'=>$DB->workshops[$wid]->get('tasks_comment'));
-	$PAGE->content .= $form->getHTML();
-}
-
-function actionEditTasksCommentForm($wid)
-{
-	global $DB, $PAGE;
-	$wid = intval($wid);
-	checkUserCanEditTasks($wid);
-	$DB->workshops[$wid]->update(array('tasks_comment'=>$_POST['tasks_comment']));
-	$PAGE->addMessage('Pomyślnie zapisano komentarz do zadań.', 'success');
-	actionShowWorkshopTasks($wid);
+	$PAGE->title = _('Comments concerning tasks');
+	$inputs = parseTable('
+		NAME          => TYPE;         tDESCRIPTION;
+		tasks_comment => richtextarea;
+	');
+	$inputs['tasks_comment']['description'] = _(
+		'This is a place where you can add information concerning all tasks, how to '.
+		'submit solutions, etc. You may, for example, attach a pdf with all the tasks. '.
+		'If you won\'t be able to check tasks during some period, write about it here.');
+	$form = new Form($inputs);
+	if ($form->submitted())
+	{
+		$values = $form->fetchAndValidateValues();
+		if ($form->valid)
+		{
+			$DB->workshops[$wid]->update($values);
+			$PAGE->addMessage('Saved.', 'success');
+			callAction('showWorkshopTasks', array($wid));
+		}
+	}
+	$form->values = $DB->workshops[$wid]->assoc('tasks_comment');
+	return print $form->getHTML();
 }
 
 function actionShowTaskSolutions($wid, $uid)
@@ -448,49 +409,63 @@ function actionShowTaskSolutions($wid, $uid)
 
 	checkUserCanEditTasks($wid);
 
-	$statusOptions = enumParticipantStatus()->assoc('id','description');
+	$statusOptions = enumParticipantStatus()->assoc('id', 'description');
 	$g = $DB->users[$uid]->get('gender');
 	foreach ($statusOptions as &$option)
 		$option = genderize($option, $g);
 
-	$form = new Form(array(
-		array('readonly', 'workshop',     'warsztaty', 'default' => $DB->workshops[$wid]->get('title')),
-		array('readonly', 'name',         'uczestnik', 'default' => getUserBadge($uid, true)),
-		array('select',   'participant',  'status',	'options' => $statusOptions),
-		array('int',      'points',       'punktów <small>(0..6)</small>'),
-		array('textarea', 'admincomment', 'komentarz tylko dla organizatorów')
-	));
-	$form->action = "showTaskSolutionsForm($wid;$uid)";
-	$form->values = $DB->workshop_user($wid,$uid)->assoc('participant,admincomment,points');
-	$form->submitValue = 'Zapisz';
+	$inputs = parseTable('
+		NAME         => TYPE;     tDESCRIPTION;             VALIDATION;
+		participant  => select;   status;
+		points       => text;     points;                   int;
+		admincomment => textarea; a comment for admins only;
+	');
+	$inputs['points']['description'] .= ' <small>(0..6)</small>';
+	$inputs['participant']['options'] = $statusOptions;
+	echo '<h3>'. $DB->workshops[$wid]->get('title') .'</h3>';
+	echo getUserBadge($uid, true);
+	$form = new Form($inputs);
+	if ($form->submitted())
+	{
+		$valued = $form->fetchAndValidateValues();
+		if ($form->valid)
+		{
+			$DB->workshop_users($wid,$uid)->update($values);
+			$PAGE->addMessage(_('Saved.'), 'success');
+			logUser('task qualify', $wid);
+		}
+	}
+	$form->values = $DB->workshop_users($wid,$uid)->assoc('participant,admincomment,points');
 
-	$PAGE->title = 'Rozwiązania zadań';
-	$PAGE->content .= '<a class="back" href="showWorkshopTasks('. $wid .')">wróć</a>';
-	$PAGE->content .= '<h3>Ogólnie</h3>';
-	$PAGE->content .= $form->getHTML();
-	$PAGE->content .= '<br/>';
+	$PAGE->title = _('Task solutions');
+	echo '<a class="back" href="showWorkshopTasks('. $wid .')">wróć</a>';
+	echo '<h4>'. _('Overall') .'</h4>';
+	echo $form->getHTML();
+	echo '<br/>';
 
 	$tasks = $DB->query('SELECT tid FROM table_tasks WHERE wid=$1 ORDER BY tid', $wid);
 	foreach ($tasks as $task)
 	{
 		$tid = $task['tid'];
-		echo "<h3>Zadanie $tid.</h3>";
+		echo '<h4>'. _('Task'). ' '. $tid .'</h4>';
 		$DB->query('SELECT * FROM table_task_solutions
-			WHERE wid=$1 AND tid=$2 AND uid=$3 ORDER BY submitted DESC LIMIT 4', $wid, $tid, $uid);
+		            WHERE wid=$1 AND tid=$2 AND uid=$3 ORDER BY submitted DESC LIMIT 4',
+			$wid, $tid, $uid);
 		$sols = $DB->fetch_all();
 		if (empty($sols))
-			echo 'Brak rozwiązania.';
+			echo _('No solution.');
 		else
 		{
 			$sol = array_shift($sols);
-			$form = new Form(array(
-				array('text',     'submitted', 'nadesłane', 'readonly'=>true,
-					'default'=>strftime("%F %T", $sol['submitted'])                  ),
-				array('select',   'status',    'status',
-					'options'=>enumSolutionStatus()->assoc('id','description')),
-				array('text',     'grade',     'ocena'                               ),
-				array('textarea', 'feedback',  'komentarz'                           )
-			));
+			echo _('submitted') .': '. strftime("%F %T", $sol['submitted']);
+			$inputs = parseTable('
+				NAME     => TYPE;     tDESCRIPTION;
+				status   => select;   status;
+				grade    => text;     grade;
+				feedback => textarea; feedback;
+			');
+			$inputs['status']['options'] = enumSolutionStatus()->assoc('id','description');
+			$form = new Form($inputs);
 			$form->action = "editSolutionsGradeForm($wid;$uid;$tid;${sol['submitted']})";
 			$form->values = $sol;
 
@@ -504,16 +479,17 @@ function actionShowTaskSolutions($wid, $uid)
 			{
 				// We could write (instead of display:none)
 				// $PAGE->jsOnLoad .= '$("#task'. $tid .'oldsols").hide();';
-				// but it would make a flicker at page load. So now javascript-disabled
+				// but it would flicker at page load. So now javascript-disabled
 				// browsers can't see old solutions.
-				echo '<a onclick="$(\'#oldsols'. $tid .'\').toggle(400);">starsze rozwiązania</a>';
+				echo '<a onclick="$(\'#oldsols'. $tid .'\').toggle(400);" style="cursor:pointer;">';
+				echo '+ '. _('older solutions') .'</a>';
 				echo '<div id="oldsols'. $tid .'" style="display:none">';
 				foreach ($sols as $sol)
 				{
-					echo 'nadesłane: '. strftime("%F %T", $sol['submitted']) .'<br/>';
-					//echo 'status: '. EnumSolutionStatuses($sol['status'])->description .'<br/>';
+					echo _('submitted'). ': '. strftime("%F %T", $sol['submitted']) .'<br/>';
+					//echo 'status: '. enumSolutionStatuses($sol['status'])->description .'<br/>';
 					if (!empty($sol['grade']))
-						echo 'ocena: '. htmlspecialchars($sol['grade']) .'<br/>';
+						echo _('grade') .': '. htmlspecialchars($sol['grade']) .'<br/>';
 					echo '<div class="descriptionBox">';
 					echo parseUserHTML($sol['solution']);
 					echo '</div><br/>';
@@ -523,24 +499,6 @@ function actionShowTaskSolutions($wid, $uid)
 		}
 		echo '<br/><br/>';
 	}
-}
-
-function actionShowTaskSolutionsForm($wid,$uid)
-{
-	global $DB,$USER,$PAGE;
-	$wid = intval($wid);
-	$uid = intval($uid);
-
-	checkUserCanEditTasks($wid);
-
-	$DB->workshop_user($wid,$uid)->update(array(
-		'participant' => enumParticipantStatus($_POST['participant'])->id,
-		'points' => (strlen(trim($_POST['points']))==0) ? NULL : intval($_POST['points']),
-		'admincomment' => $_POST['admincomment']
-	));
-	$PAGE->addMessage(_('Saved.'), 'success');
-	logUser('task qualify', $wid);
-	callAction('showTaskSolutions', array($wid, $uid));
 }
 
 function actionEditSolutionsGradeForm($wid,$uid,$tid,$submitted)
@@ -554,7 +512,7 @@ function actionEditSolutionsGradeForm($wid,$uid,$tid,$submitted)
 	checkUserCanEditTasks($wid);
 
 	$DB->task_solutions($wid, $tid, $uid, $submitted)->update(array(
-		'status' => $_POST['status'],
+		'status' => intval($_POST['status']),
 		'grade' => $_POST['grade'],
 		'feedback' => $_POST['feedback'],
 		'notified' => 2

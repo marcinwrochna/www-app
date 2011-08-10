@@ -7,16 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wwwApp 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-05 20:26+0200\n"
-"PO-Revision-Date: 2011-07-30 23:36+0100\n"
+"POT-Creation-Date: 2011-08-10 21:00+0200\n"
+"PO-Revision-Date: 2011-08-10 21:02+0100\n"
 "Last-Translator: Marcin Wrochna <mwrochna+gettext@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: enum.php:103
 msgid "unknown"
@@ -27,9 +26,7 @@ msgid "Error"
 msgstr ""
 
 #: error.php:132
-msgid ""
-"Oops, we're sorry, something exploded. Our team of kittens is working on the "
-"problem."
+msgid "Oops, we're sorry, something exploded. Our team of kittens is working on the problem."
 msgstr ""
 
 #: error.php:227
@@ -38,6 +35,175 @@ msgstr ""
 
 #: form.php:21
 msgid "Save"
+msgstr ""
+
+#: form.php:178
+#, php-format
+msgid "Invalid character: \"%s\", position %d."
+msgstr ""
+
+#: form.php:189
+#, php-format
+msgid "The value should have exactly %d characters."
+msgstr ""
+
+#: form.php:194
+msgid "The value is too short"
+msgstr ""
+
+#: form.php:194
+#: form.php:196
+msgid "characters"
+msgstr ""
+
+#: form.php:196
+msgid "The value is too long"
+msgstr ""
+
+#: form.php:201
+msgid "Invalid e-mail address."
+msgstr ""
+
+#: form.php:205
+msgid "The value doesn't match it's repetition."
+msgstr ""
+
+#: form.php:210
+msgid "The value is not an integer."
+msgstr ""
+
+#: form.php:336
+msgid "other"
+msgstr ""
+
+#: form.php:375
+msgid "or"
+msgstr ""
+
+#: plan.php:13
+msgid "Correlation matrix"
+msgstr ""
+
+#: plan.php:14
+msgid "For each pair of workshops the number of qualified users accepted for both is shown (including lecturers and staff).<br/>You can single out a principal minor by clicking on rows."
+msgstr ""
+
+#: tasks.php:15
+msgid "Qualification tasks"
+msgstr ""
+
+#: tasks.php:23
+msgid "This is a place where you can add information concerning all tasks, how to submit solutions, etc. You may, for example, attach a pdf with all the tasks. If you won't be able to check tasks during some period, write about it here."
+msgstr ""
+
+#: tasks.php:27
+#: workshop.php:298
+msgid "edit"
+msgstr ""
+
+#: tasks.php:46
+msgid "edit task"
+msgstr ""
+
+#: tasks.php:47
+msgid "delete task"
+msgstr ""
+
+#: tasks.php:59
+msgid "submit"
+msgstr ""
+
+#: tasks.php:62
+msgid "your solution"
+msgstr ""
+
+#: tasks.php:69
+msgid "add a task"
+msgstr ""
+
+#: tasks.php:73
+msgid "Your workshops await acceptance."
+msgstr ""
+
+#: tasks.php:103
+msgid "New qualification task"
+msgstr ""
+
+#: tasks.php:112
+msgid "Edit qualification task"
+msgstr ""
+
+#: tasks.php:116
+#: tasks.php:219
+#: workshop.php:525
+msgid "back"
+msgstr ""
+
+#: tasks.php:149
+msgid "Are you sure you want to delete the following task?"
+msgstr ""
+
+#: tasks.php:150
+msgid "Yes"
+msgstr ""
+
+#: tasks.php:151
+msgid "Cancel"
+msgstr ""
+
+#: tasks.php:153
+msgid "Task deletion"
+msgstr ""
+
+#: tasks.php:160
+#, php-format
+msgid "Task %d. deleted."
+msgstr ""
+
+#: tasks.php:187
+msgid "Task solution"
+msgstr ""
+
+#: tasks.php:201
+msgid "Edit your solution"
+msgstr ""
+
+#: tasks.php:203
+#: user/admin.php:98
+#: workshop.php:72
+#: column:'th'
+#: row:'status'
+msgid "status"
+msgstr ""
+
+#: tasks.php:205
+msgid "grade"
+msgstr ""
+
+#: tasks.php:207
+#: user/admin.php:146
+msgid "comment"
+msgstr ""
+
+#: tasks.php:214
+msgid "The editor allows you to attach files."
+msgstr ""
+
+#: tasks.php:220
+#, php-format
+msgid "Task %d. from %s"
+msgstr ""
+
+#: tasks.php:516
+#: user.php:352
+#: workshop.php:492
+#: user/profile.php:195
+msgid "Saved."
+msgstr ""
+
+#: tasks.php:537
+#, php-format
+msgid "Task %d graded."
 msgstr ""
 
 #: update.php:10
@@ -55,9 +221,8 @@ msgid "User #%d doesn't exist"
 msgstr ""
 
 #: user.php:78
-#, fuzzy
 msgid "Logged out."
-msgstr "Zaloguj"
+msgstr "Wylogowano."
 
 #: user.php:92
 msgid "Wrong username/e-mail or password."
@@ -84,9 +249,8 @@ msgid "return"
 msgstr ""
 
 #: user.php:158
-#, fuzzy
 msgid "Log out"
-msgstr "Zaloguj"
+msgstr "Wyloguj się"
 
 #: user.php:165
 msgid "Create your account"
@@ -94,14 +258,8 @@ msgstr "Utwórz konto"
 
 #: user.php:174
 #, fuzzy
-msgid ""
-"All fields are required. Your e-mail will only be visible to signed-in users."
-"<br/>One account should correspond to one person (e.g. don't create an "
-"account for another lecturer).<br/>"
-msgstr ""
-"Wszystkie pola są wymagane. Twój e-mail będzie widoczny tylko dla "
-"zarejestrowanych.<br/>Jedno konto powinno odpowiadać jednej osobie (np. nie "
-"twórz konta dla współwykładowcy).<br/>"
+msgid "All fields are required. Your e-mail will only be visible to signed-in users.<br/>One account should correspond to one person (e.g. don't create an account for another lecturer).<br/>"
+msgstr "Wszystkie pola są wymagane. Twój e-mail będzie widoczny tylko dla zarejestrowanych.<br/>Jedno konto powinno odpowiadać jednej osobie (np. nie twórz konta dla współwykładowcy).<br/>"
 
 #: user.php:184
 msgid "This login is already taken."
@@ -109,104 +267,188 @@ msgstr "Login jest już zajęty."
 
 #: user.php:186
 #, fuzzy
-msgid ""
-"This email address is already registered. If you didn't receive an email "
-"with confirmation, check your spam or"
-msgstr ""
-"Podany adres e-mail jest już zarejestrowany.Jeśli nie dotarła wiadomość z "
-"potwierdzeniem, sprawdź spam lub"
+msgid "This email address is already registered. If you didn't receive an email with confirmation, check your spam or"
+msgstr "Podany adres e-mail jest już zarejestrowany.Jeśli nie dotarła wiadomość z potwierdzeniem, sprawdź spam lub"
 
 #: user.php:188
 msgid "report a bug"
 msgstr "zgłoś błąd"
 
-#: user.php:206
+#: user.php:212
 #, php-format
 msgid ""
-"A new user account has been created on %s using this e-mail address.\\nTo "
-"confirm your registration, open the following link:\\n%s\\n\\n(If you didn't "
-"sign up, just ignore this email.)\\n"
+"A new user account has been created on %s using this e-mail address.\\n"
+"To confirm your registration, open the following link:\\n"
+"%s\\n"
+"\\n"
+"(If you didn't sign up, just ignore this email.)\\n"
 msgstr ""
 
-#: user.php:210
+#: user.php:216
 #, fuzzy
 msgid "New user account"
 msgstr "Utwórz konto"
 
-#: user.php:211
-msgid ""
-"Your account has been successfully created. Now, click the link you received "
-"in an e-mail to confirm.<br/>(If not, wait 15 minutes and check your spam.)"
+#: user.php:217
+msgid "Your account has been successfully created. Now, click the link you received in an e-mail to confirm.<br/>(If not, wait 15 minutes and check your spam.)"
 msgstr ""
 
-#: user.php:220
-msgid ""
-"The link you opened doesn't contain the confirmation number. Please copy the "
-"whole link from the e-mail you received."
+#: user.php:226
+msgid "The link you opened doesn't contain the confirmation number. Please copy the whole link from the e-mail you received."
 msgstr ""
 
-#: user.php:225
+#: user.php:231
 msgid "Your registration has been successfully finished. Please log in."
 msgstr ""
 
-#: user.php:233
+#: user.php:239
+#: user/admin.php:129
+#: template
 msgid "Motivation letter"
 msgstr ""
 
-#: user.php:241
+#: user.php:247
 #, php-format
-msgid ""
-"Write (in %d - 300 words)<br/>1. What do you expect from these workshops?<br/"
-">2. What are your interests in science?<br/>3. (Optional) Would you like to "
-"make a short (15 min.) presentation?<br/><small>Tell us something about a "
-"topic you would choose, or (if you have no good idea)<br/>describe as "
-"precisely as possible what would you suggest you'd like to talk about.</br>"
-"(This will be taken into account in case we get many good applications).</"
-"small>"
+msgid "Write (in %d - 300 words)<br/>1. What do you expect from these workshops?<br/>2. What are your interests in science?<br/>3. (Optional) Would you like to make a short (15 min.) presentation?<br/><small>Tell us something about a topic you would choose, or (if you have no good idea)<br/>describe as precisely as possible what would you suggest you'd like to talk about.</br>(This will be taken into account in case we get many good applications).</small>"
 msgstr ""
 
-#: user.php:257
+#: user.php:263
 msgid "Your motivation letter has been saved."
 msgstr ""
 
-#: user.php:298
+#: user.php:288
+msgid "You should first sign up as a participant or lecturer."
+msgstr ""
+
+#: user.php:307
 msgid "breakfast"
 msgstr ""
 
-#: user.php:298
+#: user.php:307
 msgid "dinner"
 msgstr ""
 
-#: user.php:298
+#: user.php:307
 msgid "supper"
 msgstr ""
 
-#: user.php:313
+#: user.php:327
 msgid "Warsaw PKP"
 msgstr ""
 
-#: user.php:313
+#: user.php:327
 msgid "Olsztyn PKP"
 msgstr ""
 
-#: user.php:313
+#: user.php:327
 msgid "I'll arrive on my own."
 msgstr ""
 
-#: user.php:316
+#: user.php:330
 msgid "on my own"
 msgstr ""
 
-#: user.php:317
+#: user.php:331
 msgid "applies to Olsztyn residents, for example"
 msgstr ""
 
-#: user.php:329 workshop.php:500 user/profile.php:189
-msgid "Saved."
+#: user.php:361
+msgid "Additional info"
 msgstr ""
 
-#: user.php:337
-msgid "Additional info"
+#: utils.php:31
+msgid "WWWapp"
+msgstr ""
+
+#: utils.php:42
+msgid "Main page"
+msgstr ""
+
+#: utils.php:73
+#: utils.php:132
+#: utils.php:133
+msgid "before"
+msgstr ""
+
+#: utils.php:99
+#, php-format
+msgid " a longer motivation letter (you wrote %d < %d words)"
+msgstr ""
+
+#: utils.php:115
+msgid "Want to participate in workshops only?"
+msgstr ""
+
+#: utils.php:117
+#: utils.php:171
+#, fuzzy
+msgid "log in"
+msgstr "Zaloguj"
+
+#: utils.php:135
+#, php-format
+msgid "Write (before %s) and check solutions to (before %s)"
+msgstr ""
+
+#: utils.php:136
+msgid "You wrote and checked solutions to"
+msgstr ""
+
+#: utils.php:137
+msgid "qualification tasks."
+msgstr ""
+
+#: utils.php:169
+msgid "Want to give a workshop block?"
+msgstr ""
+
+#: utils.php:175
+msgid "If more than one lecturer is to give a workshop block, one of them should submit a proposition, and then attach the remaining lecturers."
+msgstr ""
+
+#: utils.php:178
+msgid "Wikidot accounts are separate - to edit anything there you'll have to use a wikidot account."
+msgstr ""
+
+#: utils.php:225
+msgid "You have already been signed up for this year's edition."
+msgstr ""
+
+#: utils.php:238
+msgid "Signed you up for this year's edition."
+msgstr ""
+
+#: utils.php:245
+#, fuzzy
+msgid "Report a problem"
+msgstr "zgłoś błąd"
+
+#: utils.php:246
+msgid "Something doesn't work like it should? Things are unclear, overcomplicated, ugly, inconvenient? You absolutely have to report this!"
+msgstr ""
+
+#: utils.php:249
+msgid "Write how to contact you, if you expect an answer."
+msgstr ""
+
+#: utils.php:251
+msgid "By default we'll reply by e-mail"
+msgstr ""
+
+#: utils.php:253
+msgid "problem"
+msgstr ""
+
+#: utils.php:281
+msgid "Credits"
+msgstr ""
+
+#: utils.php:322
+msgid "Settings"
+msgstr ""
+
+#: utils.php:333
+msgid "Saved settings."
 msgstr ""
 
 #: workshop.php:25
@@ -215,11 +457,11 @@ msgstr ""
 
 #: workshop.php:36
 #, php-format
-msgid "You signed up for %d × 1,5 hours of workshops."
+msgid "You signed up for %d x 1,5 hours of workshops."
 msgstr ""
 
 #: workshop.php:37
-msgid "Remember that WWW has approximately 36 × 1,5 hours in total."
+msgid "Remember that WWW has approximately 36 x 1,5 hours in total."
 msgstr ""
 
 #: workshop.php:52
@@ -238,145 +480,137 @@ msgstr ""
 msgid "Workshop not found."
 msgstr ""
 
-#: workshop.php:226 user/profile.php:134
+#: workshop.php:226
+#: user/profile.php:134
 msgid "Lecturer"
 msgid_plural "Lecturers"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: workshop.php:259 workshop.php:332
+#: workshop.php:259
+#: workshop.php:330
 #, fuzzy
 msgid "sign out"
 msgstr "załóż konto"
 
-#: workshop.php:261 workshop.php:334 user.php:130 template
+#: workshop.php:261
+#: workshop.php:332
 msgid "sign up"
-msgstr "załóż konto"
+msgstr "zapisz się"
 
-#: workshop.php:271 workshop.php:296
+#: workshop.php:271
+#: workshop.php:294
 msgid "Status:"
 msgstr ""
 
-#: workshop.php:287
+#: workshop.php:285
 msgid "Changed workshop block status."
 msgstr ""
 
-#: workshop.php:300
-msgid "edit"
-msgstr ""
-
-#: workshop.php:317 workshop.php:248 template workshop.php:323
+#: workshop.php:315
+#: workshop.php:248
+#: template workshop.php:321
 msgid "signups and tasks"
 msgstr ""
 
-#: workshop.php:328
+#: workshop.php:326
 msgid "Your status:"
 msgstr ""
 
-#: workshop.php:375 user/profile.php:121
+#: workshop.php:373
+#: user/profile.php:121
 msgid "change"
 msgstr ""
 
-#: workshop.php:378
-msgid ""
-"Topics addressed, difficulty, scope of material, what will you do "
-"(theoretical problems, coding, experiments, ...). We encourage possibly "
-"detailed descriptions."
+#: workshop.php:376
+msgid "Topics addressed, difficulty, scope of material, what will you do (theoretical problems, coding, experiments, ...). We encourage possibly detailed descriptions."
 msgstr ""
 
-#: workshop.php:394
+#: workshop.php:387
 msgid "non-standard durations should be<br/> consulted with the organizers."
 msgstr ""
 
-#: workshop.php:398
+#: workshop.php:391
 msgid "Propose a new workshop block"
 msgstr ""
 
-#: workshop.php:398
+#: workshop.php:391
 msgid "Edit a workshop block"
 msgstr ""
 
-#: workshop.php:400
+#: workshop.php:393
 msgid "view"
 msgstr ""
 
-#: workshop.php:412
-msgid ""
-"The deadline for workshop proposal submissions has expired. Fill the form at "
-"your own risk."
+#: workshop.php:405
+msgid "The deadline for workshop proposal submissions has expired. Fill the form at your own risk."
 msgstr ""
 
-#: workshop.php:443
-msgid ""
-"You'll be able to add more lecturers later, by editing this workshop block."
+#: workshop.php:435
+msgid "You'll be able to add more lecturers later, by editing this workshop block."
 msgstr ""
 
-#: workshop.php:490
+#: workshop.php:482
 msgid "Your proposal has been submitted."
 msgstr ""
 
-#: workshop.php:524
+#: workshop.php:516
 #, fuzzy
 msgid "Full name or uid"
 msgstr "imię i nazwisko"
 
-#: workshop.php:532
+#: workshop.php:524
 msgid "Add/remove lecturers"
 msgstr ""
 
-#: workshop.php:533
-msgid "back"
-msgstr ""
-
-#: workshop.php:542
+#: workshop.php:534
 msgid "Add"
 msgstr ""
 
-#: workshop.php:580 user/profile.php:86
+#: workshop.php:572
+#: user/profile.php:86
 msgid "User not found."
 msgstr ""
 
-#: workshop.php:603
+#: workshop.php:595
 #, php-format
 msgid "Fuzzy-matched user #%d"
 msgstr ""
 
-#: workshop.php:608
+#: workshop.php:600
 msgid "The user you selected already is a lecturer here."
 msgstr ""
 
-#: workshop.php:615
-msgid ""
-"The user already signed up as a participant. Sign him out and add to "
-"lecturers?"
+#: workshop.php:607
+msgid "The user already signed up as a participant. Sign him out and add to lecturers?"
 msgstr ""
 
-#: workshop.php:617
+#: workshop.php:609
 msgid "yes"
 msgstr ""
 
-#: workshop.php:618
+#: workshop.php:610
 msgid "cancel"
 msgstr ""
 
-#: workshop.php:627
+#: workshop.php:619
 msgid "Added user to lecturers."
 msgstr ""
 
-#: workshop.php:649
+#: workshop.php:641
 msgid "You're already signed up for this workshop block."
 msgstr ""
 
-#: workshop.php:653
+#: workshop.php:645
 msgid "Signed up for a workshop block."
 msgstr ""
 
-#: workshop.php:665
+#: workshop.php:657
 msgid "Your can't resign from your status: "
 msgstr ""
 
-#: workshop.php:667
+#: workshop.php:659
 msgid "Resigned from workshop block."
 msgstr ""
 
@@ -385,36 +619,182 @@ msgid "Administration"
 msgstr ""
 
 #: user/admin.php:53
-msgid "Users administration"
-msgstr ""
-
-#: user/admin.php:55
-msgid "By default, only users with a role are shown."
+msgid "words in motivation letter"
 msgstr ""
 
 #: user/admin.php:56
-msgid "all accounts"
+msgid "Users administration"
 msgstr ""
 
-#: user/admin.php:65
+#: user/admin.php:69
 msgid "\"mailto:\" link"
 msgstr ""
 
-#: user/admin.php:82
-#, php-format
-msgid "Undefined role: %s."
+#: user/admin.php:95
+#: enum.php:82
+#: column:'description'
+#: row:'lecturer'
+msgid "lecturer"
 msgstr ""
 
-#: user/admin.php:333
-msgid "List of meal data"
+#: user/admin.php:96
+msgid "qualified"
 msgstr ""
 
-#: user/admin.php:336
+#: user/admin.php:97
+#: user/admin.php:222
+#: user/profile.php:88
+#: user.php:142
+#: column:'title'
+#: row:'editProfile'
+msgid "profile"
+msgstr ""
+
+#: user/admin.php:99
+msgid "info"
+msgstr ""
+
+#: user/admin.php:118
+msgid "qualification"
+msgstr ""
+
+#: user/admin.php:135
+msgid "Workshops"
+msgstr ""
+
+#: user/admin.php:161
+msgid "Qualified"
+msgstr ""
+
+#: user/admin.php:167
+msgid "The user didn't candidate as a participant nor lecturer."
+msgstr ""
+
+#: user/admin.php:173
+msgid "Saved"
+msgstr ""
+
+#: user/admin.php:215
+msgid "back to the list"
+msgstr ""
+
+#: user/admin.php:217
+msgid "next"
+msgstr ""
+
+#: user/admin.php:219
+msgid "previous"
+msgstr ""
+
+#: user/admin.php:223
+#: user.php:142
+#: column:'title'
+#: row:'editAdditionalInfo'
+msgid "additional info"
+msgstr ""
+
+#: user/admin.php:224
+msgid "qualification status"
+msgstr ""
+
+#: user/admin.php:237
+msgid "List of personal data"
+msgstr ""
+
+#: user/admin.php:240
+#: user/admin.php:276
+#: user/admin.php:337
 msgid "printable version"
 msgstr ""
 
-#: user/admin.php:342
-msgid "Number of qualified users who didn't fill their staying time: "
+#: user/admin.php:246
+msgid "Persons who did not fill their data: "
+msgstr ""
+
+#: user/admin.php:254
+#: user/admin.php:284
+#: user.php:166
+#: column:'description'
+#: row:'name'
+#: user/admin.php:42
+#: user/profile.php:105
+msgid "full name"
+msgstr "imię i nazwisko"
+
+#: user/admin.php:255
+#: user/admin.php:285
+msgid "phone number"
+msgstr ""
+
+#: user/admin.php:256
+msgid "parent's phone"
+msgstr ""
+
+#: user/admin.php:257
+msgid "PESEL"
+msgstr ""
+
+#: user/admin.php:258
+msgid "address"
+msgstr ""
+
+#: user/admin.php:273
+msgid "List of arrival data"
+msgstr ""
+
+#: user/admin.php:278
+msgid "without comments"
+msgstr ""
+
+#: user/admin.php:280
+msgid "with comments"
+msgstr ""
+
+#: user/admin.php:286
+msgid "arrival"
+msgstr ""
+
+#: user/admin.php:287
+msgid "departure"
+msgstr ""
+
+#: user/admin.php:288
+msgid "gathering"
+msgstr ""
+
+#: user/admin.php:292
+msgid "comments"
+msgstr ""
+
+#: user/admin.php:293
+msgid "last mod."
+msgstr ""
+
+#: user/admin.php:332
+msgid "List of meal data"
+msgstr ""
+
+#: user/admin.php:344
+msgid "Number of qualified users who didn't specify their staying time: "
+msgstr ""
+
+#: user/admin.php:345
+msgid "see"
+msgstr ""
+
+#: user/admin.php:345
+#: user/admin.php:10
+#: column:'title'
+#: row:'listPersonalData'
+msgid "list of personal data"
+msgstr ""
+
+#: user/admin.php:349
+msgid "day"
+msgstr ""
+
+#: user/admin.php:369
+msgid "T-shirt sizes"
 msgstr ""
 
 #: user/profile.php:10
@@ -437,9 +817,7 @@ msgid "Password reset"
 msgstr "hasło"
 
 #: user/profile.php:38
-msgid ""
-"Type your username or e-mail address. You'll recevie a message with a new "
-"password."
+msgid "Type your username or e-mail address. You'll recevie a message with a new password."
 msgstr ""
 
 #: user/profile.php:52
@@ -449,9 +827,14 @@ msgstr ""
 #: user/profile.php:61
 #, php-format
 msgid ""
-"Your password at %s has been reset.\\nusername: %s\\ne-mail:  %s\\npassword: "
-"%s\\n(the password has 10 hex characters)\\n\\nIf you don't know what this "
-"is about, report abuse:\\n%s\\n"
+"Your password at %s has been reset.\\n"
+"username: %s\\n"
+"e-mail:  %s\\n"
+"password: %s\\n"
+"(the password has 10 hex characters)\\n"
+"\\n"
+"If you don't know what this is about, report abuse:\\n"
+"%s\\n"
 msgstr ""
 
 #: user/profile.php:70
@@ -461,10 +844,6 @@ msgstr "hasło"
 
 #: user/profile.php:72
 msgid "An e-mail message with the new password has been sent."
-msgstr ""
-
-#: user/profile.php:88 user.php:142 column:'title' row:'editProfile'
-msgid "profile"
 msgstr ""
 
 #: user/profile.php:96
@@ -511,11 +890,11 @@ msgstr ""
 msgid "Tutor"
 msgstr ""
 
-#: user/profile.php:208
+#: user/profile.php:214
 msgid "the user hasn't confirmed his e-mail yet"
 msgstr ""
 
-#: user/profile.php:210
+#: user/profile.php:216
 msgid "the user hasn't logged in yet"
 msgstr ""
 
@@ -540,519 +919,846 @@ msgstr ""
 msgid "Table %s doesn't exist."
 msgstr ""
 
-#: enum.php:82 column:'description' row:'none'
+#: enum.php:82
+#: column:'description'
+#: row:'none'
 msgid "unassociated"
 msgstr ""
 
-#: enum.php:82 column:'explanation' row:'none'
+#: enum.php:82
+#: column:'explanation'
+#: row:'none'
 msgid "You aren't signed up for this workshop block."
 msgstr ""
 
-#: enum.php:82 column:'description' row:'candidate'
-msgid "applied"
+#: enum.php:82
+#: column:'description'
+#: row:'candidate'
+msgid "candidate"
 msgstr ""
 
-#: enum.php:82 column:'explanation' row:'candidate'
+#: enum.php:82
+#: column:'explanation'
+#: row:'candidate'
 msgid "You signed up for this workshop block (remember about qualification)."
 msgstr ""
 
-#: enum.php:82 column:'description' row:'rejected'
+#: enum.php:82
+#: column:'description'
+#: row:'rejected'
 msgid "didn't meet the requirements"
 msgstr ""
 
-#: enum.php:82 column:'explanation' row:'rejected'
+#: enum.php:82
+#: column:'explanation'
+#: row:'rejected'
 msgid "You didn't meet the requirements."
 msgstr ""
 
-#: enum.php:82 column:'description' row:'accepted'
-msgid "qualified"
+#: enum.php:82
+#: column:'description'
+#: row:'accepted'
+msgid "accepted"
 msgstr ""
 
-#: enum.php:82 column:'explanation' row:'accepted'
-msgid "You have been qualified to this workshop block."
+#: enum.php:82
+#: column:'explanation'
+#: row:'accepted'
+msgid "You have been accepted for this workshop block."
 msgstr ""
 
-#: enum.php:82 column:'description' row:'autoaccepted'
+#: enum.php:82
+#: column:'description'
+#: row:'autoaccepted'
 msgid "signed up (staff)"
 msgstr ""
 
-#: enum.php:82 column:'explanation' row:'autoaccepted'
+#: enum.php:82
+#: column:'explanation'
+#: row:'autoaccepted'
 msgid "You signed up for this workshop block (qualified as a staff member)."
 msgstr ""
 
-#: enum.php:82 column:'description' row:'lecturer'
-msgid "lecturer"
-msgstr ""
-
-#: enum.php:82 column:'explanation' row:'lecturer'
+#: enum.php:82
+#: column:'explanation'
+#: row:'lecturer'
 msgid "You are a lecturer to this workshop block."
 msgstr ""
 
-#: enum.php:95 column:'decision' row:'new'
+#: enum.php:95
+#: column:'decision'
+#: row:'new'
 msgid "new"
 msgstr ""
 
-#: enum.php:95 column:'status' row:'new'
+#: enum.php:95
+#: column:'status'
+#: row:'new'
 msgid "to be considered"
 msgstr ""
 
-#: enum.php:95 column:'decision' row:'undetailed' column:'status'
+#: enum.php:95
+#: column:'decision'
+#: row:'undetailed'
+#: column:'status'
 msgid "details requested"
 msgstr ""
 
-#: enum.php:95 column:'decision' row:'rejected'
+#: enum.php:95
+#: column:'decision'
+#: row:'rejected'
 msgid "poor"
 msgstr ""
 
-#: enum.php:95 column:'status' row:'rejected' row:'ok' row:'great'
+#: enum.php:95
+#: column:'status'
+#: row:'rejected'
+#: row:'ok'
+#: row:'great'
 msgid "initially considered"
 msgstr ""
 
-#: enum.php:95 column:'decision' row:'ok'
+#: enum.php:95
+#: column:'decision'
+#: row:'ok'
 msgid "ok"
 msgstr ""
 
-#: enum.php:95 column:'decision' row:'great'
+#: enum.php:95
+#: column:'decision'
+#: row:'great'
 msgid "great"
 msgstr ""
 
-#: enum.php:108 column:'short' row:'lightLecture'
+#: enum.php:108
+#: column:'short'
+#: row:'lightLecture'
 msgid "light"
 msgstr ""
 
-#: enum.php:108 column:'description' row:'lightLecture'
+#: enum.php:108
+#: column:'description'
+#: row:'lightLecture'
 msgid "light lecture"
 msgstr ""
 
-#: enum.php:108 column:'short' row:'workshop'
+#: enum.php:108
+#: column:'short'
+#: row:'workshop'
 msgid "workshop"
 msgstr ""
 
-#: enum.php:108 column:'description' row:'workshop'
+#: enum.php:108
+#: column:'description'
+#: row:'workshop'
 msgid "workshop block"
 msgstr ""
 
-#: enum.php:117 column:'description' row:'mathematics'
+#: enum.php:117
+#: column:'description'
+#: row:'mathematics'
 msgid "mathematics"
 msgstr ""
 
-#: enum.php:117 column:'description' row:'cs_theory'
+#: enum.php:117
+#: column:'description'
+#: row:'cs_theory'
 msgid "computer science (theory)"
 msgstr ""
 
-#: enum.php:117 column:'description' row:'cs_practice'
+#: enum.php:117
+#: column:'description'
+#: row:'cs_practice'
 msgid "computer science (practice)"
 msgstr ""
 
-#: enum.php:117 column:'description' row:'physics'
+#: enum.php:117
+#: column:'description'
+#: row:'physics'
 msgid "physics"
 msgstr ""
 
-#: enum.php:117 column:'description' row:'astronomy'
+#: enum.php:117
+#: column:'description'
+#: row:'astronomy'
 msgid "astronomy"
 msgstr ""
 
-#: enum.php:129 column:'description' row:'none'
+#: enum.php:129
+#: column:'description'
+#: row:'none'
 msgid "none"
 msgstr ""
 
-#: enum.php:129 column:'description' row:'new'
+#: enum.php:129
+#: column:'description'
+#: row:'new'
 msgid "to be checked"
 msgstr ""
 
-#: enum.php:129 column:'description' row:'returned'
+#: enum.php:129
+#: column:'description'
+#: row:'returned'
 msgid "returned for correction"
 msgstr ""
 
-#: enum.php:129 column:'description' row:'graded'
+#: enum.php:129
+#: column:'description'
+#: row:'graded'
 msgid "graded"
 msgstr ""
 
-#: log.php:67 template
+#: log.php:67
+#: template
 msgid "when"
 msgstr ""
 
-#: log.php:67 template
+#: log.php:67
+#: template
 msgid "who"
 msgstr ""
 
-#: log.php:67 template
+#: log.php:67
+#: template
 msgid "what"
 msgstr ""
 
-#: log.php:67 template
+#: log.php:67
+#: template
 msgid "which"
 msgstr ""
 
-#: tutoring.php:14 column:'title' row:'editTutoringApplication'
-msgid "twoje podanie"
+#: tasks.php:96
+#: column:'description'
+#: row:'description'
+msgid "the task"
 msgstr ""
 
-#: tutoring.php:14 column:'title' row:'viewTutoringApplications'
-msgid "lista podań"
+#: tasks.php:210
+#: column:'description'
+#: row:'solution'
+msgid "solution"
 msgstr ""
 
-#: user.php:142 column:'title' row:'editMotivationLetter'
+#: tutoring.php:14
+#: column:'title'
+#: row:'editTutoringApplication'
+msgid "your application"
+msgstr ""
+
+#: tutoring.php:14
+#: column:'title'
+#: row:'viewTutoringApplications'
+msgid "list of applications"
+msgstr ""
+
+#: user.php:142
+#: column:'title'
+#: row:'editMotivationLetter'
 msgid "motivation letter"
 msgstr ""
 
-#: user.php:142 column:'title' row:'editAdditionalInfo'
-msgid "additional info"
-msgstr ""
-
-#: user.php:166 column:'description' row:'login' user/profile.php:39
+#: user.php:166
+#: column:'description'
+#: row:'login'
+#: user/profile.php:39
 #: user/profile.php:105
 msgid "username"
 msgstr "login"
 
-#: user.php:166 column:'description' row:'password' user/profile.php:105
+#: user.php:166
+#: column:'description'
+#: row:'password'
+#: user/profile.php:105
 msgid "password"
 msgstr "hasło"
 
-#: user.php:166 column:'description' row:'password_repeat'
+#: user.php:166
+#: column:'description'
+#: row:'password_repeat'
 msgid "retype password"
 msgstr "powtórz hasło"
 
-#: user.php:166 column:'description' row:'name' user/profile.php:105
-msgid "full name"
-msgstr "imię i nazwisko"
-
-#: user.php:166 column:'description' row:'email' user/profile.php:39
+#: user.php:166
+#: column:'description'
+#: row:'email'
+#: user/admin.php:42
+#: user/profile.php:39
 #: user/profile.php:105
 msgid "e-mail"
 msgstr "e-mail"
 
-#: user.php:281 column:'description' row:'pesel'
+#: user.php:290
+#: column:'description'
+#: row:'pesel'
 msgid "PESEL number"
 msgstr ""
 
-#: user.php:281 column:'description' row:'address'
+#: user.php:290
+#: column:'description'
+#: row:'address'
 msgid "address <small>(for the insurance)</small>"
 msgstr ""
 
-#: user.php:281 column:'description' row:'telephone'
+#: user.php:290
+#: column:'description'
+#: row:'telephone'
 msgid "telephone"
 msgstr ""
 
-#: user.php:281 column:'description' row:'parenttelephone'
+#: user.php:290
+#: column:'description'
+#: row:'parenttelephone'
 msgid "telephone to your parents/carers"
 msgstr ""
 
-#: user.php:281 column:'description' row:'staybegin'
+#: user.php:290
+#: column:'description'
+#: row:'staybegintime'
 msgid "staying time: <span class=\"right\">from</span>"
 msgstr ""
 
-#: user.php:281 column:'description' row:'stayend'
+#: user.php:290
+#: column:'description'
+#: row:'stayendtime'
 msgid "<span class=\"right\">to</span>"
 msgstr ""
 
-#: user.php:281 column:'description' row:'gatherplace'
+#: user.php:290
+#: column:'description'
+#: row:'gatherplace'
 msgid "I'll join the gathering at"
 msgstr ""
 
-#: user.php:281 column:'description' row:'isselfcatered'
+#: user.php:290
+#: column:'description'
+#: row:'isselfcatered'
 msgid "accomodation and meals"
 msgstr ""
 
-#: user.php:281 column:'description' row:'tshirtsize'
+#: user.php:290
+#: column:'description'
+#: row:'tshirtsize'
 msgid "preferred t-shirt size"
 msgstr ""
 
-#: user.php:281 column:'description' row:'comments'
+#: user.php:290
+#: column:'description'
+#: row:'comments'
 msgid "comments (e.g. vegetarian)"
 msgstr ""
 
-#: user.php:129 template
+#: user.php:129
+#: template
 msgid "Log in"
 msgstr "Zaloguj"
 
-#: user.php:131 template
+#: user.php:130
+#: template
+#, fuzzy
+msgid "create account"
+msgstr "Utwórz konto"
+
+#: user.php:131
+#: template
 msgid "forgot password?"
 msgstr "nie pamiętasz hasła?"
 
-#: utils.php:32 column:'title' row:'homepage'
-msgid "strona główna"
+#: utils.php:31
+#: column:'title'
+#: row:'homepage'
+msgid "main page"
 msgstr ""
 
-#: utils.php:32 column:'title' row:'http://warsztatywww.wikidot.com/'
+#: utils.php:31
+#: column:'title'
+#: row:'http://warsztatywww.wikidot.com/'
 msgid "wikidot"
 msgstr ""
 
-#: utils.php:32 column:'title' row:'reportBug'
-msgid "zgłoś problem"
-msgstr ""
+#: utils.php:31
+#: column:'title'
+#: row:'reportBug'
+#, fuzzy
+msgid "report a problem"
+msgstr "zgłoś błąd"
 
-#: utils.php:63 column:'notDoneText' row:'applyAsParticipant' utils.php:123
-#: row:'applyAsLecturer'
-msgid "Zgłoś"
-msgstr ""
-
-#: utils.php:63 column:'doneText' row:'applyAsParticipant' utils.php:123
-#: row:'applyAsLecturer'
-msgid "Zgłosił%ś"
-msgstr ""
-
-#: utils.php:63 column:'commonText' row:'applyAsParticipant'
-msgid "się jako uczestnik."
-msgstr ""
-
-#: utils.php:63 column:'notDoneText' row:'fillProfile'
-#: row:'fillAdditionalInfo' utils.php:123
-msgid "Wypełnij"
-msgstr ""
-
-#: utils.php:63 column:'doneText' row:'fillProfile' row:'fillAdditionalInfo'
+#: utils.php:63
+#: column:'notDoneText'
+#: row:'applyAsParticipant'
 #: utils.php:123
-msgid "Wypełnił%ś"
+#: row:'applyAsLecturer'
+msgid "Apply"
 msgstr ""
 
-#: utils.php:63 column:'commonText' row:'fillProfile' utils.php:123
-msgid "profil."
+#: utils.php:63
+#: column:'doneText'
+#: row:'applyAsParticipant'
+#: utils.php:123
+#: row:'applyAsLecturer'
+msgid "You applied"
 msgstr ""
 
-#: utils.php:63 column:'notDoneText' row:'signupForWorkshops'
-msgid "Zapisz"
+#: utils.php:63
+#: column:'commonText'
+#: row:'applyAsParticipant'
+msgid "as a participant."
 msgstr ""
 
-#: utils.php:63 column:'doneText' row:'signupForWorkshops'
-msgid "Zapisał%ś"
+#: utils.php:63
+#: column:'notDoneText'
+#: row:'fillProfile'
+#: row:'fillAdditionalInfo'
+#: utils.php:123
+msgid "Fill"
 msgstr ""
 
-#: utils.php:63 column:'commonText' row:'signupForWorkshops'
-msgid "się na co najmniej 4 bloki warsztatowe."
+#: utils.php:63
+#: column:'doneText'
+#: row:'fillProfile'
+#: row:'fillAdditionalInfo'
+#: utils.php:123
+msgid "You filled"
 msgstr ""
 
-#: utils.php:63 column:'notDoneText' row:'writeMotLetter' utils.php:123
+#: utils.php:63
+#: column:'commonText'
+#: row:'fillProfile'
+#: utils.php:123
+msgid "your profile."
+msgstr ""
+
+#: utils.php:63
+#: column:'notDoneText'
+#: row:'signupForWorkshops'
+#, fuzzy
+msgid "Sign up"
+msgstr "zapisz się"
+
+#: utils.php:63
+#: column:'doneText'
+#: row:'signupForWorkshops'
+#, fuzzy
+msgid "You signed up"
+msgstr "zapisz się"
+
+#: utils.php:63
+#: column:'commonText'
+#: row:'signupForWorkshops'
+msgid "for at least 4 workshop blocks."
+msgstr ""
+
+#: utils.php:63
+#: column:'notDoneText'
+#: row:'writeMotLetter'
+#: utils.php:123
 #: row:'writeDescription'
-msgid "Napisz"
+msgid "Write"
 msgstr ""
 
-#: utils.php:63 column:'doneText' row:'writeMotLetter' utils.php:123
+#: utils.php:63
+#: column:'doneText'
+#: row:'writeMotLetter'
+#: utils.php:123
 #: row:'writeDescription'
-msgid "Napisał%ś"
+msgid "You wrote"
 msgstr ""
 
-#: utils.php:63 column:'commonText' row:'writeMotLetter'
-msgid "list motywacyjny."
+#: utils.php:63
+#: column:'commonText'
+#: row:'writeMotLetter'
+msgid "a motivation letter."
 msgstr ""
 
-#: utils.php:63 column:'notDoneText' row:'solveTasks'
-msgid "Rozwiąż"
+#: utils.php:63
+#: column:'notDoneText'
+#: row:'solveTasks'
+msgid "Solve"
 msgstr ""
 
-#: utils.php:63 column:'doneText' row:'solveTasks'
-msgid "Rozwiązał%ś"
+#: utils.php:63
+#: column:'doneText'
+#: row:'solveTasks'
+msgid "You solved"
 msgstr ""
 
-#: utils.php:63 column:'commonText' row:'solveTasks'
-msgid "zadania kwalifikacyjne"
+#: utils.php:63
+#: column:'commonText'
+#: row:'solveTasks'
+msgid "qualification tasks"
 msgstr ""
 
-#: utils.php:63 column:'notDoneText' row:'qualify'
-msgid "Czekaj na wyniki."
+#: utils.php:63
+#: column:'notDoneText'
+#: row:'qualify'
+msgid "Wait for results."
 msgstr ""
 
-#: utils.php:63 column:'doneText' row:'qualify'
-msgid "Został%ś zakwalifikowan%."
+#: utils.php:63
+#: column:'doneText'
+#: row:'qualify'
+msgid "You have been qualified."
 msgstr ""
 
-#: utils.php:63 column:'commonText' row:'fillAdditionalInfo'
-msgid "dodatkowe dane."
+#: utils.php:63
+#: column:'commonText'
+#: row:'fillAdditionalInfo'
+msgid "the additional info form."
 msgstr ""
 
-#: utils.php:123 column:'commonText' row:'applyAsLecturer'
-msgid "się jako kadra."
+#: utils.php:123
+#: column:'commonText'
+#: row:'applyAsLecturer'
+msgid "as a lecturer."
 msgstr ""
 
-#: utils.php:123 column:'notDoneText' row:'proposeWorkshop'
-msgid "Zaproponuj"
+#: utils.php:123
+#: column:'notDoneText'
+#: row:'proposeWorkshop'
+msgid "Propose"
 msgstr ""
 
-#: utils.php:123 column:'doneText' row:'proposeWorkshop'
-msgid "Zaproponował%ś"
+#: utils.php:123
+#: column:'doneText'
+#: row:'proposeWorkshop'
+msgid "You proposed"
 msgstr ""
 
-#: utils.php:123 column:'commonText' row:'proposeWorkshop'
-msgid "blok warsztatowy"
+#: utils.php:123
+#: column:'commonText'
+#: row:'proposeWorkshop'
+msgid "a workshop block."
 msgstr ""
 
-#: utils.php:123 column:'notDoneText' row:'qualify'
-msgid "Czekaj na wstępną akceptację."
+#: utils.php:123
+#: column:'notDoneText'
+#: row:'qualify'
+msgid "Wait for preliminary approval."
 msgstr ""
 
-#: utils.php:123 column:'doneText' row:'qualify'
-msgid "Wstępnie zaakceptowano Twój blok warsztatowy."
+#: utils.php:123
+#: column:'doneText'
+#: row:'qualify'
+msgid "Your workshop block has been preliminarly approved."
 msgstr ""
 
-#: utils.php:123 column:'commonText' row:'writeDescription'
-msgid "opis dla uczestników na wikidocie"
+#: utils.php:123
+#: column:'commonText'
+#: row:'writeDescription'
+msgid "a decription for users on wikidot"
 msgstr ""
 
-#: workshop.php:13 column:'title' row:'listPublicWorkshops'
+#: utils.php:283
+#: template
+msgid "Coders"
+msgstr ""
+
+#: utils.php:284
+#: template
+msgid "Icons"
+msgstr ""
+
+#: workshop.php:13
+#: column:'title'
+#: row:'listPublicWorkshops'
 msgid "workshop list"
 msgstr ""
 
-#: workshop.php:13 column:'title' row:'listOwnWorkshops'
+#: workshop.php:13
+#: column:'title'
+#: row:'listOwnWorkshops'
 msgid "your workshops"
 msgstr ""
 
-#: workshop.php:13 column:'title' row:'createWorkshop'
+#: workshop.php:13
+#: column:'title'
+#: row:'createWorkshop'
 msgid "propose new workshops"
 msgstr ""
 
-#: workshop.php:72 column:'th' row:'wid'
+#: workshop.php:72
+#: column:'th'
+#: row:'wid'
 msgid "#"
 msgstr ""
 
-#: workshop.php:72 column:'th' row:'lecturers'
+#: workshop.php:72
+#: column:'th'
+#: row:'lecturers'
 msgid "lecturers"
 msgstr ""
 
-#: workshop.php:72 column:'th' row:'title'
+#: workshop.php:72
+#: column:'th'
+#: row:'title'
 msgid "title"
 msgstr ""
 
-#: workshop.php:72 column:'th' row:'type'
+#: workshop.php:72
+#: column:'th'
+#: row:'type'
 msgid "type"
 msgstr ""
 
-#: workshop.php:72 column:'th' row:'subject'
+#: workshop.php:72
+#: column:'th'
+#: row:'subject'
 msgid "subjects"
 msgstr ""
 
-#: workshop.php:72 column:'th' row:'duration'
+#: workshop.php:72
+#: column:'th'
+#: row:'duration'
 msgid "duration [1.5h]"
 msgstr ""
 
-#: workshop.php:72 column:'th' row:'status'
-msgid "status"
-msgstr ""
-
-#: workshop.php:72 column:'th' row:'participants'
+#: workshop.php:72
+#: column:'th'
+#: row:'participants'
 #, fuzzy
 msgid "signups"
 msgstr "załóż konto"
 
-#: workshop.php:363 column:'description' row:'title'
+#: workshop.php:361
+#: column:'description'
+#: row:'title'
 msgid "Title"
 msgstr ""
 
-#: workshop.php:363 column:'description' row:'lecturers'
+#: workshop.php:361
+#: column:'description'
+#: row:'lecturers'
 msgid "Lecturers"
 msgstr ""
 
-#: workshop.php:363 column:'description' row:'description'
+#: workshop.php:361
+#: column:'description'
+#: row:'description'
 msgid "Description"
 msgstr ""
 
-#: workshop.php:363 column:'description' row:'subjects'
+#: workshop.php:361
+#: column:'description'
+#: row:'subjects'
 msgid "Subject"
 msgstr ""
 
-#: workshop.php:363 column:'description' row:'type'
+#: workshop.php:361
+#: column:'description'
+#: row:'type'
 msgid "Type"
 msgstr ""
 
-#: workshop.php:363 column:'description' row:'duration' workshop.php:252
+#: workshop.php:361
+#: column:'description'
+#: row:'duration'
+#: workshop.php:252
 #: template
 msgid "Duration"
 msgstr ""
 
-#: workshop.php:363 column:'description' row:'link'
+#: workshop.php:361
+#: column:'description'
+#: row:'link'
 msgid "Link to description on wikidot"
 msgstr ""
 
-#: workshop.php:247 template workshop.php:322
+#: workshop.php:247
+#: template workshop.php:320
 msgid "description"
 msgstr ""
 
-#: workshop.php:253 template
+#: workshop.php:253
+#: template
 msgid "see the description on wikidot"
 msgstr ""
 
-#: user/admin.php:10 column:'title' row:'adminUsers'
-msgid "admin users"
-msgstr ""
+#: user/admin.php:10
+#: column:'title'
+#: row:'adminUsers'
+#, fuzzy
+msgid "users"
+msgstr "login"
 
-#: user/admin.php:10 column:'title' row:'listAllWorkshops'
+#: user/admin.php:10
+#: column:'title'
+#: row:'listAllWorkshops'
 msgid "all workshops"
 msgstr ""
 
-#: user/admin.php:10 column:'title' row:'showCorrelation'
+#: user/admin.php:10
+#: column:'title'
+#: row:'showCorrelation'
 msgid "correlations"
 msgstr ""
 
-#: user/admin.php:10 column:'title' row:'editOptions'
+#: user/admin.php:10
+#: column:'title'
+#: row:'editOptions'
 msgid "settings"
 msgstr ""
 
-#: user/admin.php:10 column:'title' row:'showLog'
+#: user/admin.php:10
+#: column:'title'
+#: row:'showLog'
 msgid "log"
 msgstr ""
 
-#: user/admin.php:10 column:'title' row:'listPersonalData'
-msgid "list of personal data"
-msgstr ""
-
-#: user/admin.php:10 column:'title' row:'listArrivalData'
+#: user/admin.php:10
+#: column:'title'
+#: row:'listArrivalData'
 msgid "list of arrival data"
 msgstr ""
 
-#: user/admin.php:10 column:'title' row:'listDailyCounts'
+#: user/admin.php:10
+#: column:'title'
+#: row:'listDailyCounts'
 msgid "list of meal data"
 msgstr ""
 
-#: user/admin.php:10 column:'title' row:'showPointsTable'
+#: user/admin.php:10
+#: column:'title'
+#: row:'showPointsTable'
 msgid "summary of points"
 msgstr ""
 
-#: user/profile.php:11 column:'description' row:'oldpassword'
+#: user/admin.php:36
+#: column:'short'
+#: row:'admin'
+msgid "Adm"
+msgstr ""
+
+#: user/admin.php:36
+#: column:'description'
+#: row:'admin'
+msgid "administrator"
+msgstr ""
+
+#: user/admin.php:36
+#: column:'short'
+#: row:'tutor'
+msgid "T"
+msgstr ""
+
+#: user/admin.php:36
+#: column:'description'
+#: row:'tutor'
+msgid "tutor"
+msgstr ""
+
+#: user/admin.php:42
+#: column:'description'
+#: row:'uid'
+msgid "uid"
+msgstr ""
+
+#: user/admin.php:42
+#: column:'description'
+#: row:'roles'
+msgid "roles"
+msgstr ""
+
+#: user/admin.php:42
+#: column:'description'
+#: row:'lecturer'
+msgid "L"
+msgstr ""
+
+#: user/admin.php:42
+#: column:'description'
+#: row:'qualified'
+msgid "q"
+msgstr ""
+
+#: user/admin.php:42
+#: column:'description'
+#: row:'motivationletter'
+msgid "letter"
+msgstr ""
+
+#: user/admin.php:124
+#: template user/profile.php:105
+#: column:'description'
+#: row:'graduationyear'
+msgid "graduation year"
+msgstr ""
+
+#: user/admin.php:127
+#: template
+msgid "Interests"
+msgstr ""
+
+#: user/admin.php:150
+#: template
+msgid "details"
+msgstr ""
+
+#: user/profile.php:11
+#: column:'description'
+#: row:'oldpassword'
 #, fuzzy
 msgid "old password"
 msgstr "hasło"
 
-#: user/profile.php:11 column:'description' row:'newpassword'
+#: user/profile.php:11
+#: column:'description'
+#: row:'newpassword'
 #, fuzzy
 msgid "new password"
 msgstr "hasło"
 
-#: user/profile.php:11 column:'description' row:'newpassword_repeat'
+#: user/profile.php:11
+#: column:'description'
+#: row:'newpassword_repeat'
 #, fuzzy
 msgid "type new password again"
 msgstr "powtórz hasło"
 
-#: user/profile.php:105 column:'description' row:'registered'
+#: user/profile.php:105
+#: column:'description'
+#: row:'registered'
 msgid "registered"
 msgstr ""
 
-#: user/profile.php:105 column:'description' row:'logged'
+#: user/profile.php:105
+#: column:'description'
+#: row:'logged'
 msgid "last login"
 msgstr ""
 
-#: user/profile.php:105 column:'description' row:'gender'
+#: user/profile.php:105
+#: column:'description'
+#: row:'gender'
 msgid "grammatical gender"
 msgstr ""
 
-#: user/profile.php:105 column:'description' row:'role'
+#: user/profile.php:105
+#: column:'description'
+#: row:'role'
 msgid "role in current edition"
 msgstr ""
 
-#: user/profile.php:105 column:'description' row:'roles'
+#: user/profile.php:105
+#: column:'description'
+#: row:'roles'
 msgid "other roles"
 msgstr ""
 
-#: user/profile.php:105 column:'description' row:'school'
+#: user/profile.php:105
+#: column:'description'
+#: row:'school'
 msgid "school/university"
 msgstr ""
 
-#: user/profile.php:105 column:'description' row:'maturayear'
-msgid "graduation year"
+#: user/profile.php:105
+#: column:'description'
+#: row:'howdoyouknowus'
+msgid "how do you know us?"
 msgstr ""
 
-#: user/profile.php:105 column:'description' row:'skadwieszowww'
-msgid "how do you know WWW?"
-msgstr ""
-
-#: user/profile.php:105 column:'description' row:'zainteresowania'
+#: user/profile.php:105
+#: column:'description'
+#: row:'interests'
 msgid "interests"
 msgstr ""
+
