@@ -126,7 +126,7 @@ Protected Member Functions</h2></td></tr>
                 <span class="comment">//$this-&gt;tables[&#39;pg_class&#39;] = new DBTable_Postgresql($this, &#39;pg_class&#39;, array(array(&#39;name&#39;=&gt;&#39;relname&#39;,)));</span>
                 <span class="keywordflow">foreach</span> (<a class="code" href="classDB.html#a75d8342d237a97b7822d691aa5a2546c">$tables</a> as $table)
                 {
-                        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = $this-&gt;<a class="code" href="classDB__SQL.html#a1a580ec0eb6ad87c9993562531265314">query</a>(<span class="stringliteral">&#39;</span>
+                        $result = $this-&gt;<a class="code" href="classDB__SQL.html#a1a580ec0eb6ad87c9993562531265314">query</a>(<span class="stringliteral">&#39;</span>
 <span class="stringliteral">                                SELECT</span>
 <span class="stringliteral">                                        pg_attribute.attname AS name,</span>
 <span class="stringliteral">                                        format_type(pg_attribute.atttypid, pg_attribute.atttypmod) AS type</span>

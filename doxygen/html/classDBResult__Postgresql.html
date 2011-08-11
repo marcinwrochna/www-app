@@ -218,10 +218,10 @@ Protected Attributes</h2></td></tr>
 
 <p>Definition at line <a class="el" href="postgresql_8php_source.html#l00119">119</a> of file <a class="el" href="postgresql_8php_source.html">postgresql.php</a>.</p>
 <div class="fragment"><pre class="fragment">        {
-                <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = pg_fetch_all($this-&gt;resultResource);
+                $result = pg_fetch_all($this-&gt;resultResource);
                 <span class="comment">// pg_fetch_all returns false for empty results. We should check for errors here.</span>
-                <span class="keywordflow">if</span> (!<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>)  <span class="keywordflow">return</span> array();
-                <span class="keywordflow">return</span> <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>;
+                <span class="keywordflow">if</span> (!$result)  <span class="keywordflow">return</span> array();
+                <span class="keywordflow">return</span> $result;
         }
 </pre></div>
 </div>

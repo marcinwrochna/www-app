@@ -126,19 +126,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00080"></a><a class="code" href="user_8php.html#a30a72f87d5741ff2204f385920514239">00080</a> function <a class="code" href="user_8php.html#a30a72f87d5741ff2204f385920514239">actionLogin</a>()
 <a name="l00081"></a>00081 {
 <a name="l00082"></a>00082         global <a class="code" href="common_8php.html#a7dc56dc8b18ad37272b56fa7395bedef">$DB</a>, <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>, $USER;
-<a name="l00083"></a>00083         <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = $DB-&gt;query(
+<a name="l00083"></a>00083         $result = $DB-&gt;query(
 <a name="l00084"></a>00084                 <span class="stringliteral">&#39;SELECT uid FROM table_users</span>
 <a name="l00085"></a>00085 <span class="stringliteral">                 WHERE (login=$1 OR email=$1) AND password=$2&#39;</span>,
 <a name="l00086"></a>00086                 $_POST[<span class="stringliteral">&#39;login&#39;</span>], <a class="code" href="user_2utils_8php.html#afb1922d511d289957bb546dcab1ab5d1">passHash</a>($_POST[<span class="stringliteral">&#39;password&#39;</span>])
 <a name="l00087"></a>00087         );
-<a name="l00088"></a>00088         <span class="keywordflow">if</span> (!count(<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>))
+<a name="l00088"></a>00088         <span class="keywordflow">if</span> (!count($result))
 <a name="l00089"></a>00089         {
 <a name="l00090"></a>00090                 unset($_SESSION[<span class="stringliteral">&#39;user_id&#39;</span>]);
 <a name="l00091"></a>00091                 $PAGE-&gt;addMessage(_(<span class="stringliteral">&#39;Wrong username/e-mail or password.&#39;</span>), <span class="stringliteral">&#39;userError&#39;</span>);
 <a name="l00092"></a>00092                 <span class="keywordflow">return</span> <a class="code" href="index_8php.html#a6e8525da6dad002542958c13132118e4">callAction</a>(<span class="stringliteral">&#39;homepage&#39;</span>);
 <a name="l00093"></a>00093         }
 <a name="l00094"></a>00094 
-<a name="l00095"></a>00095         $uid = intval(<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>-&gt;fetch());
+<a name="l00095"></a>00095         $uid = intval($result-&gt;fetch());
 <a name="l00096"></a>00096         <span class="keywordflow">if</span> ($DB-&gt;users[$uid]-&gt;get(<span class="stringliteral">&#39;confirm&#39;</span>))
 <a name="l00097"></a>00097         {
 <a name="l00098"></a>00098                 unset($_SESSION[<span class="stringliteral">&#39;user_id&#39;</span>]);

@@ -124,10 +124,10 @@ Public Member Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="sql_8php_source.html#l00115">115</a> of file <a class="el" href="sql_8php_source.html">sql.php</a>.</p>
 <div class="fragment"><pre class="fragment">        {
-                <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = $this-&gt;<a class="code" href="classDBResult.html#a5bfb23fc09017f8e72ceacbaf7b4f98c">fetch_assoc</a>($n);
-                <span class="keywordflow">if</span> (count(<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>)==1)
-                        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = array_pop(<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>);
-                <span class="keywordflow">return</span> <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>;
+                $result = $this-&gt;<a class="code" href="classDBResult.html#a5bfb23fc09017f8e72ceacbaf7b4f98c">fetch_assoc</a>($n);
+                <span class="keywordflow">if</span> (count($result)==1)
+                        $result = array_pop($result);
+                <span class="keywordflow">return</span> $result;
         }
 </pre></div>
 </div>

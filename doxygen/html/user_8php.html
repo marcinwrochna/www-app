@@ -178,19 +178,19 @@ Functions</h2></td></tr>
 <p>Definition at line <a class="el" href="user_8php_source.html#l00080">80</a> of file <a class="el" href="user_8php_source.html">user.php</a>.</p>
 <div class="fragment"><pre class="fragment">{
         global <a class="code" href="common_8php.html#a7dc56dc8b18ad37272b56fa7395bedef">$DB</a>, <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>, $USER;
-        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = $DB-&gt;query(
+        $result = $DB-&gt;query(
                 <span class="stringliteral">&#39;SELECT uid FROM table_users</span>
 <span class="stringliteral">                 WHERE (login=$1 OR email=$1) AND password=$2&#39;</span>,
                 $_POST[<span class="stringliteral">&#39;login&#39;</span>], <a class="code" href="user_2utils_8php.html#afb1922d511d289957bb546dcab1ab5d1">passHash</a>($_POST[<span class="stringliteral">&#39;password&#39;</span>])
         );
-        <span class="keywordflow">if</span> (!count(<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>))
+        <span class="keywordflow">if</span> (!count($result))
         {
                 unset($_SESSION[<span class="stringliteral">&#39;user_id&#39;</span>]);
                 $PAGE-&gt;addMessage(_(<span class="stringliteral">&#39;Wrong username/e-mail or password.&#39;</span>), <span class="stringliteral">&#39;userError&#39;</span>);
                 <span class="keywordflow">return</span> <a class="code" href="index_8php.html#a6e8525da6dad002542958c13132118e4">callAction</a>(<span class="stringliteral">&#39;homepage&#39;</span>);
         }
 
-        $uid = intval(<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>-&gt;fetch());
+        $uid = intval($result-&gt;fetch());
         <span class="keywordflow">if</span> ($DB-&gt;users[$uid]-&gt;get(<span class="stringliteral">&#39;confirm&#39;</span>))
         {
                 unset($_SESSION[<span class="stringliteral">&#39;user_id&#39;</span>]);

@@ -214,17 +214,17 @@ Protected Attributes</h2></td></tr>
 <p>Definition at line <a class="el" href="db_8php_source.html#l00127">127</a> of file <a class="el" href="db_8php_source.html">db.php</a>.</p>
 <div class="fragment"><pre class="fragment">        {
                 $all = $this-&gt;<a class="code" href="classDBResult.html#aca1c3d35c16329e9057e428e02718768">fetch_all</a>();
-                <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = array();
+                $result = array();
                 <span class="keywordflow">if</span> (empty($all))
-                        <span class="keywordflow">return</span> <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>;
+                        <span class="keywordflow">return</span> $result;
                 <span class="keywordflow">if</span> (is_null($column))
                 {
                         $column = array_keys($all[0]);
                         $column = $column[0];
                 }
                 <span class="keywordflow">foreach</span> ($all as $row)
-                        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>[]= $row[$column];
-                <span class="keywordflow">return</span> <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>;
+                        $result[]= $row[$column];
+                <span class="keywordflow">return</span> $result;
         }
 </pre></div>
 </div>

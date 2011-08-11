@@ -85,7 +85,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00023"></a>00023                 <span class="comment">//$this-&gt;tables[&#39;pg_class&#39;] = new DBTable_Postgresql($this, &#39;pg_class&#39;, array(array(&#39;name&#39;=&gt;&#39;relname&#39;,)));</span>
 <a name="l00024"></a>00024                 <span class="keywordflow">foreach</span> (<a class="code" href="classDB.html#a75d8342d237a97b7822d691aa5a2546c">$tables</a> as $table)
 <a name="l00025"></a>00025                 {
-<a name="l00026"></a>00026                         <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = $this-&gt;<a class="code" href="classDB__SQL.html#a1a580ec0eb6ad87c9993562531265314">query</a>(<span class="stringliteral">&#39;</span>
+<a name="l00026"></a>00026                         $result = $this-&gt;<a class="code" href="classDB__SQL.html#a1a580ec0eb6ad87c9993562531265314">query</a>(<span class="stringliteral">&#39;</span>
 <a name="l00027"></a>00027 <span class="stringliteral">                                SELECT</span>
 <a name="l00028"></a>00028 <span class="stringliteral">                                        pg_attribute.attname AS name,</span>
 <a name="l00029"></a>00029 <span class="stringliteral">                                        format_type(pg_attribute.atttypid, pg_attribute.atttypmod) AS type</span>
@@ -180,10 +180,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00118"></a>00118 
 <a name="l00119"></a><a class="code" href="classDBResult__Postgresql.html#a19e57fb62c28116f5e89e9ef3d0242d0">00119</a>         <span class="keyword">public</span> function <a class="code" href="classDBResult__Postgresql.html#a19e57fb62c28116f5e89e9ef3d0242d0">fetch_all</a>()
 <a name="l00120"></a>00120         {
-<a name="l00121"></a>00121                 <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = pg_fetch_all($this-&gt;resultResource);
+<a name="l00121"></a>00121                 $result = pg_fetch_all($this-&gt;resultResource);
 <a name="l00122"></a>00122                 <span class="comment">// pg_fetch_all returns false for empty results. We should check for errors here.</span>
-<a name="l00123"></a>00123                 <span class="keywordflow">if</span> (!<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>)  <span class="keywordflow">return</span> array();
-<a name="l00124"></a>00124                 <span class="keywordflow">return</span> <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>;
+<a name="l00123"></a>00123                 <span class="keywordflow">if</span> (!$result)  <span class="keywordflow">return</span> array();
+<a name="l00124"></a>00124                 <span class="keywordflow">return</span> $result;
 <a name="l00125"></a>00125         }
 <a name="l00126"></a>00126 
 <a name="l00127"></a><a class="code" href="classDBResult__Postgresql.html#aaef008467c9ebceb85ce72c80a9ce43b">00127</a>         <span class="keyword">public</span> function <a class="code" href="classDBResult__Postgresql.html#aaef008467c9ebceb85ce72c80a9ce43b">fetch_column</a>($column = null)

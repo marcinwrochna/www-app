@@ -127,15 +127,15 @@ Protected Member Functions</h2></td></tr>
                         array_shift($params);
                 }
                 <span class="keywordflow">if</span> (is_null($params))
-                        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = $this-&gt;<a class="code" href="classDB__SQL.html#a8c58cadec5d7776ade2f6a3d71b1554a">query_noparams</a>($query);
+                        $result = $this-&gt;<a class="code" href="classDB__SQL.html#a8c58cadec5d7776ade2f6a3d71b1554a">query_noparams</a>($query);
                 <span class="keywordflow">else</span> <span class="keywordflow">if</span> (is_array($params))
-                        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = $this-&gt;<a class="code" href="classDB__SQL.html#a2b01f1bee3e2b4ee87e593251ad1e0db">query_params</a>($query, $params);
+                        $result = $this-&gt;<a class="code" href="classDB__SQL.html#a2b01f1bee3e2b4ee87e593251ad1e0db">query_params</a>($query, $params);
                 <span class="keywordflow">else</span>
-                        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = $this-&gt;<a class="code" href="classDB__SQL.html#a2b01f1bee3e2b4ee87e593251ad1e0db">query_params</a>($query, array($params));
+                        $result = $this-&gt;<a class="code" href="classDB__SQL.html#a2b01f1bee3e2b4ee87e593251ad1e0db">query_params</a>($query, array($params));
 
-                <span class="keywordflow">if</span> (<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> === <span class="keyword">false</span>)  <span class="keywordflow">throw</span> <span class="keyword">new</span> <a class="code" href="classDbException.html">DbException</a>($errorString);
+                <span class="keywordflow">if</span> ($result === <span class="keyword">false</span>)  <span class="keywordflow">throw</span> <span class="keyword">new</span> <a class="code" href="classDbException.html">DbException</a>($errorString);
                 $class = <span class="stringliteral">&#39;DBResult_&#39;</span>. $this-&gt;driver;
-                $this-&gt;lastResult = <span class="keyword">new</span> $class($this, <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>);
+                $this-&gt;lastResult = <span class="keyword">new</span> $class($this, $result);
                 <span class="keywordflow">return</span> $this-&gt;lastResult;
         }
 </pre></div>

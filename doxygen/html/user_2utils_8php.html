@@ -262,9 +262,9 @@ Functions</h2></td></tr>
         <span class="keywordflow">else</span>
                 $icon = <a class="code" href="template_8php.html#a4fbd311bbd72b7beba6f27fe63b0acb1">getIcon</a>($icon, _(<span class="stringliteral">&#39;profile on wikidot&#39;</span>), <span class="comment">// TODO profile on wikidot exists?</span>
                         <span class="stringliteral">&#39;http://warsztatywww.wikidot.com/&#39;</span>. urlencode($name));
-        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = <span class="stringliteral">&quot;$icon $name&quot;</span>;
-        <span class="keywordflow">if</span> ($email)  <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> .= <span class="stringliteral">&#39; &amp;lt;&#39;</span>. $DB-&gt;users[$uid]-&gt;get(<span class="stringliteral">&#39;email&#39;</span>) .<span class="stringliteral">&#39;&amp;gt;&#39;</span>;
-        <span class="keywordflow">return</span> <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>;
+        $result = <span class="stringliteral">&quot;$icon $name&quot;</span>;
+        <span class="keywordflow">if</span> ($email)  $result .= <span class="stringliteral">&#39; &amp;lt;&#39;</span>. $DB-&gt;users[$uid]-&gt;get(<span class="stringliteral">&#39;email&#39;</span>) .<span class="stringliteral">&#39;&amp;gt;&#39;</span>;
+        <span class="keywordflow">return</span> $result;
 }
 </pre></div>
 </div>

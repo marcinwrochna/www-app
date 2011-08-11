@@ -189,10 +189,10 @@ Functions</h2></td></tr>
 
         <span class="keywordflow">if</span> (isset($_POST[<span class="stringliteral">&#39;query&#39;</span>]))
         {
-                <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = $DB-&gt;query($_POST[<span class="stringliteral">&#39;query&#39;</span>]);
-                $PAGE-&gt;addMessage(<span class="stringliteral">&#39;Rows affected: &#39;</span>. <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>-&gt;affected_rows(), <span class="stringliteral">&#39;success&#39;</span>);
+                $result = $DB-&gt;query($_POST[<span class="stringliteral">&#39;query&#39;</span>]);
+                $PAGE-&gt;addMessage(<span class="stringliteral">&#39;Rows affected: &#39;</span>. $result-&gt;affected_rows(), <span class="stringliteral">&#39;success&#39;</span>);
                 echo <span class="stringliteral">&#39;&lt;b&gt;SELECT result:&lt;/b&gt;&lt;table&gt;&#39;</span>;
-                <span class="keywordflow">foreach</span> (<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> as $i=&gt;$row)
+                <span class="keywordflow">foreach</span> ($result as $i=&gt;$row)
                         echo <span class="stringliteral">&#39;&lt;tr&gt;&lt;td&gt;&#39;</span>. $i .<span class="stringliteral">&#39;&lt;/td&gt;&lt;td&gt;&#39;</span>. implode(<span class="stringliteral">&#39;&lt;/td&gt;&lt;td&gt;&#39;</span>,$row) .<span class="stringliteral">&#39;&lt;/td&gt;&lt;/tr&gt;&#39;</span>;
                 echo <span class="stringliteral">&#39;&lt;/table&gt;&#39;</span>;
         }
@@ -615,14 +615,14 @@ Functions</h2></td></tr>
 
 <p>Referenced by <a class="el" href="form_8php_source.html#l00032">Form::addRow()</a>.</p>
 <div class="fragment"><pre class="fragment">{
-        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = $array;
+        $result = $array;
         <span class="keywordflow">for</span> ($i = 0; $i &lt; count($keys); $i++)
-                <span class="keywordflow">if</span> (array_key_exists($i, <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>))
+                <span class="keywordflow">if</span> (array_key_exists($i, $result))
         {
-                        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>[$keys[$i]] = <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>[$i];
-                        unset(<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>[$i]);
+                        $result[$keys[$i]] = $result[$i];
+                        unset($result[$i]);
         }
-        <span class="keywordflow">return</span> <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>;
+        <span class="keywordflow">return</span> $result;
 }
 </pre></div>
 </div>
@@ -663,8 +663,8 @@ Functions</h2></td></tr>
 
         <span class="keywordflow">if</span> ($enabled &amp;&amp; !empty($action))
                 $notDoneText = <span class="stringliteral">&quot;&lt;a href=&#39;$action&#39;&gt;$notDoneText&lt;/a&gt;&quot;</span>;
-        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = ($done ? $doneText : $notDoneText) .<span class="charliteral">&#39; &#39;</span>. $commonText;
-        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = <a class="code" href="user_2utils_8php.html#a7144fa5a413ad5690425b7b720aeedba">genderize</a>(<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>);
+        $result = ($done ? $doneText : $notDoneText) .<span class="charliteral">&#39; &#39;</span>. $commonText;
+        $result = <a class="code" href="user_2utils_8php.html#a7144fa5a413ad5690425b7b720aeedba">genderize</a>($result);
         <span class="keywordflow">return</span> <span class="stringliteral">&quot;&lt;li class=&#39;$class&#39;&gt;$result&lt;/li&gt;&quot;</span>;
 }
 </pre></div>
@@ -874,7 +874,7 @@ Functions</h2></td></tr>
 <div class="fragment"><pre class="fragment">{
         <span class="comment">// Parse line by line.</span>
         $rows = explode(<span class="stringliteral">&quot;\n&quot;</span>, $description);
-        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = array();
+        $result = array();
         $i = 0;
         <span class="keywordflow">foreach</span> ($rows as $row)
         {
@@ -939,11 +939,11 @@ Functions</h2></td></tr>
                                         $row[trim($field)] = <span class="keyword">true</span>;
                         }
                         $row[$keyHeader] = $key;
-                        <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>[$key] = $row;
+                        $result[$key] = $row;
                 }
                 $i++;
         }
-        <span class="keywordflow">return</span> <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>;
+        <span class="keywordflow">return</span> $result;
 }
 </pre></div>
 </div>

@@ -142,8 +142,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00080"></a>00080         global $USER;
 <a name="l00081"></a>00081         <span class="keywordflow">if</span> (isset($USER[<span class="stringliteral">&#39;uid&#39;</span>]))  $uid = intval($USER[<span class="stringliteral">&#39;uid&#39;</span>]);
 <a name="l00082"></a>00082         <span class="keywordflow">else</span> $uid = -1;
-<a name="l00083"></a>00083         <a class="code" href="notify_8php.html#a78db1a0602e3b6ac1d9a1b5ec103c160">$time</a> = time();
-<a name="l00084"></a>00084         <span class="keywordflow">if</span> (!isset($_SESSION[<span class="stringliteral">&#39;logid&#39;</span>]))  $_SESSION[<span class="stringliteral">&#39;logid&#39;</span>] = <a class="code" href="notify_8php.html#a78db1a0602e3b6ac1d9a1b5ec103c160">$time</a>;
+<a name="l00083"></a>00083         $time = time();
+<a name="l00084"></a>00084         <span class="keywordflow">if</span> (!isset($_SESSION[<span class="stringliteral">&#39;logid&#39;</span>]))  $_SESSION[<span class="stringliteral">&#39;logid&#39;</span>] = $time;
 <a name="l00085"></a>00085 
 <a name="l00086"></a>00086         <span class="comment">// Fill the data to remember into $params, to pass it safely through pg_query_params.</span>
 <a name="l00087"></a>00087         $params = array();

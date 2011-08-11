@@ -129,9 +129,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00099"></a>00099         <span class="keywordflow">else</span>
 <a name="l00100"></a>00100                 $icon = <a class="code" href="template_8php.html#a4fbd311bbd72b7beba6f27fe63b0acb1">getIcon</a>($icon, _(<span class="stringliteral">&#39;profile on wikidot&#39;</span>), <span class="comment">// TODO profile on wikidot exists?</span>
 <a name="l00101"></a>00101                         <span class="stringliteral">&#39;http://warsztatywww.wikidot.com/&#39;</span>. urlencode($name));
-<a name="l00102"></a>00102         <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = <span class="stringliteral">&quot;$icon $name&quot;</span>;
-<a name="l00103"></a>00103         <span class="keywordflow">if</span> ($email)  <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> .= <span class="stringliteral">&#39; &amp;lt;&#39;</span>. $DB-&gt;users[$uid]-&gt;get(<span class="stringliteral">&#39;email&#39;</span>) .<span class="stringliteral">&#39;&amp;gt;&#39;</span>;
-<a name="l00104"></a>00104         <span class="keywordflow">return</span> <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>;
+<a name="l00102"></a>00102         $result = <span class="stringliteral">&quot;$icon $name&quot;</span>;
+<a name="l00103"></a>00103         <span class="keywordflow">if</span> ($email)  $result .= <span class="stringliteral">&#39; &amp;lt;&#39;</span>. $DB-&gt;users[$uid]-&gt;get(<span class="stringliteral">&#39;email&#39;</span>) .<span class="stringliteral">&#39;&amp;gt;&#39;</span>;
+<a name="l00104"></a>00104         <span class="keywordflow">return</span> $result;
 <a name="l00105"></a>00105 }
 <a name="l00106"></a>00106 
 <a name="l00114"></a><a class="code" href="user_2utils_8php.html#abfcbff4a35e363f8999bfa976125f491">00114</a> function <a class="code" href="user_2utils_8php.html#abfcbff4a35e363f8999bfa976125f491">getUserRoles</a>($uid)

@@ -192,15 +192,15 @@ Functions</h2></td></tr>
         $rows = array();
         <span class="keywordflow">for</span> ($i=0; $i&lt;=10; $i++) <span class="comment">// Workshops have 11 days [0..10].</span>
         {
-                <a class="code" href="notify_8php.html#a78db1a0602e3b6ac1d9a1b5ec103c160">$time</a> = $starttime + $i*24*3600;
-                $row = array(strftime(<span class="stringliteral">&quot;%a %e.&quot;</span>, <a class="code" href="notify_8php.html#a78db1a0602e3b6ac1d9a1b5ec103c160">$time</a>+9*3600));
+                $time = $starttime + $i*24*3600;
+                $row = array(strftime(<span class="stringliteral">&quot;%a %e.&quot;</span>, $time+9*3600));
                 $query = <span class="stringliteral">&#39;SELECT COUNT(*) FROM w1_edition_users</span>
 <span class="stringliteral">                              WHERE edition=$1 AND qualified &gt; 0</span>
 <span class="stringliteral">                                    AND staybegintime&lt;=$2 AND stayendtime&gt;=$2</span>
 <span class="stringliteral">                                    AND isselfcatered=0</span>
 <span class="stringliteral">                                    &#39;</span>;
                 <span class="keywordflow">foreach</span> ($hours as $h)
-                        $row[]= $DB-&gt;query($query, $edition, <a class="code" href="notify_8php.html#a78db1a0602e3b6ac1d9a1b5ec103c160">$time</a>+$h*3600)-&gt;fetch();
+                        $row[]= $DB-&gt;query($query, $edition, $time+$h*3600)-&gt;fetch();
                 $rows[]= $row;
         }
         <a class="code" href="template_8php.html#a3bbebc058e2a5749c5129ef04f2db578">buildTableHTML</a>($rows, $headers);

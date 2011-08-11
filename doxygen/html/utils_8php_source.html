@@ -259,8 +259,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00197"></a>00197 
 <a name="l00198"></a>00198         <span class="keywordflow">if</span> ($enabled &amp;&amp; !empty($action))
 <a name="l00199"></a>00199                 $notDoneText = <span class="stringliteral">&quot;&lt;a href=&#39;$action&#39;&gt;$notDoneText&lt;/a&gt;&quot;</span>;
-<a name="l00200"></a>00200         <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = ($done ? $doneText : $notDoneText) .<span class="charliteral">&#39; &#39;</span>. $commonText;
-<a name="l00201"></a>00201         <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = <a class="code" href="user_2utils_8php.html#a7144fa5a413ad5690425b7b720aeedba">genderize</a>(<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>);
+<a name="l00200"></a>00200         $result = ($done ? $doneText : $notDoneText) .<span class="charliteral">&#39; &#39;</span>. $commonText;
+<a name="l00201"></a>00201         $result = <a class="code" href="user_2utils_8php.html#a7144fa5a413ad5690425b7b720aeedba">genderize</a>($result);
 <a name="l00202"></a>00202         <span class="keywordflow">return</span> <span class="stringliteral">&quot;&lt;li class=&#39;$class&#39;&gt;$result&lt;/li&gt;&quot;</span>;
 <a name="l00203"></a>00203 }
 <a name="l00204"></a>00204 
@@ -402,10 +402,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00340"></a>00340 
 <a name="l00341"></a>00341         <span class="keywordflow">if</span> (isset($_POST[<span class="stringliteral">&#39;query&#39;</span>]))
 <a name="l00342"></a>00342         {
-<a name="l00343"></a>00343                 <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = $DB-&gt;query($_POST[<span class="stringliteral">&#39;query&#39;</span>]);
-<a name="l00344"></a>00344                 $PAGE-&gt;addMessage(<span class="stringliteral">&#39;Rows affected: &#39;</span>. <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>-&gt;affected_rows(), <span class="stringliteral">&#39;success&#39;</span>);
+<a name="l00343"></a>00343                 $result = $DB-&gt;query($_POST[<span class="stringliteral">&#39;query&#39;</span>]);
+<a name="l00344"></a>00344                 $PAGE-&gt;addMessage(<span class="stringliteral">&#39;Rows affected: &#39;</span>. $result-&gt;affected_rows(), <span class="stringliteral">&#39;success&#39;</span>);
 <a name="l00345"></a>00345                 echo <span class="stringliteral">&#39;&lt;b&gt;SELECT result:&lt;/b&gt;&lt;table&gt;&#39;</span>;
-<a name="l00346"></a>00346                 <span class="keywordflow">foreach</span> (<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> as $i=&gt;$row)
+<a name="l00346"></a>00346                 <span class="keywordflow">foreach</span> ($result as $i=&gt;$row)
 <a name="l00347"></a>00347                         echo <span class="stringliteral">&#39;&lt;tr&gt;&lt;td&gt;&#39;</span>. $i .<span class="stringliteral">&#39;&lt;/td&gt;&lt;td&gt;&#39;</span>. implode(<span class="stringliteral">&#39;&lt;/td&gt;&lt;td&gt;&#39;</span>,$row) .<span class="stringliteral">&#39;&lt;/td&gt;&lt;/tr&gt;&#39;</span>;
 <a name="l00348"></a>00348                 echo <span class="stringliteral">&#39;&lt;/table&gt;&#39;</span>;
 <a name="l00349"></a>00349         }
@@ -427,14 +427,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00365"></a>00365 <span class="comment"> * returns array(&#39;name&#39;=&gt;&#39;myName&#39;, &#39;value&#39;=&gt;&#39;myValue&#39;, &#39;custom&#39;=&gt;&#39;c&#39;, &#39;readonly&#39;=&gt;true) */</span>
 <a name="l00366"></a><a class="code" href="utils_8php.html#a5d84b42e619618444a11590f91486f64">00366</a> function <a class="code" href="utils_8php.html#a5d84b42e619618444a11590f91486f64">arrayToAssoc</a>($array, $keys)
 <a name="l00367"></a>00367 {
-<a name="l00368"></a>00368         <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = $array;
+<a name="l00368"></a>00368         $result = $array;
 <a name="l00369"></a>00369         <span class="keywordflow">for</span> ($i = 0; $i &lt; count($keys); $i++)
-<a name="l00370"></a>00370                 <span class="keywordflow">if</span> (array_key_exists($i, <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>))
+<a name="l00370"></a>00370                 <span class="keywordflow">if</span> (array_key_exists($i, $result))
 <a name="l00371"></a>00371         {
-<a name="l00372"></a>00372                         <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>[$keys[$i]] = <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>[$i];
-<a name="l00373"></a>00373                         unset(<a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>[$i]);
+<a name="l00372"></a>00372                         $result[$keys[$i]] = $result[$i];
+<a name="l00373"></a>00373                         unset($result[$i]);
 <a name="l00374"></a>00374         }
-<a name="l00375"></a>00375         <span class="keywordflow">return</span> <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>;
+<a name="l00375"></a>00375         <span class="keywordflow">return</span> $result;
 <a name="l00376"></a>00376 }
 <a name="l00377"></a>00377 
 <a name="l00378"></a>00378 <span class="comment">/*      Parses a table description into an associative array of associative arrays.</span>
@@ -456,7 +456,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00394"></a>00394 {
 <a name="l00395"></a>00395         <span class="comment">// Parse line by line.</span>
 <a name="l00396"></a>00396         $rows = explode(<span class="stringliteral">&quot;\n&quot;</span>, $description);
-<a name="l00397"></a>00397         <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = array();
+<a name="l00397"></a>00397         $result = array();
 <a name="l00398"></a>00398         $i = 0;
 <a name="l00399"></a>00399         <span class="keywordflow">foreach</span> ($rows as $row)
 <a name="l00400"></a>00400         {
@@ -521,11 +521,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00459"></a>00459                                         $row[trim($field)] = <span class="keyword">true</span>;
 <a name="l00460"></a>00460                         }
 <a name="l00461"></a>00461                         $row[$keyHeader] = $key;
-<a name="l00462"></a>00462                         <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>[$key] = $row;
+<a name="l00462"></a>00462                         $result[$key] = $row;
 <a name="l00463"></a>00463                 }
 <a name="l00464"></a>00464                 $i++;
 <a name="l00465"></a>00465         }
-<a name="l00466"></a>00466         <span class="keywordflow">return</span> <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>;
+<a name="l00466"></a>00466         <span class="keywordflow">return</span> $result;
 <a name="l00467"></a>00467 }
 <a name="l00468"></a>00468 
 <a name="l00469"></a><a class="code" href="utils_8php.html#a0da0744a927ee4af264f38b1c2fce8bf">00469</a> function <a class="code" href="utils_8php.html#a0da0744a927ee4af264f38b1c2fce8bf">getUpdatedOrder</a>($name, $headers, $default)

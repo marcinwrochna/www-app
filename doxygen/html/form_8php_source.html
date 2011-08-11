@@ -299,7 +299,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00237"></a>00237 
 <a name="l00238"></a><a class="code" href="form_8php.html#a38d3d05e993dce971ae9af083f4902a7">00238</a> function <a class="code" href="form_8php.html#a38d3d05e993dce971ae9af083f4902a7">generateFormRows</a>($inputs, $previous=array())
 <a name="l00239"></a>00239 {
-<a name="l00240"></a>00240         <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> = <span class="stringliteral">&#39;&#39;</span>;
+<a name="l00240"></a>00240         $result = <span class="stringliteral">&#39;&#39;</span>;
 <a name="l00241"></a>00241         <span class="keywordflow">foreach</span> ($inputs as $row)
 <a name="l00242"></a>00242         {
 <a name="l00243"></a>00243                 <span class="keywordflow">if</span> (isset($row[<span class="stringliteral">&#39;name&#39;</span>]))  $arguments = $row;
@@ -308,9 +308,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00246"></a>00246                         ; <span class="comment">// old forms sometimes may have fields set in &#39;default&#39; instead of $previous DEPRECATED.</span>
 <a name="l00247"></a>00247                 <span class="keywordflow">else</span> <span class="keywordflow">if</span> (isset($previous[$arguments[<span class="stringliteral">&#39;name&#39;</span>]]) &amp;&amp; !is_null($previous[$arguments[<span class="stringliteral">&#39;name&#39;</span>]]))
 <a name="l00248"></a>00248                         $arguments[<span class="stringliteral">&#39;default&#39;</span>] = $previous[$arguments[<span class="stringliteral">&#39;name&#39;</span>]];
-<a name="l00249"></a>00249                 <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a> .= <a class="code" href="form_8php.html#a4569360da5e9495ff2456dbab40966c2">buildFormRow</a>($arguments);
+<a name="l00249"></a>00249                 $result .= <a class="code" href="form_8php.html#a4569360da5e9495ff2456dbab40966c2">buildFormRow</a>($arguments);
 <a name="l00250"></a>00250         }
-<a name="l00251"></a>00251         <span class="keywordflow">return</span> <a class="code" href="notify_8php.html#a112ef069ddc0454086e3d1e6d8d55d07">$result</a>;
+<a name="l00251"></a>00251         <span class="keywordflow">return</span> $result;
 <a name="l00252"></a>00252 }
 <a name="l00253"></a>00253 
 <a name="l00254"></a><a class="code" href="form_8php.html#a439bc28817dc0df1cca41357c1d60b49">00254</a> define(<span class="stringliteral">&#39;VALUE_OTHER&#39;</span>, -66642);
