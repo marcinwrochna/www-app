@@ -407,7 +407,7 @@ function parseTable($description, $gettext = 'gettext')
 		$key = trim($row[0]);
 		$fields = explode(';', $row[1]);
 		array_pop($fields); // Empty space after last ';'.
-		foreach($fields as &$field)
+		foreach ($fields as &$field)
 			$field = trim($field);
 		// First row describes key names (headers) and column modifiers.
 		if ($i == 0)

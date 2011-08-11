@@ -1,12 +1,12 @@
 <?php
 /*
  * workshop.php
- * Included in common.php
-*/
-// TODO redesign workshop info, signup/out buttons in particular.
-
+ */
 require_once('tasks.php');
 
+/**
+ * Menu box with workshop-specific actions.
+ */
 function addWarsztatyMenuBox()
 {
 	global $PAGE;
@@ -18,6 +18,11 @@ function addWarsztatyMenuBox()
 	'));
 }
 
+/**
+ * Lists workshops marked as accepted, for the participants to sign up.
+ * Displays an information/warning about how much workshops did a user sign up for.
+ * @see listWorkshops()
+ */
 function actionListPublicWorkshops()
 {
 	global $PAGE, $USER, $DB;
@@ -45,6 +50,10 @@ function actionListPublicWorkshops()
 		array('wid','lecturers','title','subject','duration','participants'));
 }
 
+/**
+ * Lists user's own workshops (those he sent proposals for, or has been added to as a lecturer).
+ * @see listWorkshops()
+ */
 function actionListOwnWorkshops()
 {
 	global $USER, $PAGE;
@@ -56,6 +65,10 @@ function actionListOwnWorkshops()
 		array('wid','lecturers','title','type','subject','duration','status','participants'));
 }
 
+/**
+ * Lists all workshops, most of all those awaiting acceptation.
+ * @see listWorkshops()
+ */
 function actionListAllWorkshops()
 {
 	global $PAGE;
@@ -65,6 +78,13 @@ function actionListAllWorkshops()
 		array('wid','lecturers','title','type','subject','duration','status','participants'));
 }
 
+/**
+ * Lists workshops in a table.
+ * (Admins need different information than lecturers, but most of it is the same.)
+ * @param $which 'Public', 'Own' or 'All'
+ * @param $where a WHERE sql clause limiting the workshops listed.
+ * @param $columns columns to be displayed.
+ */
 function listWorkshops($which, $where, $columns)
 {
 	global $USER, $DB, $PAGE;
@@ -120,7 +140,7 @@ function listWorkshops($which, $where, $columns)
 
 	/* SELECT (participant counts by status) */
 	$selectParticipants = '';
-	foreach(enumParticipantStatus() as $statusName => $status)
+	foreach (enumParticipantStatus() as $statusName => $status)
 		$selectParticipants .= '(SELECT COUNT(*) FROM table_workshop_users wu
 			WHERE wu.wid=w.wid AND participant='. $status->id .') AS count_'. $statusName .',';
 
@@ -175,7 +195,7 @@ function listWorkshops($which, $where, $columns)
 		{
 			$tip = '';
 			// TODO i18n polish plural -ych
-			foreach(enumParticipantStatus() as $statusName => $status)
+			foreach (enumParticipantStatus() as $statusName => $status)
 				$tip .= str_replace('%','ych',$status->description) .': '. $row["count_$statusName"] .'<br/>';
 			$row['participants'] .= '<a '. getTipJS($tip) .'>';
 			$row['participants'] .= ($row['count_accepted'] + $row['count_autoaccepted']) .'</a>';
@@ -195,6 +215,10 @@ function listWorkshops($which, $where, $columns)
 	echo "</tbody></table>";
 }
 
+/**
+ * Returns array of uids of given workshop's lecturers..
+ * @param $wid a wid (workshop id).
+ */
 function getLecturers($wid)
 {
 	global $DB;
@@ -203,10 +227,15 @@ function getLecturers($wid)
 	return $lecturers->fetch_column();
 }
 
+/**
+ * Displays information about a workshop block (proposal).
+ * Displays a simple form for admins to change to workshop block's status
+ * @param $wid a wid (workshop id).
+ */
 function actionShowWorkshop($wid = null)
 {
 	global $USER, $DB, $PAGE;
-	if (is_null($wid))  throw new KnownException(_('Workshop not found.'));
+	if (is_null($wid))  throw new KnownException(_('Workshop not found.')); // Handle deprecated links.
 	$wid = intval($wid);
 
 	$data = $DB->workshops[$wid]->assoc('*');
@@ -234,7 +263,7 @@ function actionShowWorkshop($wid = null)
 	// The subjects.
 	$subjects = $DB->query('SELECT subject FROM table_workshop_subjects WHERE wid=$1', $wid);
 	$data['subjects'] = array();
-	foreach($subjects as $subject)
+	foreach ($subjects as $subject)
 		$data['subjects'][]= enumSubject($subject['subject'])->description;
 	$data['subjects'] = implode(', ', $data['subjects']);
 
@@ -585,7 +614,7 @@ function actionAddWorkshopLecturer($wid, $lecturer, $confirm = false)
 				ORDER BY name', getOption('currentEdition'))->fetch_all();
 			$best = 100000;
 			$bestname = '';
-			foreach($names as $name)
+			foreach ($names as $name)
 				if (levenshtein($name['name'], $lecturer) < $best)
 				{
 					$best = levenshtein($name['name'], $lecturer);
@@ -664,7 +693,7 @@ function actionResignFromWorkshop($wid)
 function subjectOrder($subjects)
 {
 	$r = 0;
-	foreach(enumSubject() as $subjectName=>$subject)
+	foreach (enumSubject() as $subjectName=>$subject)
 		if (in_array($subjectName, $subjects))
 			$r += $subject->orderWeight;
 	return $r;

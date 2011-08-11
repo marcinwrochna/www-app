@@ -1,8 +1,10 @@
 <?php
-/*
- * index.php includes pretty much everything and
- * calls the appropriate action, parsing the GET.
-*/
+/**
+ *	index.php includes pretty much everything and
+ *	calls the appropriate action, parsing the GET.
+ *	The PAGE is built, the action's output written
+ * to $PAGE->content, add*MenuBox()s called.
+ */
 
 require_once('common.php');
 require_once('utils.php');
@@ -16,9 +18,16 @@ $PAGE = new Page();
 include_once('update.php'); // Apply updates.
 initUser(); // initializes the $USER global.
 require_once('workshop.php');
-require_once('plan.php');
+require_once('summary.php');
 include_once('tutoring.php');
 
+/**
+ * Calls an action, by default with a 303 redirect - implementing the POST-REDIRECT-GET pattern.
+ * The redirect preserves only messages.
+ * @param $action the action's name, e.g.: 'homepage'.
+ * @param $args array of arguments past to the action function.
+ * @param $redirect (optional) Defaults to true. If false, the action will be called directly.
+ */
 function callAction($action, $args = array(), $redirect = true)
 {
 	global $PAGE, $USER;

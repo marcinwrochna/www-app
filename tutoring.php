@@ -142,3 +142,12 @@ function actionConsiderTutoringApplication($uid, $agree)
 	logUser('tutor '. ($agree ? 'become' : 'resign'), $uid);
 	actionViewTutoringApplication($uid);
 }
+
+function getName($uid, $default='')
+{
+	global $DB;
+	if (!isset($DB->users[intval($uid)]))
+		return $default;
+	else
+		return $DB->users[intval($uid)]->get('name');
+}

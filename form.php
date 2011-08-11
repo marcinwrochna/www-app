@@ -277,7 +277,7 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 		{
 			$tmp = array();
 			if (!empty($options))
-				foreach($default as $d)  $tmp[]= $options[$d];
+				foreach ($default as $d)  $tmp[]= $options[$d];
 			$default = implode(', ', $tmp);
 		}
 		if ($type == 'textarea' || $type == 'richtextarea')

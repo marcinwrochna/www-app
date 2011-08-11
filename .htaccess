@@ -1,7 +1,12 @@
 RewriteEngine on
 
+# Pass existing files.
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^(.*)$           -                                                [last,L,NE]
+# Pass doxygen.
+RewriteRule ^doxygen           -                                                [last,L,NE]
+
+
 
 # Warning: actions can't have the same name as a directory.
 # impersonate($1)/$2($3)

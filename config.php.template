@@ -1,0 +1,25 @@
+<?php
+/*
+ *	config.php contains site-specific configurations.
+ *	You shouldn't copy it between local/remote servers.
+ */
+
+define('ABSOLUTE_PATH_PREFIX', '/www/www/'); // Should end with a slash.
+define('ROOT_PASSWORD', 'introduce smooth sawtooth trajectory');
+define('GOOGLE_ANALYTICS_ACCOUNT', false); // E.g. 'UA-12345678-9'.
+// Database
+define('TABLE_PREFIX', 'w1_'); // Shouldn't be empty.
+define('DB_DRIVER', 'PostgreSQL'); // Currently only PostgreSQL is available.
+define('DB_CONNECTION_STRING', 'host=localhost user=www dbname=www'); // As in pg_connect().
+// Emails
+define('ERROR_EMAIL', false); // Send an email in case of any error.
+define('ERROR_EMAIL_ADDRESS', 'mwrochna+wwwerror@gmail.com');
+define('BUGREPORT_EMAIL_ADDRESS', 'mwrochna+wwwbugreport@gmail.com');
+define('EMAIL_METHOD', 'display'); // Use this if you want emails to be displayed on the page, instead of being sent.
+// define('EMAIL_METHOD', 'gmail'); // See email.php for details.
+// define('OAUTH_CONSUMER_KEY', 'warsztatywww.nstrefa.pl');
+// define('OAUTH_METHOD', 'HMAC-SHA1'); // or: define('OAUTH_METHOD', 'RSA-SHA1');
+// define('OAUTH_CONSUMER_SECRET', 'someNumberFromGoogle'); // or: define('OAUTH_CONSUMER_SECRET', 'path/to/rsaprivatekey.pem');
+}
+
+

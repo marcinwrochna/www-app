@@ -52,10 +52,10 @@ function writeMTime($f)
 		<style type="text/css">body { font-size: 100.00%; } /* .contentBox.article { zoom:1; } */</style>
 		<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7-squish.js" type="text/javascript"></script>
 	<![endif]-->
-	<?php if (USE_GOOGLE_ANALYTICS): ?>
+	<?php if (GOOGLE_ANALYTICS_ACCOUNT): ?>
 		<script type="text/javascript">
 			var _gaq = _gaq || [];
-			_gaq.push(['_setAccount', 'UA-12926426-2']);
+			_gaq.push(['_setAccount', '<?php echo GOOGLE_ANALYTICS_ACCOUNT; ?>']);
 			_gaq.push(['_setCustomVar', 1, 'uid', '<?php global $USER; echo $USER['uid']; ?>', 1]);
 			_gaq.push(['_trackPageview']);
 

@@ -8,7 +8,7 @@ CGI and Perl for latex and upload status bar
 		mimetex isn't beautiful, jsmath matured very much,
 		uber-upload is uber-complicated, TinyMCE now features a HTML upload handler).
 === Configuration ===
-See config.php.
+Fill config.php.template and move to "config.php".
 
 == Utilities ==
 === internationalization ===
@@ -17,20 +17,14 @@ Strings to be translated are either:
 - passed directly to the _(), N_() functions,
 - enclosed in double brackets {{string}}, or
 - defined in a parseTable column with a t modifier.
-When you add/change a string to be translated, run respectively:
-- cd locale; xgettext -k_ --from-code utf-8 -o auto.pot --no-wrap ../*.php ../*/*.php
-- manually edit templates.pot
-- manually edit tables.pot
-TODO automate that process.
-Then run  (still inside locale/, replacing pl_PL with all the langs you need)
-	msgcat auto.pot tables.pot templates.pot > messages.pot
-	msgmerge -U pl_PL/LC_MESSAGES/messages.po messages.pot
-Then fill each language's messages.po (with an editor like poEdit).
-
-For details see locale/README.txt
+When you add/change a string to be translated, run
+	cd locale; php updateTranslations.php;
+and edit the .po files, prefferably with an editor like poEdit.
+	poedit locale/pl_PL/LC_MESSAGES/messages.po
 
 === icons map ===
-Whenever you add/edit an icon in images/icons/, run mapIcons.py (in images/).
+Whenever you add/edit an icon in images/icons/, run
+	cd images; ./mapIcons.py
 
 This is to avoid making many request for all the small icons, they're merged in one file by mapIcons.py.
 In code use getIcon() to display the icons.
@@ -48,5 +42,5 @@ CGI components used:
 - simple latex rendering - mimetex.cgi    - GPL          - ?
 - upload status bar      - uber-upload    - GPLv3        - http://uber-uploader.sourceforge.net/
 Icons:
-- icons                  - FatCow         - CC-A-3.0     - http://www.fatcow.com/free-icons/
-- icons                  - twotiny        - Artisitc/GPL - http://code.google.com/p/twotiny/
+- most icons             - FatCow         - CC-A-3.0     - http://www.fatcow.com/free-icons/
+- some smaller icons     - twotiny        - Artisitc/GPL - http://code.google.com/p/twotiny/

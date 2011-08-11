@@ -1,12 +1,7 @@
-== Showstoppers ==
-redesign workshop info, signup/out buttons in particular. "Signup/Resign button rights are inconsistent."
-summary.php <- plan.php, user/admin.php
-
-publish git (code.google.com/hosting/createProject or maybe gitHub?)
+genderize-printf conflict.
+== Things that are just plain wrong ==
 doxygen
 installation - at least describe.
-
-== Things that are just plain wrong ==
 notify.php - translate (emails- it requires we remember a user's language preference).
 tutoring.php - review (update depracated things), translate
 move hardcoded edition data to table_editions (start, end, meals, actionEditWorkshop's "deadline", ...)

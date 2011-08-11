@@ -22,7 +22,7 @@ class Enum implements ArrayAccess, IteratorAggregate
 		if (is_null($keyOrId))
 			return self::$enumTypes[$enumName];
 		if (is_numeric($keyOrId))
-			foreach(self::$enumTypes[$enumName] as $enumItem)
+			foreach (self::$enumTypes[$enumName] as $enumItem)
 				if ($enumItem->id == $keyOrId)
 					return $enumItem;
 		return self::$enumTypes[$enumName][$keyOrId];
@@ -33,7 +33,7 @@ class Enum implements ArrayAccess, IteratorAggregate
 	private function __construct(array $items, $default)
 	{
 		$this->items = array();
-		foreach($items as $key => $item)
+		foreach ($items as $key => $item)
 			$this->items[$key]= new EnumItem($item);
 		$default['key'] = 'default';
 		$default['id']  = -1;
@@ -55,7 +55,7 @@ class Enum implements ArrayAccess, IteratorAggregate
 	public function assoc($keyColumn, $valColumn)
 	{
 		$a = array();
-		foreach($this->items as $item)
+		foreach ($this->items as $item)
 			$a[$item[$keyColumn]] = $item[$valColumn];
 		return $a;
 	}

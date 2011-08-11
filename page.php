@@ -62,7 +62,7 @@ class Page extends SimpleTemplate
 	{
 		$count = 0;
 		$menuItems = '';
-		foreach($items as $item)
+		foreach ($items as $item)
 		{
 			if (!isset($item['perm']))
 				$item['perm'] = userCan($item['action']);

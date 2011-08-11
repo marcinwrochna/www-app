@@ -259,12 +259,12 @@ function buildParticipantList($wid)
 	$tasks = $DB->fetch_column();
 
 	$counts = array();
-	foreach(enumParticipantStatus() as $statusName => $status)
+	foreach (enumParticipantStatus() as $statusName => $status)
 		$counts[$status->id] = 0;
 	foreach ($participants as $participant)
 		$counts[$participant['participant']]++;
 	$countDescription = array();
-	foreach(enumParticipantStatus() as $statusName => $status)
+	foreach (enumParticipantStatus() as $statusName => $status)
 		if ($statusName != 'none' || $counts[$status->id])
 		$countDescription[]= str_replace('%','ych',$status->description) .': '. $counts[$status->id]; // TODO i18n polish plural -ych
 
