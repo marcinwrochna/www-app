@@ -31,7 +31,7 @@ function actionEditTutoringApplication()
 	if (empty($user['tutorapplication']))  $status = 'brak podania';
 	else if ($user['tutoruid'] == USER_ANONYMOUS)  $status = 'oczekuje...';
 	else $status = getName($user['tutoruid']) .' jest twoim tutorem :)';
-	$PAGE->content .= '<b>status</b>: '. $status .'<br/>';
+	echo '<b>status</b>: '. $status .'<br/>';
 
 	$PAGE->title = 'Podanie o tutora';
 	$form = new Form(array(
@@ -43,8 +43,7 @@ function actionEditTutoringApplication()
 	));
 	$form->action = 'editTutoringApplicationForm';
 	$form->values = $user;
-	$form->submitValue = 'Zapisz';
-	$PAGE->content .= $form->getHTML();
+	echo $form->getHTML();
 }
 
 function actionEditTutoringApplicationForm()
@@ -73,17 +72,17 @@ function actionViewTutoringApplications()
 	global $PAGE;
 	$PAGE->title = 'Lista podań o tutora';
 
-	if (!count($users))  $PAGE->content .= 'brak podań';
+	if (!count($users))  echo 'brak podań';
 	else
 	{
-		$PAGE->content .= '<table><tr><th>imię i nazwisko</th><th>tutor</th><th>podanie</th></tr>';
+		echo '<table><tr><th>imię i nazwisko</th><th>tutor</th><th>podanie</th></tr>';
 		foreach ($users as $user)
-			$PAGE->content .= '<tr class="'. alternate('even','odd') .'">'.
+			echo '<tr class="'. alternate('even','odd') .'">'.
 				'<td>'. getUserBadge($user['uid'], true) .'</td>'.
 				'<td>'. getUserBadge($user['tutoruid'], false, 'nikt') .'</td>'.
 				'<td>'. getIcon('arrow-right.png', 'zobacz podanie',
 					'viewTutoringApplication('. $user['uid'] .')') .'</td></tr>';
-		$PAGE->content .= '</table>';
+		echo '</table>';
 	}
 }
 
@@ -114,7 +113,7 @@ function actionViewTutoringApplication($uid)
 	<b>szkoła/kierunek studiów</b>: %school%<br/>
 	<b>rok uzyskania matury</b>: %graduationyear%<br/>
 	<?php
-	$PAGE->content .= $template->finish();
+	echo $template->finish();
 }
 
 function actionConsiderTutoringApplication($uid, $agree)

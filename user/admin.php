@@ -24,7 +24,7 @@ function addAdminMenuBox()
 		= $items['listArrivalData']['perm']
 		= $items['listDailyCounts']['perm']
 		= $items['showPointsTable']['perm']
-		= in_array('admin', $USER['roles']);
+		= userIs('admin');
 	$PAGE->addMenuBox(_('Administration'), $items);
 }
 
@@ -92,8 +92,14 @@ function actionAdminUsers($filterBy = null)
 		$row['motivationletter'] = str_word_count(strip_tags($row['motivationletter']));
 		if (!$row['motivationletter'])
 			$row['motivationletter'] = '';
-		$row['lecturer']  = $row['lecturer'] ? '<span '. getTipJS(_('lecturer')) .'>L</span>' : '';
-		$row['qualified'] = $row['qualified'] ? '<span '. getTipJS(_('qualified')) .'>q</span>' : '';
+		if ($row['lecturer'])
+			$row['lecturer']  =  '<span '. getTipJS(_('lecturer')) .'>'. _('L') .'</span>';
+		else
+			$row['lecturer']  =  '<span '. getTipJS(_('candidate')) .'>'. _('c') .'</span>';
+		if ($row['qualified'])
+			$row['qualified'] =  '<span '. getTipJS(_('qualified')) .'>'. _('q'). '</span>';
+		else
+			$row['qualified'] = '';
 		$row[]= '<a href="editProfile('. $row['uid'] .')">'. _('profile') .'</a>
 		         <a href="editUserStatus('. $row['uid'] .')">'. _('status') .'</a>
 		         <a href="editAdditionalInfo('. $row['uid'] .')">'. _('info'). '</a>';
@@ -178,34 +184,6 @@ function actionEditUserStatus($uid)
 	echo $form->getHTML();
 }
 
-/*function actionEditUserStatusForm($uid)
-{
-	global $DB, $PAGE;
-	$uid = intval($uid);
-	if (!userCan('adminUsers'))  throw new PolicyException();
-
-	$oldj = isset($DB->user_roles[array('uid'=>$uid,'role'=>'jadący')]);
-	$newj = !empty($_POST['jadący']);
-	if (!$oldj && $newj)
-	{
-		$DB->user_roles[]= array('uid'=>$uid,'role'=>'jadący');
-		$DB->edition_users(getOption('currentEdition'), $uid)->update(array('qualified'=>1));
-		logUser('set jadący 1', $uid);
-		$PAGE->addMessage('Pomyślnie dodano do jadących.', 'success');
-	}
-	else if ($oldj && !$newj)
-	{
-		$DB->user_roles[array($uid,'jadący')]->delete();
-		$DB->edition_users(getOption('currentEdition'), $uid)->update(array('qualified'=>0));
-		logUser('set jadący 0', $uid);
-		$PAGE->addMessage('Pomyślnie usunięto z jadących.', 'success');
-	}
-	else
-		$PAGE->addMessage('Pozostawiono niezmieniony status.');
-	callAction('editUserStatus', array($uid));
-}*/
-
-
 function getUserHeader($uid, $name, $action)
 {
 	global $DB;
@@ -228,7 +206,6 @@ function getUserHeader($uid, $name, $action)
 	$s .= "</div></h2>";
 	return $s;
 }
-
 
 function actionListPersonalData()
 {

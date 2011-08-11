@@ -6,7 +6,7 @@
 function actionChangePassword()
 {
 	global $USER, $PAGE, $DB;
-	if (!in_array('registered', $USER['roles']))  throw new PolicyException();
+	if (!userIs('registered'))  throw new PolicyException();
 	$PAGE->title = _('Password change');
 	$form = new Form(parseTable('
 		NAME                => TYPE;     tDESCRIPTION;    VALIDATION;
@@ -129,15 +129,14 @@ function actionEditProfile($uid = null)
 	$inputs['gender']['options'] = array('m' => _('masculine'), 'f' => _('feminine'));
 	$inputs['role']['options'] = array(
 		'none'=> _('None'),
-		'uczestnik'=> _('Candidate'),
-		'auczestnik'=> _('Qualified participant'),
-		'kadra'=> _('Lecturer'),
-		'akadra'=> _('Qualified lecturer'),
+		'candidate'=> _('Candidate'),
+		'qualified_candidate'=> _('Qualified candidate'),
+		'lecturer'=> _('Lecturer'),
+		'qualified_lecturer'=> _('Qualified lecturer'),
 	);
 	$inputs['roles']['options'] = array(
 		'admin'=> _('Admin'),
 		'tutor'=> _('Tutor'),
-		//'jadący'=> genderize(_('Qualified'), $DB->users[$uid]->get('gender'))
 	);
 	$inputs['school']['autocomplete'] = $DB->query('SELECT school FROM table_users WHERE school IS NOT NULL
 		GROUP BY school HAVING count(*)>1 ORDER BY count(*) DESC LIMIT 150')->fetch_column();
@@ -165,11 +164,9 @@ function actionEditProfile($uid = null)
 				else
 				{
 					$value = array(
-						'qualified' => in_array($role, array('auczestnik', 'akadra')) ? 1 : 0,
-						'lecturer' => in_array($role, array('kadra', 'akadra')) ? 1 : 0
+						'qualified' => (strpos($role, 'qualified') !== false) ? 1 : 0,
+						'lecturer' =>  (strpos($role, 'lecturer')  !== false) ? 1 : 0,
 					);
-					$roles[]= $value['lecturer'] ? 'kadra' : 'uczestnik';
-					if ($role == 'akadra')  $roles[]='akadra';
 
 					if ($DB->edition_users($currentEdition, $uid)->count())
 						$DB->edition_users($currentEdition, $uid)->update($value);
@@ -205,8 +202,8 @@ function actionEditProfile($uid = null)
 		$form->values['role'] = 'none';
 	else
 	{
-		$form->values['role'] =  $row->get('qualified') ? 'a' : '';
-		$form->values['role'] .= $row->get('lecturer') ? 'kadra' : 'uczestnik';
+		$form->values['role'] =  $row->get('qualified') ? 'qualified_' : '';
+		$form->values['role'] .= $row->get('lecturer') ? 'lecturer' : 'candidate';
 	}
 	if ($admin)
 	{
@@ -228,7 +225,8 @@ function getGraduationYearOptions()
 		'I rok studiów', 'II  rok studiów', 'III rok studiów', 'IV rok studiów', 'V rok studiów');
 	$date = getdate();
 	$year = $date['year']+3; // The first element of $classOptions graduates in 3 years.
-	if ($date['mon']>=9)  $year++; // We consider the 1st of September to be the threshold (should we?).
+	if ($date['mon']>=9)
+		$year++; // We consider the 1st of September to be the threshold (should we?).
 	$graduationYearOptions = array();
 	foreach ($classOptions as $i=>$opt)
 	{

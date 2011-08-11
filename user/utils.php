@@ -17,7 +17,10 @@ function userCan($action, $owner=false)
 		if (in_array('registered', $USER['roles']))
 			$roles[]= 'owner';
 	$required = $DB->query('SELECT role FROM table_role_permissions WHERE action=$1', $action);
-	return (count(array_intersect($roles,$required->fetch_column())) > 0);
+	foreach ($required as $requirements)
+		if (!count(array_diff(explode(' ', $requirements['role']), $roles)))
+			return true;
+	return false;
 }
 
 function assertProfileFilled($quiet = false)
@@ -37,8 +40,9 @@ function assertProfileFilled($quiet = false)
 function gender($m='y', $f='a', $gender='user')
 {
 	global $USER;
-	if ($gender === 'user')  $gender = $USER['gender'];
-	return ($gender==='f'?$f:$m);
+	if ($gender === 'user')
+		$gender = $USER['gender'];
+	return (($gender === 'f') ? $f : $m);
 }
 
 function genderize($s, $gender='user')
@@ -64,7 +68,8 @@ function getUserBadge($uid, $email=false, $default='?')
 		return $default;
 	$name = $DB->users[intval($uid)]->get('name');
 	$icon = 'user-blue.gif';
-	if ($uid == $USER['uid'])  $icon = 'user-green.gif';
+	if ($uid == $USER['uid'])
+		$icon = 'user-green.gif';
 
 	if (userCan('editProfile', $uid))
 		$icon = getIcon($icon, _('edit profile'), 'editProfile('. $uid .')');
@@ -76,11 +81,9 @@ function getUserBadge($uid, $email=false, $default='?')
 	return $result;
 }
 
-function getUserRoles($uid = null)
+function getUserRoles($uid)
 {
 	global $DB, $USER;
-	if (is_null($uid))
-		$uid = $USER['uid'];
 	$DB->query('SELECT role FROM table_user_roles WHERE uid=$1', $uid);
 	$roles = $DB->fetch_column();
 	$r = $DB->query('SELECT lecturer, qualified FROM table_edition_users WHERE edition=$1 AND uid=$2',

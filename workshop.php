@@ -29,7 +29,7 @@ function actionListPublicWorkshops()
 	$DB->query('SELECT SUM(w.duration)
 		FROM table_workshops w, table_workshop_users wu
 		WHERE w.status=$1 AND w.edition=$2 AND wu.wid=w.wid AND wu.uid=$3',
-		enumBlockStatus('great')->id, getOption('currentEdition'), $USER['uid']);
+		enumBlockStatus('accepted')->id, getOption('currentEdition'), $USER['uid']);
 	$sum = intval($DB->fetch());
 	if ($sum)
 	{
@@ -38,10 +38,10 @@ function actionListPublicWorkshops()
 		$PAGE->addMessage($msg, 'info');
 	}
 
-	// Public workshops = workshops with type:workshop and status:great.
+	// Public workshops = workshops with type:workshop and status:accepted.
 	listWorkshops('Public',
 		'(type='.  enumBlockType('workshop')->id .' AND '.
-		'status='. enumBlockStatus('great')->id .')',
+		'status='. enumBlockStatus('accepted')->id .')',
 		array('wid','lecturers','title','subject','duration','participants'));
 }
 
@@ -253,6 +253,7 @@ function actionShowWorkshop($wid = null)
 		<a href="%link%">{{see the description on wikidot}}</a><br/>
 		<br/>
 	<?php
+	echo $template->finish(true);
 
 	// The signup/signout button (same as in showWorkshopTasks).
 	if (enumParticipantStatus($participant)->inArray(array('candidate', 'autoaccepted')))
@@ -263,7 +264,7 @@ function actionShowWorkshop($wid = null)
 
 	// Proposition description.
 	if (userCan('showWorkshopDetails', $lecturers)) {
-		echo 'Opis propozycji: <div class="descriptionBox">%description%</div>';
+		echo _('Proposal').': <div class="descriptionBox">'. $data['description'] .'</div>';
 	}
 	// Workshop block status (e.g. accepted or not).
 	if (userCan('changeWorkshopStatus', $lecturers))
@@ -296,7 +297,6 @@ function actionShowWorkshop($wid = null)
 	// Edit-workshop button.
 	if (userCan('editWorkshop', $lecturers))
 		echo getButton(_('edit'), "editWorkshop($wid)", 'brick-edit.png');
-	$PAGE->content .= $template->finish(true);
 }
 
 function actionShowWorkshopTasks($wid)
@@ -321,7 +321,7 @@ function actionShowWorkshopTasks($wid)
 			<a class='selected'>{{signups and tasks}}</a>
 		</div></h2>
 	<?php
-	$PAGE->content .= $template->finish(true);
+	echo $template->finish(true);
 
 	echo _('Your status:') .' <i>'. genderize(enumParticipantStatus($participant)->explanation) .'</i><br/>';
 
@@ -507,7 +507,7 @@ function actionEditWorkshopLecturers($wid)
 			'name' => 'uid'. $lecturer,
 			'type' => 'custom',
 			'description' => getUserBadge($lecturer, true),
-			'custom'=>"<a href='removeWorkshopLecturer($wid;$lecturer)'>[usuń]</a>"
+			'custom'=>"<a href='removeWorkshopLecturer($wid;$lecturer)'>[". _('remove'). "</a>"
 		);
 
 	$inputs['lecturer']= array(
@@ -522,8 +522,8 @@ function actionEditWorkshopLecturers($wid)
 		ORDER BY name', getOption('currentEdition'))->fetch_column();
 
 	$PAGE->title = _('Add/remove lecturers');
-	$PAGE->content .= "<a class='back' href='editWorkshop($wid)'>". _('back') ."</a>";
-	$PAGE->content .= '<h3>'. $DB->workshops($wid)->get('title') .'</h3>';
+	echo "<a class='back' href='editWorkshop($wid)'>". _('back') ."</a>";
+	echo '<h3>'. $DB->workshops($wid)->get('title') .'</h3>';
 	$form = new Form($inputs);
 	if ($form->submitted())
 	{
@@ -544,18 +544,18 @@ function actionRemoveWorkshopLecturer($wid, $uid, $confirm = false)
 	if (!userCan('editWorkshop', $lecturers))  throw new PolicyException();
 
 	if (!in_array($uid, $lecturers))
-		$PAGE->addMessage('Wskazany użytkownik nie należy do prowadzących.', 'userError');
+		$PAGE->addMessage(_('The user is not a lecturer.'), 'userError');
 	else if (($uid == $USER['uid']) && !$confirm)
 	{
-		$PAGE->addMessage('Czy na pewno chcesz usunąć samego siebie z prowadzących?<br/>'.
-			"<a href='removeWorkshopLecturer($wid;$uid;1)' class='button'>tak</a> ".
-			"<a href='editWorkshopLecturers($wid)' class='button'>anuluj</a>",
+		$PAGE->addMessage(_('Are you sure you want to remove yourself from lecturers?') .'<br/>'.
+			"<a href='removeWorkshopLecturer($wid;$uid;1)' class='button'>". _('yes'). "</a> ".
+			"<a href='editWorkshopLecturers($wid)' class='button'>". _('cancel'). "</a>",
 			'warning');
 	}
 	else
 	{
 		$DB->query('DELETE FROM table_workshop_users WHERE wid=$1 AND uid=$2', $wid, $uid);
-		$PAGE->addMessage('Pomyślnie usunięto użytkownika z prowadzących.', 'success');
+		$PAGE->addMessage('The user has been removed from lecturers here.', 'success');
 	}
 	callAction('editWorkshopLecturers', array($wid));
 }

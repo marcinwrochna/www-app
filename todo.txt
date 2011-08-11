@@ -1,18 +1,16 @@
-notify.php - translate (emails- it requires we remember a user's language preference).
-// tutoring.php - review, translate
 == Showstoppers ==
-replace "kadra", "akadra", "jadący" with editions_users.{lectuter,qualified}
+redesign workshop info, signup/out buttons in particular. "Signup/Resign button rights are inconsistent."
+summary.php <- plan.php, user/admin.php
+
 publish git (code.google.com/hosting/createProject or maybe gitHub?)
 doxygen
-redesign workshop info, signup/out buttons in particular. "Signup/Resign button rights are inconsistent."
 installation - at least describe.
 
-merge blockStatus:{ok,great} into :accepted
-summary.php <- plan.php, user/admin.php
-----------------------------------------------------
+== Things that are just plain wrong ==
+notify.php - translate (emails- it requires we remember a user's language preference).
+tutoring.php - review (update depracated things), translate
 move hardcoded edition data to table_editions (start, end, meals, actionEditWorkshop's "deadline", ...)
-move columns from table_users to table_edition_users:  motivationletter, gatherplace, comments?
-check perms in task solution forms
+recheck permissions (grep userCan, userIs), check perms in task solution forms
 
 == Security ==
 parseUserHTML() - use HTMLPurifier, recheck if evrything applies either this or htmlspecialchars.
@@ -22,20 +20,23 @@ CSRF protection in $form->submitted();
 
 == Features ==
 update tinymce
+replace uber-upload with TinyMCE's html5 uploader?
+replace mimetext with jsmath?
 language choice.
 "payed" checkbox
-log impersonations
+move columns from table_users to table_edition_users:  motivationletter, gatherplace, comments?
 in actionEditWorkshop make url in JS when title changes: http://warsztatywww.wikidot.com/www7:tytul-warsztatow
 make printable tables through buildTableHTML
 export those tables to GoogleDocs API?
 tinymce <code> (for task solutions - at least handle indentation)
 make email X-Sender tag (or lack of it) explicit in email.php
 give the staff the possibility to impersonate a Tester user.
+log impersonations
 better SELECT, DB_Slice?
 make the app more open - publish lists, user profiles, ...
 
 == Code style ==
-notifiy.php: change $email to either $content or $address, because it's misleading
+notify.php: change $email to either $content or $address, because it's misleading
 replace in_array... with userIs('role');
 rename table_workshop_user.participant? table_options->table_settings? table_edition_users.lecturer->islecturer, qualified->isqualified?
 transfer lists of constants to enum.php

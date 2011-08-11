@@ -87,7 +87,7 @@ function actionHomepage()
 		WHERE w.wid=wu.wid AND w.edition=$1 AND wu.uid=$2 AND
 			(wu.participant>=$3) AND w.status>=$4';
 	$DB->query($query, $currentEdition, $USER['uid'],
-		enumParticipantStatus('candidate')->id, enumBlockStatus('ok')->id);
+		enumParticipantStatus('candidate')->id, enumBlockStatus('accepted')->id);
 	$did['signupForWorkshops']['done'] = $DB->fetch() >= 4;
 
 	// Check motivation letter.
@@ -100,7 +100,7 @@ function actionHomepage()
 				$words, getOption('motivationLetterWords'));
 	// Check qualification tasks solved.
 	$DB->query($query, $currentEdition, $USER['uid'],
-		enumParticipantStatus('accepted')->id, enumBlockStatus('ok')->id);
+		enumParticipantStatus('accepted')->id, enumBlockStatus('accepted')->id);
 	$did['solveTasks']['done'] = $DB->fetch() >= 4;
 	$did['solveTasks']['enabled'] = $didApplyAsParticipant && $did['signupForWorkshops']['done'];
 
@@ -145,8 +145,7 @@ function actionHomepage()
 		SELECT count(*)
 		FROM table_workshops w, table_workshop_users wu
 		WHERE w.wid=wu.wid AND w.edition=$1 AND wu.uid=$2 AND wu.participant=$3',
-		$currentEdition, $USER['uid'], enumParticipantStatus('lecturer')->id
-	);
+		$currentEdition, $USER['uid'], enumParticipantStatus('lecturer')->id);
 	$did['proposeWorkshop']['done'] = $DB->fetch() > 0;
 	$did['proposeWorkshop']['enabled'] = $didApplyAsLecturer;
 	// Check if any workshop block has been accepted.
@@ -154,15 +153,15 @@ function actionHomepage()
 		SELECT count(*)
 		FROM table_workshops w, table_workshop_users wu
 		WHERE w.wid=wu.wid AND w.edition=$1 AND wu.uid=$2 AND wu.participant=$3 AND w.status>=$4',
-		$currentEdition, $USER['uid'], enumParticipantStatus('lecturer')->id, enumBlockStatus('ok')->id
+		$currentEdition, $USER['uid'], enumParticipantStatus('lecturer')->id, enumBlockStatus('accepted')->id
 	);
 	$didGetAccepted = $DB->fetch() > 0; */
 	$did['qualify']['done'] = $didQualify && $didApplyAsLecturer;
-	$did['qualify']['enabled'] = $did['proposeWorkshop']['done'];
+	$did['qualify']['enabled'] = $did['proposeWorkshop']['done'] && $didApplyAsLecturer;
 
 	// Things that aren't (TODO: could be) automatically checked.
 	$did['writeDescription']['done'] = null;
-	$did['writeDescription']['enabled'] = $did['proposeWorkshop']['done'];
+	$did['writeDescription']['enabled'] = $did['proposeWorkshop']['done'] && $didApplyAsLecturer;
 	$did['checkTasks']['done'] = null;
 	$did['checkTasks']['enabled'] = $did['qualify']['done'];
 
@@ -186,14 +185,14 @@ function buildTodoElement($element)
 	foreach ($element as $key => $val)
 		$$key = $val;
 
-	if (!empty($action))
+	if (!empty($action) && $action != 'editProfile')
 		$enabled = $enabled && userCan($action);
 
 	if (!is_null($done))
 		$class = $enabled ? ($done ? 'done' : 'todo') : 'disabled';
 	else
 		$class = $enabled ? 'enabled' : 'disabled';
-	if (!in_array('registered', $USER['roles']))
+	if (!userIs('registered'))
 		$class  = 'disabled';
 
 	if ($enabled && !empty($action))
@@ -233,8 +232,6 @@ function applyForCurrentWorkshopEdition($lecturer)
 		'qualified' => 0,
 		'lecturer'  => $lecturer ? 1 : 0
 	);
-	$DB->user_roles[] = array('uid' => $USER['uid'], 'role' => $lecturer ? 'kadra' : 'uczestnik');
-	$USER['roles'][] = $lecturer ? 'kadra' : 'uczestnik';
 	$PAGE->addMessage(_('Signed you up for this year\'s edition.'), 'success');
 	callAction('homepage');
 }
@@ -298,7 +295,8 @@ function getOption($name)
 {
 	global $DB;
 	$option = $DB->options[$name]->assoc('value, type');
-	if ($option['type'] == 'int')  return intval($option['value']);
+	if ($option['type'] == 'int')
+		return intval($option['value']);
 	return $option['value'];
 }
 
@@ -338,16 +336,16 @@ function actionEditOptionsForm()
 function actionDatabaseRaw()
 {
 	global $DB, $USER, $PAGE;
-	if (!in_array('admin', $USER['roles']))  throw new PolicyException();
+	if (!userIs('admin'))  throw new PolicyException();
 
 	if (isset($_POST['query']))
 	{
 		$result = $DB->query($_POST['query']);
 		$PAGE->addMessage('Rows affected: '. $result->affected_rows(), 'success');
-		$PAGE->content .= '<b>SELECT result:</b><table>';
+		echo '<b>SELECT result:</b><table>';
 		foreach ($result as $i=>$row)
-			$PAGE->content .= '<tr><td>'. $i .'</td><td>'. implode('</td><td>',$row) .'</td></tr>';
-		$PAGE->content .= '</table>';
+			echo '<tr><td>'. $i .'</td><td>'. implode('</td><td>',$row) .'</td></tr>';
+		echo '</table>';
 	}
 
 	global $PAGE;

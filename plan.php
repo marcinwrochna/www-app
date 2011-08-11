@@ -6,24 +6,24 @@ function actionShowCorrelation()
 	global $DB, $PAGE;
 	$DB->query('SELECT wid,title  FROM table_workshops
 	            WHERE edition=$1 AND type=$2 AND status=$3  ORDER BY title',
-		getOption('currentEdition'), enumBlockType('workshop')->id, enumBlockStatus('great')->id
+		getOption('currentEdition'), enumBlockType('workshop')->id, enumBlockStatus('accepted')->id
 	);
 	$workshops = $DB->fetch_all();
 
 	$PAGE->title = _('Correlation matrix');
-	$PAGE->content .=  _('For each pair of workshops the number of qualified users '.
+	echo  _('For each pair of workshops the number of qualified users '.
 		'accepted for both is shown (including lecturers and staff).<br/>'.
 		'You can single out a principal minor by clicking on rows.');
-	$PAGE->content .=  '<table style="text-align:center;"><tr class="odd"><td></td><td></td>';
+	echo  '<table style="text-align:center;"><tr class="odd"><td></td><td></td>';
 	$class = 'third';
 	foreach($workshops as $w1)
 	{
-		$PAGE->content .= '<td class="'. $class .'"><b><a'. getTipJS($w1['title']).'>'.
+		echo '<td class="'. $class .'"><b><a'. getTipJS($w1['title']).'>'.
 			$w1['wid'] .'</a></b></td>';
 		$class = ($class=='even')?'odd':(($class=='odd')?'third':'even');
 	}
 	$class = 'third';
-	$PAGE->content .= '</tr>';
+	echo '</tr>';
 	foreach($workshops as $w)
 	{
 		$DB->query('
@@ -35,24 +35,26 @@ function actionShowCorrelation()
 			FROM table_workshops w
 			WHERE edition=$1 AND w.type=$3 AND w.status=$4
 			ORDER BY w.title',
-			getOption('currentEdition'), $w['wid'], enumBlockType('workshop')->id, enumBlockStatus('great')->id, enumParticipantStatus('accepted')->id
+			getOption('currentEdition'), $w['wid'], enumBlockType('workshop')->id, enumBlockStatus('accepted')->id, enumParticipantStatus('accepted')->id
 		);
 
-		$PAGE->content .= '<tr class="'. $class .'" id="w'. $w['wid']. '">';
-		$PAGE->content .= '<td><b>'. $w['wid'] .'</b></td><td>'. $w['title'] .'</td>';
+		echo '<tr class="'. $class .'" id="w'. $w['wid']. '">';
+		echo '<td><b>'. $w['wid'] .'</b></td><td>'. $w['title'] .'</td>';
 		$tdclass = 'third';
 		while ($row = $DB->fetch_assoc()) {
-			$PAGE->content .= '<td class="'. $tdclass .'" id="w'.$row['wid'].'_w'.$w['wid'].'">';
-			if ($row['wid'] == $w['wid'])  $PAGE->content .= '<span class="diagonal">';
-			$PAGE->content .= intval($row['cnt']);
-			if ($row['wid'] == $w['wid'])  $PAGE->content .= '</span>';
-			$PAGE->content .=  '</td>';
+			echo '<td class="'. $tdclass .'" id="w'.$row['wid'].'_w'.$w['wid'].'">';
+			if ($row['wid'] == $w['wid'])
+				echo '<span class="diagonal">';
+			echo intval($row['cnt']);
+			if ($row['wid'] == $w['wid'])
+				echo '</span>';
+			echo  '</td>';
 			$tdclass = ($tdclass=='even')?'odd':(($tdclass=='odd')?'third':'even');
 		}
-		$PAGE->content .= '</tr>';
+		echo '</tr>';
 		$class = ($class=='even')?'odd':(($class=='odd')?'third':'even');
 	}
-	$PAGE->content .=  '</table>';
+	echo  '</table>';
 
 	$wids = array();
 	foreach ($workshops as $w)  $wids[]= $w['wid'];

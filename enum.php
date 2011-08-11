@@ -97,11 +97,9 @@ Enum::define('blockStatus',
 		new        => 0;   new;                to be considered;
 		undetailed => 1;   details requested;  details requested;
 		rejected   => 2;   poor;               initially considered;
-		ok         => 3;   ok;                 initially considered;
-		great      => 4;   great;              initially considered;
+		accepted   => 4;   accepted;           initially considered;
 	'),
 	array('decision'=>_('unknown'), 'status'=>_('unknown'))
-	//TODO merge blockStatus:{ok,great} into :accepted
 );
 
 Enum::define('blockType',

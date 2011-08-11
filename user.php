@@ -63,8 +63,7 @@ function getUser($uid)
 		throw new KnownException(sprintf(_('User #%d doesn\'t exist'), $uid));
 
 	$user = $DB->users[$uid]->assoc('uid,name,login,logged,gender,email');
-	$roles = $DB->query('SELECT role FROM table_user_roles WHERE uid=$1', $uid);
-	$user['roles'] = $roles->fetch_column();
+	$user['roles'] = getUserRoles($uid);
 	$user['roles'][] = 'registered';
 	$user['roles'][] = 'public';
 	return $user;
@@ -300,7 +299,7 @@ function actionEditAdditionalInfo($uid = null)
 		tshirtsize      => select;   preferred t-shirt size;                               ;     default=>L;
 		comments        => textarea; comments (e.g. vegetarian);                           ;
 	');
-	if (in_array('kadra', $USER['roles']))
+	if (userIs('lecturer'))
 		unset($inputs['parenttelephone']);
 
 	$starttime = strtotime('2011/08/08 00:00');

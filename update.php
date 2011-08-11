@@ -299,7 +299,7 @@ switch ($version)
 				WHERE w.wid=wu.wid AND w.edition=$1 AND wu.participant=$2
 				AND w.status>=$3 ORDER BY w.wid
 			)',
-			getOption('currentEdition'), enumParticipantStatus('lecturer')->id, enumBlockStatus('ok')->id);
+			getOption('currentEdition'), enumParticipantStatus('lecturer')->id, enumBlockStatus('accepted')->id);
 		setVersion(38);
 	case(38):
 		$DB->query('DELETE FROM table_user_roles WHERE role=\'akadra\'');
@@ -398,4 +398,10 @@ switch ($version)
 		$DB->query('UPDATE w1_options SET description=\'gmail account used to send e-mails\' WHERE name=\'gmailOAuthEmail\'');
 		setVersion(48);
 	case(48):
+		$DB->query('UPDATE w1_role_permissions SET role=\'lecturer\' WHERE role=\'kadra\'');
+		$DB->query('UPDATE w1_role_permissions SET role=\'qualified lecturer\' WHERE role=\'akadra\'');
+		$DB->query('UPDATE w1_role_permissions SET role=\'qualified\' WHERE role=\'jadący\'');
+		$DB->query('UPDATE w1_role_permissions SET role=\'candidate\' WHERE role=\'uczestnik\'');
+		setVersion(49);
+	case(49):
 }
