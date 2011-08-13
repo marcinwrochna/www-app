@@ -67,7 +67,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00005"></a>00005 <span class="comment"> *</span>
 <a name="l00006"></a>00006 <span class="comment"> */</span>
 <a name="l00007"></a>00007 
-<a name="l00008"></a><a class="code" href="classForm.html">00008</a> <span class="keyword">class </span><a class="code" href="classForm.html">Form</a>
+<a name="l00008"></a><a class="code" href="classForm.html">00008</a> <span class="keyword">class </span><a class="code" href="classForm.html">Form</a> <span class="keyword">implements</span> ArrayAccess
 <a name="l00009"></a>00009 {
 <a name="l00010"></a><a class="code" href="classForm.html#a167575bc5a8f98bad7a0f7687acc5a07">00010</a>         <span class="keyword">public</span> <a class="code" href="classForm.html#a167575bc5a8f98bad7a0f7687acc5a07">$action</a> = <span class="stringliteral">&#39;&#39;</span>;
 <a name="l00011"></a><a class="code" href="classForm.html#af14ac1bac85a65c0d0e118bdabeba31e">00011</a>         <span class="keyword">public</span> <a class="code" href="classForm.html#af14ac1bac85a65c0d0e118bdabeba31e">$rows</a> = array();
@@ -86,385 +86,392 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00024"></a>00024                         <span class="keywordflow">if</span> (is_int($id))
 <a name="l00025"></a>00025                                 $this-&gt;<a class="code" href="classForm.html#a7eb9f8601d59b270c029aa947db1d638">addRow</a>($row); <span class="comment">// DEPRECATED, use parseTable to define rows.</span>
 <a name="l00026"></a>00026                         <span class="keywordflow">else</span>
-<a name="l00027"></a>00027                                 $this-&gt;rows[$id]= $row;
+<a name="l00027"></a>00027                                 $this-&gt;rows[$id]= <span class="keyword">new</span> ArrayObject($row);
 <a name="l00028"></a>00028 
 <a name="l00029"></a>00029         }
 <a name="l00030"></a>00030 
-<a name="l00031"></a>00031         <span class="comment">// DEPRECATED, use parseTable to define rows.</span>
+<a name="l00031"></a>00031         <span class="comment">// DEPRECATED? prefer parseTable to define rows.</span>
 <a name="l00032"></a><a class="code" href="classForm.html#a7eb9f8601d59b270c029aa947db1d638">00032</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a7eb9f8601d59b270c029aa947db1d638">addRow</a>($row) <span class="comment">//or addRow($type, $name, $description, $readonly).</span>
 <a name="l00033"></a>00033         {
 <a name="l00034"></a>00034                 <span class="keywordflow">if</span> (!is_array($row))
 <a name="l00035"></a>00035                         $row = func_get_args();
 <a name="l00036"></a>00036                 $row = <a class="code" href="utils_8php.html#a5d84b42e619618444a11590f91486f64">arrayToAssoc</a>($row, array(<span class="stringliteral">&#39;type&#39;</span>,<span class="stringliteral">&#39;name&#39;</span>,<span class="stringliteral">&#39;description&#39;</span>,<span class="stringliteral">&#39;readonly&#39;</span>));
-<a name="l00037"></a>00037                 $this-&gt;rows[$row[<span class="stringliteral">&#39;name&#39;</span>]]= $row;
+<a name="l00037"></a>00037                 $this-&gt;rows[$row[<span class="stringliteral">&#39;name&#39;</span>]]= <span class="keyword">new</span> ArrayObject($row);
 <a name="l00038"></a>00038         }
 <a name="l00039"></a>00039 
-<a name="l00040"></a><a class="code" href="classForm.html#ae1bfa3eb01dfd8c23988ec74ac97d3b0">00040</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#ae1bfa3eb01dfd8c23988ec74ac97d3b0">getHTML</a>()
-<a name="l00041"></a>00041         {
-<a name="l00042"></a>00042                 $params = array(
-<a name="l00043"></a>00043                         <span class="stringliteral">&#39;action&#39;</span>      =&gt; $this-&gt;action,
-<a name="l00044"></a>00044                         <span class="stringliteral">&#39;class&#39;</span>       =&gt; $this-&gt;cssClass ? <span class="stringliteral">&#39;class=&quot;&#39;</span>. $this-&gt;cssClass .<span class="charliteral">&#39;&quot;&#39;</span> : <span class="stringliteral">&#39;&#39;</span>,
-<a name="l00045"></a>00045                         <span class="stringliteral">&#39;columnWidth&#39;</span> =&gt; $this-&gt;columnWidth,
-<a name="l00046"></a>00046                         <span class="stringliteral">&#39;custom&#39;</span>      =&gt; $this-&gt;custom,
-<a name="l00047"></a>00047                         <span class="stringliteral">&#39;submitValue&#39;</span> =&gt; $this-&gt;submitValue,
-<a name="l00048"></a>00048                         <span class="stringliteral">&#39;formid&#39;</span>      =&gt; $this-&gt;<a class="code" href="classForm.html#a10e7052f8571da993bbfc5023277ccb6">getFormId</a>(),
-<a name="l00049"></a>00049                         <span class="stringliteral">&#39;rows&#39;</span>        =&gt; <a class="code" href="form_8php.html#a38d3d05e993dce971ae9af083f4902a7">generateFormRows</a>($this-&gt;rows, $this-&gt;values),
-<a name="l00050"></a>00050                 );
-<a name="l00051"></a>00051                 $template = <span class="keyword">new</span> <a class="code" href="classSimpleTemplate.html">SimpleTemplate</a>($params);
-<a name="l00052"></a>00052                 ?&gt;
-<a name="l00053"></a>00053                         &lt;form method=<span class="stringliteral">&quot;post&quot;</span> action=<span class="stringliteral">&quot;%action%&quot;</span> name=<span class="stringliteral">&quot;form&quot;</span> %<span class="keyword">class</span>%&gt;
-<a name="l00054"></a>00054                                 &lt;input type=<span class="stringliteral">&quot;hidden&quot;</span> name=<span class="stringliteral">&quot;formid&quot;</span> value=<span class="stringliteral">&quot;%formid%&quot;</span> /&gt;
-<a name="l00055"></a>00055                                 &lt;?php <span class="keywordflow">if</span> (is_null($this-&gt;columnWidth)) : ?&gt;
-<a name="l00056"></a>00056                                         &lt;table&gt;
-<a name="l00057"></a>00057                                 &lt;?php <span class="keywordflow">else</span>: ?&gt;
-<a name="l00058"></a>00058                                         &lt;table style=<span class="stringliteral">&quot;table-layout:fixed&quot;</span>&gt;
-<a name="l00059"></a>00059                                                 &lt;tr <span class="keyword">class</span>=<span class="stringliteral">&quot;columnWidth&quot;</span>&gt;&lt;td width=<span class="stringliteral">&quot;%columnWidth%&quot;</span>&gt;&lt;/td&gt;&lt;/tr&gt;
-<a name="l00060"></a>00060                                 &lt;?php <a class="code" href="html_8php.html#a82cd33ca97ff99f2fcc5e9c81d65251b">endif</a>; ?&gt;
-<a name="l00061"></a>00061                                                 %rows%
-<a name="l00062"></a>00062                                         &lt;/table&gt;
-<a name="l00063"></a>00063                                 %custom%
-<a name="l00064"></a>00064                                 &lt;?php <span class="keywordflow">if</span> (!is_null($this-&gt;submitValue)) : ?&gt;
-<a name="l00065"></a>00065                                         &lt;input type=<span class="stringliteral">&quot;submit&quot;</span> value=<span class="stringliteral">&quot;%submitValue%&quot;</span> /&gt;
-<a name="l00066"></a>00066                                 &lt;?php <a class="code" href="html_8php.html#a82cd33ca97ff99f2fcc5e9c81d65251b">endif</a>; ?&gt;
-<a name="l00067"></a>00067                         &lt;/form&gt;
-<a name="l00068"></a>00068                 &lt;?php
-<a name="l00069"></a>00069                 <span class="keywordflow">return</span> $template-&gt;finish();
-<a name="l00070"></a>00070         }
-<a name="l00071"></a>00071 
-<a name="l00072"></a><a class="code" href="classForm.html#a893a8e41c98ad360281401ede8c48242">00072</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a893a8e41c98ad360281401ede8c48242">submitted</a>()
-<a name="l00073"></a>00073         {
-<a name="l00074"></a>00074                 <span class="comment">// TODO Could add CSRF protection: just set $_SESSION[&#39;requestId&#39;] and check it here.</span>
-<a name="l00075"></a>00075                 <span class="keywordflow">return</span> isset($_POST[<span class="stringliteral">&#39;formid&#39;</span>]) &amp;&amp; ($_POST[<span class="stringliteral">&#39;formid&#39;</span>] == $this-&gt;<a class="code" href="classForm.html#a10e7052f8571da993bbfc5023277ccb6">getFormId</a>());
-<a name="l00076"></a>00076         }
-<a name="l00077"></a>00077 
-<a name="l00078"></a><a class="code" href="classForm.html#ac530ae1428933b4dca9af774505cb27f">00078</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#ac530ae1428933b4dca9af774505cb27f">getColumns</a>()
-<a name="l00079"></a>00079         {
-<a name="l00080"></a>00080                 $columns = array();
-<a name="l00081"></a>00081                 <span class="keywordflow">foreach</span> ($this-&gt;rows as $row)
-<a name="l00082"></a>00082                         <span class="keywordflow">if</span> (!in_array($row[<span class="stringliteral">&#39;type&#39;</span>], array(<span class="stringliteral">&#39;checkboxgroup&#39;</span>, <span class="stringliteral">&#39;custom&#39;</span>)) &amp;&amp; empty($row[<span class="stringliteral">&#39;notdb&#39;</span>]))
-<a name="l00083"></a>00083                                 $columns[]= <span class="charliteral">&#39;&quot;&#39;</span>. $row[<span class="stringliteral">&#39;name&#39;</span>] .<span class="charliteral">&#39;&quot;&#39;</span>;
-<a name="l00084"></a>00084                 <span class="keywordflow">return</span> implode(<span class="charliteral">&#39;,&#39;</span>, $columns);
-<a name="l00085"></a>00085         }
-<a name="l00086"></a>00086 
-<a name="l00087"></a><a class="code" href="classForm.html#a558854c597d60900c6fbbed08e7ada50">00087</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a558854c597d60900c6fbbed08e7ada50">fetchValues</a>()
-<a name="l00088"></a>00088         {
-<a name="l00089"></a>00089 
-<a name="l00090"></a>00090                 <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a> = array();
-<a name="l00091"></a>00091                 <span class="keywordflow">foreach</span> ($this-&gt;rows as $row)
-<a name="l00092"></a>00092                 {
-<a name="l00093"></a>00093                         <span class="keywordflow">if</span> (!empty($row[<span class="stringliteral">&#39;readonly&#39;</span>])
-<a name="l00094"></a>00094                                         || !empty($row[<span class="stringliteral">&#39;hidden&#39;</span>])
-<a name="l00095"></a>00095                                         || ($row[<span class="stringliteral">&#39;type&#39;</span>] == <span class="stringliteral">&#39;checkboxgroup&#39;</span>)
-<a name="l00096"></a>00096                                         || ($row[<span class="stringliteral">&#39;type&#39;</span>] == <span class="stringliteral">&#39;custom&#39;</span>))
-<a name="l00097"></a>00097                                 <span class="keywordflow">continue</span>;
-<a name="l00098"></a>00098 
-<a name="l00099"></a>00099                         $value = isset($_POST[$row[<span class="stringliteral">&#39;name&#39;</span>]]) ? $_POST[$row[<span class="stringliteral">&#39;name&#39;</span>]] : null;
-<a name="l00100"></a>00100 
-<a name="l00101"></a>00101                         <span class="keywordflow">if</span> (isset($row[<span class="stringliteral">&#39;other&#39;</span>]) &amp;&amp; ($value == <a class="code" href="form_8php.html#a439bc28817dc0df1cca41357c1d60b49">VALUE_OTHER</a>))
-<a name="l00102"></a>00102                                 $value = isset($_POST[$row[<span class="stringliteral">&#39;name&#39;</span>] .<span class="stringliteral">&#39;_other&#39;</span>]) ? $_POST[$row[<span class="stringliteral">&#39;name&#39;</span>] .<span class="stringliteral">&#39;_other&#39;</span>] : null;
+<a name="l00040"></a><a class="code" href="classForm.html#aefbd7dc0c2223c1af5637ef3c974b24b">00040</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#aefbd7dc0c2223c1af5637ef3c974b24b">offsetGet</a>($offset)  { <span class="keywordflow">return</span> $this-&gt;rows[$offset]; }
+<a name="l00041"></a><a class="code" href="classForm.html#a21f629cbab598159a96646eab29fed4a">00041</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a21f629cbab598159a96646eab29fed4a">offsetSet</a>($offset, $value)  { $this-&gt;rows[$offset] = $value; }
+<a name="l00042"></a><a class="code" href="classForm.html#aa0f7ad4c038d94700713c7705292ea9b">00042</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#aa0f7ad4c038d94700713c7705292ea9b">offsetExists</a>($offset)  { <span class="keywordflow">return</span> isset($this-&gt;rows[$offset]); }
+<a name="l00043"></a><a class="code" href="classForm.html#a6df97f533d353a1ca62cde164e03e858">00043</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a6df97f533d353a1ca62cde164e03e858">offsetUnset</a>($offset)  { unset($this-&gt;rows[$offset]); }
+<a name="l00044"></a>00044 
+<a name="l00045"></a><a class="code" href="classForm.html#ae1bfa3eb01dfd8c23988ec74ac97d3b0">00045</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#ae1bfa3eb01dfd8c23988ec74ac97d3b0">getHTML</a>()
+<a name="l00046"></a>00046         {
+<a name="l00047"></a>00047                 $params = array(
+<a name="l00048"></a>00048                         <span class="stringliteral">&#39;action&#39;</span>      =&gt; $this-&gt;action,
+<a name="l00049"></a>00049                         <span class="stringliteral">&#39;class&#39;</span>       =&gt; $this-&gt;cssClass ? <span class="stringliteral">&#39;class=&quot;&#39;</span>. $this-&gt;cssClass .<span class="charliteral">&#39;&quot;&#39;</span> : <span class="stringliteral">&#39;&#39;</span>,
+<a name="l00050"></a>00050                         <span class="stringliteral">&#39;columnWidth&#39;</span> =&gt; $this-&gt;columnWidth,
+<a name="l00051"></a>00051                         <span class="stringliteral">&#39;custom&#39;</span>      =&gt; $this-&gt;custom,
+<a name="l00052"></a>00052                         <span class="stringliteral">&#39;submitValue&#39;</span> =&gt; $this-&gt;submitValue,
+<a name="l00053"></a>00053                         <span class="stringliteral">&#39;formid&#39;</span>      =&gt; $this-&gt;<a class="code" href="classForm.html#a10e7052f8571da993bbfc5023277ccb6">getFormId</a>(),
+<a name="l00054"></a>00054                         <span class="stringliteral">&#39;rows&#39;</span>        =&gt; <a class="code" href="form_8php.html#a38d3d05e993dce971ae9af083f4902a7">generateFormRows</a>($this-&gt;rows, $this-&gt;values),
+<a name="l00055"></a>00055                 );
+<a name="l00056"></a>00056                 $template = <span class="keyword">new</span> <a class="code" href="classSimpleTemplate.html">SimpleTemplate</a>($params);
+<a name="l00057"></a>00057                 ?&gt;
+<a name="l00058"></a>00058                         &lt;form method=<span class="stringliteral">&quot;post&quot;</span> action=<span class="stringliteral">&quot;%action%&quot;</span> name=<span class="stringliteral">&quot;form&quot;</span> %<span class="keyword">class</span>%&gt;
+<a name="l00059"></a>00059                                 &lt;input type=<span class="stringliteral">&quot;hidden&quot;</span> name=<span class="stringliteral">&quot;formid&quot;</span> value=<span class="stringliteral">&quot;%formid%&quot;</span> /&gt;
+<a name="l00060"></a>00060                                 &lt;?php <span class="keywordflow">if</span> (is_null($this-&gt;columnWidth)) : ?&gt;
+<a name="l00061"></a>00061                                         &lt;table&gt;
+<a name="l00062"></a>00062                                 &lt;?php <span class="keywordflow">else</span>: ?&gt;
+<a name="l00063"></a>00063                                         &lt;table style=<span class="stringliteral">&quot;table-layout:fixed&quot;</span>&gt;
+<a name="l00064"></a>00064                                                 &lt;tr <span class="keyword">class</span>=<span class="stringliteral">&quot;columnWidth&quot;</span>&gt;&lt;td width=<span class="stringliteral">&quot;%columnWidth%&quot;</span>&gt;&lt;/td&gt;&lt;/tr&gt;
+<a name="l00065"></a>00065                                 &lt;?php <a class="code" href="html_8php.html#a82cd33ca97ff99f2fcc5e9c81d65251b">endif</a>; ?&gt;
+<a name="l00066"></a>00066                                                 %rows%
+<a name="l00067"></a>00067                                         &lt;/table&gt;
+<a name="l00068"></a>00068                                 %custom%
+<a name="l00069"></a>00069                                 &lt;?php <span class="keywordflow">if</span> (!is_null($this-&gt;submitValue)) : ?&gt;
+<a name="l00070"></a>00070                                         &lt;input type=<span class="stringliteral">&quot;submit&quot;</span> value=<span class="stringliteral">&quot;%submitValue%&quot;</span> /&gt;
+<a name="l00071"></a>00071                                 &lt;?php <a class="code" href="html_8php.html#a82cd33ca97ff99f2fcc5e9c81d65251b">endif</a>; ?&gt;
+<a name="l00072"></a>00072                         &lt;/form&gt;
+<a name="l00073"></a>00073                 &lt;?php
+<a name="l00074"></a>00074                 <span class="keywordflow">return</span> $template-&gt;finish();
+<a name="l00075"></a>00075         }
+<a name="l00076"></a>00076 
+<a name="l00077"></a><a class="code" href="classForm.html#a893a8e41c98ad360281401ede8c48242">00077</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a893a8e41c98ad360281401ede8c48242">submitted</a>()
+<a name="l00078"></a>00078         {
+<a name="l00079"></a>00079                 <span class="comment">// TODO Could add CSRF protection: just set $_SESSION[&#39;requestId&#39;] and check it here.</span>
+<a name="l00080"></a>00080                 <span class="keywordflow">return</span> isset($_POST[<span class="stringliteral">&#39;formid&#39;</span>]) &amp;&amp; ($_POST[<span class="stringliteral">&#39;formid&#39;</span>] == $this-&gt;<a class="code" href="classForm.html#a10e7052f8571da993bbfc5023277ccb6">getFormId</a>());
+<a name="l00081"></a>00081         }
+<a name="l00082"></a>00082 
+<a name="l00083"></a><a class="code" href="classForm.html#ac530ae1428933b4dca9af774505cb27f">00083</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#ac530ae1428933b4dca9af774505cb27f">getColumns</a>()
+<a name="l00084"></a>00084         {
+<a name="l00085"></a>00085                 $columns = array();
+<a name="l00086"></a>00086                 <span class="keywordflow">foreach</span> ($this-&gt;rows as $row)
+<a name="l00087"></a>00087                         <span class="keywordflow">if</span> (!in_array($row[<span class="stringliteral">&#39;type&#39;</span>], array(<span class="stringliteral">&#39;checkboxgroup&#39;</span>, <span class="stringliteral">&#39;custom&#39;</span>)) &amp;&amp; empty($row[<span class="stringliteral">&#39;notdb&#39;</span>]))
+<a name="l00088"></a>00088                                 $columns[]= <span class="charliteral">&#39;&quot;&#39;</span>. $row[<span class="stringliteral">&#39;name&#39;</span>] .<span class="charliteral">&#39;&quot;&#39;</span>;
+<a name="l00089"></a>00089                 <span class="keywordflow">return</span> implode(<span class="charliteral">&#39;,&#39;</span>, $columns);
+<a name="l00090"></a>00090         }
+<a name="l00091"></a>00091 
+<a name="l00092"></a><a class="code" href="classForm.html#a558854c597d60900c6fbbed08e7ada50">00092</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a558854c597d60900c6fbbed08e7ada50">fetchValues</a>()
+<a name="l00093"></a>00093         {
+<a name="l00094"></a>00094 
+<a name="l00095"></a>00095                 <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a> = array();
+<a name="l00096"></a>00096                 <span class="keywordflow">foreach</span> ($this-&gt;rows as $row)
+<a name="l00097"></a>00097                 {
+<a name="l00098"></a>00098                         <span class="keywordflow">if</span> (!empty($row[<span class="stringliteral">&#39;readonly&#39;</span>])
+<a name="l00099"></a>00099                                         || !empty($row[<span class="stringliteral">&#39;hidden&#39;</span>])
+<a name="l00100"></a>00100                                         || ($row[<span class="stringliteral">&#39;type&#39;</span>] == <span class="stringliteral">&#39;checkboxgroup&#39;</span>)
+<a name="l00101"></a>00101                                         || ($row[<span class="stringliteral">&#39;type&#39;</span>] == <span class="stringliteral">&#39;custom&#39;</span>))
+<a name="l00102"></a>00102                                 <span class="keywordflow">continue</span>;
 <a name="l00103"></a>00103 
-<a name="l00104"></a>00104                         <span class="keywordflow">switch</span>($row[<span class="stringliteral">&#39;type&#39;</span>])
-<a name="l00105"></a>00105                         {
-<a name="l00106"></a>00106                                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;int&#39;</span>:
-<a name="l00107"></a>00107                                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;timestamp&#39;</span>:
-<a name="l00108"></a>00108                                         $value = intval($value);
-<a name="l00109"></a>00109                                         <span class="keywordflow">break</span>;
-<a name="l00110"></a>00110                                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;checkbox&#39;</span>:
-<a name="l00111"></a>00111                                         $value = empty($value) ? 0 : 1; <span class="comment">// SQL would have problems with true/false.</span>
-<a name="l00112"></a>00112                                         <span class="keywordflow">break</span>;
-<a name="l00113"></a>00113                         }
-<a name="l00114"></a>00114 
-<a name="l00115"></a>00115                         <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>[$row[<span class="stringliteral">&#39;name&#39;</span>]] = $value;
-<a name="l00116"></a>00116                 }
-<a name="l00117"></a>00117                 <span class="keywordflow">return</span> <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>;
-<a name="l00118"></a>00118         }
-<a name="l00119"></a>00119 
-<a name="l00120"></a><a class="code" href="classForm.html#a10e7052f8571da993bbfc5023277ccb6">00120</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a10e7052f8571da993bbfc5023277ccb6">getFormId</a>()
-<a name="l00121"></a>00121         {
-<a name="l00122"></a>00122                 <span class="keywordflow">return</span> sha1($this-&gt;action . $this-&gt;<a class="code" href="classForm.html#ac530ae1428933b4dca9af774505cb27f">getColumns</a>());
-<a name="l00123"></a>00123         }
-<a name="l00124"></a>00124 
-<a name="l00125"></a><a class="code" href="classForm.html#a795e27f62fd884a4019e94d0e7e1235e">00125</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a795e27f62fd884a4019e94d0e7e1235e">fetchAndValidateValues</a>()
-<a name="l00126"></a>00126         {
-<a name="l00127"></a>00127                 global <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
-<a name="l00128"></a>00128                 <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a> = $this-&gt;<a class="code" href="classForm.html#a558854c597d60900c6fbbed08e7ada50">fetchValues</a>();
-<a name="l00129"></a>00129                 $this-&gt;valid = <span class="keyword">true</span>;
-<a name="l00130"></a>00130                 <span class="keywordflow">foreach</span> ($this-&gt;rows as &amp;$row)
-<a name="l00131"></a>00131                         <span class="keywordflow">if</span> (!empty($row[<span class="stringliteral">&#39;validation&#39;</span>]) &amp;&amp; empty($row[<span class="stringliteral">&#39;readonly&#39;</span>]))
-<a name="l00132"></a>00132                 {
-<a name="l00133"></a>00133                         $row[<span class="stringliteral">&#39;errors&#39;</span>] = array();
-<a name="l00134"></a>00134                         $validators = explode(<span class="charliteral">&#39;,&#39;</span>, $row[<span class="stringliteral">&#39;validation&#39;</span>]);
-<a name="l00135"></a>00135                         <span class="keywordflow">foreach</span> ($validators as $v)
-<a name="l00136"></a>00136                         {
-<a name="l00137"></a>00137                                 $validator = substr($v, 0, strpos($v.<span class="charliteral">&#39;(&#39;</span>, <span class="charliteral">&#39;(&#39;</span>));
-<a name="l00138"></a>00138                                 $params = substr($v, strpos($v, <span class="charliteral">&#39;(&#39;</span>) + 1, -1);
-<a name="l00139"></a>00139                                 $params = explode(<span class="charliteral">&#39; &#39;</span>, $params);
-<a name="l00140"></a>00140                                 $r = $this-&gt;<a class="code" href="classForm.html#a8cc847b2ed56ea33cf21edca54577b81">validate</a>(<a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>[$row[<span class="stringliteral">&#39;name&#39;</span>]], $validator, $params, <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>);
-<a name="l00141"></a>00141                                 <span class="keywordflow">if</span> ($r !== <span class="keyword">true</span>)
-<a name="l00142"></a>00142                                 {
-<a name="l00143"></a>00143                                         $row[<span class="stringliteral">&#39;errors&#39;</span>][] = $r;
-<a name="l00144"></a>00144                                         $this-&gt;valid = <span class="keyword">false</span>;
-<a name="l00145"></a>00145                                 }
-<a name="l00146"></a>00146                         }
-<a name="l00147"></a>00147                 }
-<a name="l00148"></a>00148                 <span class="keywordflow">return</span> <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>;
-<a name="l00149"></a>00149         }
-<a name="l00150"></a>00150 
-<a name="l00151"></a><a class="code" href="classForm.html#a020aebaa477de8844672b153ac9032b2">00151</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a020aebaa477de8844672b153ac9032b2">assert</a>($assertion, $errorDescription)
-<a name="l00152"></a>00152         {
-<a name="l00153"></a>00153                 <span class="keywordflow">if</span> (!$assertion)
-<a name="l00154"></a>00154                 {
-<a name="l00155"></a>00155                         global <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
-<a name="l00156"></a>00156                         $PAGE-&gt;addMessage($errorDescription, <span class="stringliteral">&#39;userError&#39;</span>);
-<a name="l00157"></a>00157                         $this-&gt;valid = <span class="keyword">false</span>;
-<a name="l00158"></a>00158                 }
-<a name="l00159"></a>00159                 <span class="keywordflow">return</span> $assertion;
-<a name="l00160"></a>00160         }
-<a name="l00161"></a>00161 
-<a name="l00162"></a><a class="code" href="classForm.html#a8cc847b2ed56ea33cf21edca54577b81">00162</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a8cc847b2ed56ea33cf21edca54577b81">validate</a>(&amp;$value, $validator, $params, <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>)
-<a name="l00163"></a>00163         {
-<a name="l00164"></a>00164                 global <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
-<a name="l00165"></a>00165                 <span class="keywordflow">switch</span> ($validator)
-<a name="l00166"></a>00166                 {
-<a name="l00167"></a>00167                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;charset&#39;</span>:
-<a name="l00168"></a>00168                                 $value = (string) $value;
-<a name="l00169"></a>00169                                 <span class="keywordflow">for</span> ($i = 0; $i &lt; mb_strlen($value, <span class="stringliteral">&#39;UTF-8&#39;</span>); $i++)
-<a name="l00170"></a>00170                                 {
-<a name="l00171"></a>00171                                         $char = mb_substr($value, $i, 1, <span class="stringliteral">&#39;UTF-8&#39;</span>);
-<a name="l00172"></a>00172                                         $good = <span class="keyword">false</span>;
-<a name="l00173"></a>00173                                         <span class="keywordflow">foreach</span> ($params as $p)
-<a name="l00174"></a>00174                                                 $good = $good || $this-&gt;<a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">validateCharset</a>($char, $p);
-<a name="l00175"></a>00175                                         <span class="keywordflow">if</span> (!$good)
-<a name="l00176"></a>00176                                                 <span class="keywordflow">return</span> sprintf(_(<span class="stringliteral">&#39;Invalid character: &quot;%s&quot;, position %d.&#39;</span>),
-<a name="l00177"></a>00177                                                         $i + 1,
-<a name="l00178"></a>00178                                                         htmlspecialchars($char)
-<a name="l00179"></a>00179                                                 );
-<a name="l00180"></a>00180                                 }
-<a name="l00181"></a>00181                                 <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00182"></a>00182                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;length&#39;</span>:
-<a name="l00183"></a>00183                                 $value = trim($value);
-<a name="l00184"></a>00184                                 <span class="keywordflow">if</span> (count($params) == 1)
-<a name="l00185"></a>00185                                 {
-<a name="l00186"></a>00186                                         <span class="keywordflow">if</span> (strlen($value) != $params[0])
-<a name="l00187"></a>00187                                                 <span class="keywordflow">return</span> sprintf(_(<span class="stringliteral">&#39;The value should have exactly %d characters.&#39;</span>), $params[0]);
-<a name="l00188"></a>00188                                 }
-<a name="l00189"></a>00189                                 <span class="keywordflow">else</span>
-<a name="l00190"></a>00190                                 {
-<a name="l00191"></a>00191                                         <span class="keywordflow">if</span> (strlen($value) &lt; $params[0])
-<a name="l00192"></a>00192                                                 <span class="keywordflow">return</span> _(<span class="stringliteral">&#39;The value is too short&#39;</span>). <span class="stringliteral">&#39;(&lt; &#39;</span>. $params[0] ._(<span class="stringliteral">&#39;characters&#39;</span>).<span class="stringliteral">&#39;).&#39;</span>;
-<a name="l00193"></a>00193                                         <span class="keywordflow">if</span> (strlen($value) &gt; $params[1])
-<a name="l00194"></a>00194                                                 <span class="keywordflow">return</span> _(<span class="stringliteral">&#39;The value is too long&#39;</span>).  <span class="stringliteral">&#39;(&gt; &#39;</span>. $params[0] ._(<span class="stringliteral">&#39;characters&#39;</span>) .<span class="stringliteral">&#39;).&#39;</span>;
+<a name="l00104"></a>00104                         $value = isset($_POST[$row[<span class="stringliteral">&#39;name&#39;</span>]]) ? $_POST[$row[<span class="stringliteral">&#39;name&#39;</span>]] : null;
+<a name="l00105"></a>00105 
+<a name="l00106"></a>00106                         <span class="keywordflow">if</span> (isset($row[<span class="stringliteral">&#39;other&#39;</span>]) &amp;&amp; ($value == <a class="code" href="form_8php.html#a439bc28817dc0df1cca41357c1d60b49">VALUE_OTHER</a>))
+<a name="l00107"></a>00107                                 $value = isset($_POST[$row[<span class="stringliteral">&#39;name&#39;</span>] .<span class="stringliteral">&#39;_other&#39;</span>]) ? $_POST[$row[<span class="stringliteral">&#39;name&#39;</span>] .<span class="stringliteral">&#39;_other&#39;</span>] : null;
+<a name="l00108"></a>00108 
+<a name="l00109"></a>00109                         <span class="keywordflow">switch</span>($row[<span class="stringliteral">&#39;type&#39;</span>])
+<a name="l00110"></a>00110                         {
+<a name="l00111"></a>00111                                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;int&#39;</span>:
+<a name="l00112"></a>00112                                         $value = intval($value);
+<a name="l00113"></a>00113                                         <span class="keywordflow">break</span>;
+<a name="l00114"></a>00114                                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;timestamp&#39;</span>:
+<a name="l00115"></a>00115                                         $value = strtotime($value);
+<a name="l00116"></a>00116                                         <span class="keywordflow">break</span>;
+<a name="l00117"></a>00117                                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;checkbox&#39;</span>:
+<a name="l00118"></a>00118                                         $value = empty($value) ? 0 : 1; <span class="comment">// SQL would have problems with true/false.</span>
+<a name="l00119"></a>00119                                         <span class="keywordflow">break</span>;
+<a name="l00120"></a>00120                         }
+<a name="l00121"></a>00121 
+<a name="l00122"></a>00122                         <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>[$row[<span class="stringliteral">&#39;name&#39;</span>]] = $value;
+<a name="l00123"></a>00123                 }
+<a name="l00124"></a>00124                 <span class="keywordflow">return</span> <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>;
+<a name="l00125"></a>00125         }
+<a name="l00126"></a>00126 
+<a name="l00127"></a><a class="code" href="classForm.html#a10e7052f8571da993bbfc5023277ccb6">00127</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a10e7052f8571da993bbfc5023277ccb6">getFormId</a>()
+<a name="l00128"></a>00128         {
+<a name="l00129"></a>00129                 <span class="keywordflow">return</span> sha1($this-&gt;action . $this-&gt;<a class="code" href="classForm.html#ac530ae1428933b4dca9af774505cb27f">getColumns</a>());
+<a name="l00130"></a>00130         }
+<a name="l00131"></a>00131 
+<a name="l00132"></a><a class="code" href="classForm.html#a795e27f62fd884a4019e94d0e7e1235e">00132</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a795e27f62fd884a4019e94d0e7e1235e">fetchAndValidateValues</a>()
+<a name="l00133"></a>00133         {
+<a name="l00134"></a>00134                 global <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
+<a name="l00135"></a>00135                 <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a> = $this-&gt;<a class="code" href="classForm.html#a558854c597d60900c6fbbed08e7ada50">fetchValues</a>();
+<a name="l00136"></a>00136                 $this-&gt;valid = <span class="keyword">true</span>;
+<a name="l00137"></a>00137                 <span class="keywordflow">foreach</span> ($this-&gt;rows as &amp;$row)
+<a name="l00138"></a>00138                         <span class="keywordflow">if</span> (!empty($row[<span class="stringliteral">&#39;validation&#39;</span>]) &amp;&amp; empty($row[<span class="stringliteral">&#39;readonly&#39;</span>]))
+<a name="l00139"></a>00139                 {
+<a name="l00140"></a>00140                         $row[<span class="stringliteral">&#39;errors&#39;</span>] = array();
+<a name="l00141"></a>00141                         $validators = explode(<span class="charliteral">&#39;,&#39;</span>, $row[<span class="stringliteral">&#39;validation&#39;</span>]);
+<a name="l00142"></a>00142                         <span class="keywordflow">foreach</span> ($validators as $v)
+<a name="l00143"></a>00143                         {
+<a name="l00144"></a>00144                                 $validator = substr($v, 0, strpos($v.<span class="charliteral">&#39;(&#39;</span>, <span class="charliteral">&#39;(&#39;</span>));
+<a name="l00145"></a>00145                                 $params = substr($v, strpos($v, <span class="charliteral">&#39;(&#39;</span>) + 1, -1);
+<a name="l00146"></a>00146                                 $params = explode(<span class="charliteral">&#39; &#39;</span>, $params);
+<a name="l00147"></a>00147                                 $r = $this-&gt;<a class="code" href="classForm.html#a8cc847b2ed56ea33cf21edca54577b81">validate</a>(<a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>[$row[<span class="stringliteral">&#39;name&#39;</span>]], $validator, $params, <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>);
+<a name="l00148"></a>00148                                 <span class="keywordflow">if</span> ($r !== <span class="keyword">true</span>)
+<a name="l00149"></a>00149                                 {
+<a name="l00150"></a>00150                                         $row[<span class="stringliteral">&#39;errors&#39;</span>][] = $r;
+<a name="l00151"></a>00151                                         $this-&gt;valid = <span class="keyword">false</span>;
+<a name="l00152"></a>00152                                 }
+<a name="l00153"></a>00153                         }
+<a name="l00154"></a>00154                 }
+<a name="l00155"></a>00155                 <span class="keywordflow">return</span> <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>;
+<a name="l00156"></a>00156         }
+<a name="l00157"></a>00157 
+<a name="l00158"></a><a class="code" href="classForm.html#a020aebaa477de8844672b153ac9032b2">00158</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a020aebaa477de8844672b153ac9032b2">assert</a>($assertion, $errorDescription)
+<a name="l00159"></a>00159         {
+<a name="l00160"></a>00160                 <span class="keywordflow">if</span> (!$assertion)
+<a name="l00161"></a>00161                 {
+<a name="l00162"></a>00162                         global <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
+<a name="l00163"></a>00163                         $PAGE-&gt;addMessage($errorDescription, <span class="stringliteral">&#39;userError&#39;</span>);
+<a name="l00164"></a>00164                         $this-&gt;valid = <span class="keyword">false</span>;
+<a name="l00165"></a>00165                 }
+<a name="l00166"></a>00166                 <span class="keywordflow">return</span> $assertion;
+<a name="l00167"></a>00167         }
+<a name="l00168"></a>00168 
+<a name="l00169"></a><a class="code" href="classForm.html#a8cc847b2ed56ea33cf21edca54577b81">00169</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a8cc847b2ed56ea33cf21edca54577b81">validate</a>(&amp;$value, $validator, $params, <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>)
+<a name="l00170"></a>00170         {
+<a name="l00171"></a>00171                 global <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
+<a name="l00172"></a>00172                 <span class="keywordflow">switch</span> ($validator)
+<a name="l00173"></a>00173                 {
+<a name="l00174"></a>00174                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;charset&#39;</span>:
+<a name="l00175"></a>00175                                 $value = (string) $value;
+<a name="l00176"></a>00176                                 <span class="keywordflow">for</span> ($i = 0; $i &lt; mb_strlen($value, <span class="stringliteral">&#39;UTF-8&#39;</span>); $i++)
+<a name="l00177"></a>00177                                 {
+<a name="l00178"></a>00178                                         $char = mb_substr($value, $i, 1, <span class="stringliteral">&#39;UTF-8&#39;</span>);
+<a name="l00179"></a>00179                                         $good = <span class="keyword">false</span>;
+<a name="l00180"></a>00180                                         <span class="keywordflow">foreach</span> ($params as $p)
+<a name="l00181"></a>00181                                                 $good = $good || $this-&gt;<a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">validateCharset</a>($char, $p);
+<a name="l00182"></a>00182                                         <span class="keywordflow">if</span> (!$good)
+<a name="l00183"></a>00183                                                 <span class="keywordflow">return</span> sprintf(_(<span class="stringliteral">&#39;Invalid character: &quot;%s&quot;, position %d.&#39;</span>),
+<a name="l00184"></a>00184                                                         $i + 1,
+<a name="l00185"></a>00185                                                         htmlspecialchars($char)
+<a name="l00186"></a>00186                                                 );
+<a name="l00187"></a>00187                                 }
+<a name="l00188"></a>00188                                 <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00189"></a>00189                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;length&#39;</span>:
+<a name="l00190"></a>00190                                 $value = trim($value);
+<a name="l00191"></a>00191                                 <span class="keywordflow">if</span> (count($params) == 1)
+<a name="l00192"></a>00192                                 {
+<a name="l00193"></a>00193                                         <span class="keywordflow">if</span> (strlen($value) != $params[0])
+<a name="l00194"></a>00194                                                 <span class="keywordflow">return</span> sprintf(_(<span class="stringliteral">&#39;The value should have exactly %d characters.&#39;</span>), $params[0]);
 <a name="l00195"></a>00195                                 }
-<a name="l00196"></a>00196                                 <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00197"></a>00197                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;email&#39;</span>:
-<a name="l00198"></a>00198                                 <span class="keywordflow">if</span> (!<a class="code" href="email_8php.html#a73637e760498c5cea55074896ec982ac">validEmail</a>($value))
-<a name="l00199"></a>00199                                         <span class="keywordflow">return</span> _(<span class="stringliteral">&#39;Invalid e-mail address.&#39;</span>);
-<a name="l00200"></a>00200                                 <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00201"></a>00201                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;equal&#39;</span>:
-<a name="l00202"></a>00202                                 <span class="keywordflow">if</span> ($value != <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>[$params[0]])
-<a name="l00203"></a>00203                                         <span class="keywordflow">return</span> _(<span class="stringliteral">&#39;The value doesn\&#39;t match it\&#39;s repetition.&#39;</span>);
-<a name="l00204"></a>00204                                 unset(<a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>[$params[0]]);
-<a name="l00205"></a>00205                                 <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00206"></a>00206                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;int&#39;</span>:
-<a name="l00207"></a>00207                                 <span class="keywordflow">if</span> (intval($value) != $value)
-<a name="l00208"></a>00208                                         <span class="keywordflow">return</span> _(<span class="stringliteral">&#39;The value is not an integer.&#39;</span>);
-<a name="l00209"></a>00209                                 $value = intval($value);
-<a name="l00210"></a>00210                                 <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00211"></a>00211                         <span class="keywordflow">default</span>:
-<a name="l00212"></a>00212                                 <span class="keywordflow">return</span> <span class="stringliteral">&#39;Unknown validator: &#39;</span>. $validator .<span class="charliteral">&#39;.&#39;</span>;
-<a name="l00213"></a>00213                 }
-<a name="l00214"></a>00214         }
-<a name="l00215"></a>00215 
-<a name="l00216"></a><a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">00216</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">validateCharset</a>($char, $charset)
-<a name="l00217"></a>00217         {
-<a name="l00218"></a>00218                 <span class="keywordflow">switch</span> ($charset)
-<a name="l00219"></a>00219                 {
-<a name="l00220"></a>00220                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;alpha&#39;</span>:
-<a name="l00221"></a>00221                                 <span class="keywordflow">return</span> (<span class="keywordtype">bool</span>) preg_match(<span class="stringliteral">&#39;/(*UTF8)\pL/u&#39;</span>, $char);
-<a name="l00222"></a>00222                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;alnum&#39;</span>:
-<a name="l00223"></a>00223                                 <span class="keywordflow">return</span> $this-&gt;<a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">validateCharset</a>($char, <span class="stringliteral">&#39;alpha&#39;</span>) || $this-&gt;<a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">validateCharset</a>($char, <span class="stringliteral">&#39;digit&#39;</span>);
-<a name="l00224"></a>00224                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;name&#39;</span>:
-<a name="l00225"></a>00225                                 <span class="keywordflow">return</span> $this-&gt;<a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">validateCharset</a>($char, <span class="stringliteral">&#39;alpha&#39;</span>) || $this-&gt;<a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">validateCharset</a>($char, <span class="stringliteral">&#39; \&#39;-.’&#39;</span>);
-<a name="l00226"></a>00226                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;white&#39;</span>:
-<a name="l00227"></a>00227                                 <span class="keywordflow">return</span> ctype_space($char);
-<a name="l00228"></a>00228                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;&#39;</span>:
-<a name="l00229"></a>00229                                 <span class="keywordflow">return</span> $char === <span class="charliteral">&#39; &#39;</span>;
-<a name="l00230"></a>00230                         <span class="keywordflow">default</span>:
-<a name="l00231"></a>00231                                 <span class="keywordflow">if</span> (is_callable(<span class="stringliteral">&quot;ctype_$charset&quot;</span>))
-<a name="l00232"></a>00232                                 <span class="keywordflow">return</span> call_user_func_array(<span class="stringliteral">&quot;ctype_$charset&quot;</span>, array($char));
-<a name="l00233"></a>00233                                 <span class="keywordflow">return</span> strpos($charset, $char) !== <span class="keyword">false</span>;
-<a name="l00234"></a>00234                 }
-<a name="l00235"></a>00235         }
-<a name="l00236"></a>00236 }
-<a name="l00237"></a>00237 
-<a name="l00238"></a><a class="code" href="form_8php.html#a38d3d05e993dce971ae9af083f4902a7">00238</a> function <a class="code" href="form_8php.html#a38d3d05e993dce971ae9af083f4902a7">generateFormRows</a>($inputs, $previous=array())
-<a name="l00239"></a>00239 {
-<a name="l00240"></a>00240         $result = <span class="stringliteral">&#39;&#39;</span>;
-<a name="l00241"></a>00241         <span class="keywordflow">foreach</span> ($inputs as $row)
-<a name="l00242"></a>00242         {
-<a name="l00243"></a>00243                 <span class="keywordflow">if</span> (isset($row[<span class="stringliteral">&#39;name&#39;</span>]))  $arguments = $row;
-<a name="l00244"></a>00244                 <span class="keywordflow">else</span>  $arguments = array(<span class="stringliteral">&#39;type&#39;</span>=&gt;$row[0], <span class="stringliteral">&#39;name&#39;</span>=&gt;$row[1], <span class="stringliteral">&#39;description&#39;</span>=&gt;$row[2]);
-<a name="l00245"></a>00245                 <span class="keywordflow">if</span> (isset($arguments[<span class="stringliteral">&#39;readonly&#39;</span>]) &amp;&amp; $arguments[<span class="stringliteral">&#39;readonly&#39;</span>] &amp;&amp; isset($arguments[<span class="stringliteral">&#39;default&#39;</span>]))
-<a name="l00246"></a>00246                         ; <span class="comment">// old forms sometimes may have fields set in &#39;default&#39; instead of $previous DEPRECATED.</span>
-<a name="l00247"></a>00247                 <span class="keywordflow">else</span> <span class="keywordflow">if</span> (isset($previous[$arguments[<span class="stringliteral">&#39;name&#39;</span>]]) &amp;&amp; !is_null($previous[$arguments[<span class="stringliteral">&#39;name&#39;</span>]]))
-<a name="l00248"></a>00248                         $arguments[<span class="stringliteral">&#39;default&#39;</span>] = $previous[$arguments[<span class="stringliteral">&#39;name&#39;</span>]];
-<a name="l00249"></a>00249                 $result .= <a class="code" href="form_8php.html#a4569360da5e9495ff2456dbab40966c2">buildFormRow</a>($arguments);
-<a name="l00250"></a>00250         }
-<a name="l00251"></a>00251         <span class="keywordflow">return</span> $result;
-<a name="l00252"></a>00252 }
-<a name="l00253"></a>00253 
-<a name="l00254"></a><a class="code" href="form_8php.html#a439bc28817dc0df1cca41357c1d60b49">00254</a> define(<span class="stringliteral">&#39;VALUE_OTHER&#39;</span>, -66642);
-<a name="l00255"></a><a class="code" href="form_8php.html#a4569360da5e9495ff2456dbab40966c2">00255</a> function <a class="code" href="form_8php.html#a4569360da5e9495ff2456dbab40966c2">buildFormRow</a>($type, $name=NULL, $description=NULL, $default=NULL, $options=array(), $ignorePOST=<span class="keyword">false</span>)
-<a name="l00256"></a>00256 {
-<a name="l00257"></a>00257         global <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
-<a name="l00258"></a>00258         <span class="comment">// Handle named arguments.</span>
-<a name="l00259"></a>00259         <span class="keywordflow">if</span> (is_array($type))
-<a name="l00260"></a>00260                 <span class="keywordflow">foreach</span> ($type as $key =&gt; $val)
-<a name="l00261"></a>00261                         $$key = $val;
-<a name="l00262"></a>00262 
-<a name="l00263"></a>00263         <span class="keywordflow">if</span> (!isset($properties))  $properties = <span class="stringliteral">&#39;&#39;</span>;
-<a name="l00264"></a>00264         <span class="keywordflow">if</span> (!isset($readonly))    $readonly = <span class="keyword">false</span>;
-<a name="l00265"></a>00265         <span class="keywordflow">if</span> (!isset($text))        $text = <span class="stringliteral">&#39;&#39;</span>;
-<a name="l00266"></a>00266         <span class="keywordflow">if</span> (!isset($hidden))      $hidden = <span class="keyword">false</span>;
-<a name="l00267"></a>00267 
-<a name="l00268"></a>00268         <span class="keywordflow">if</span> ($hidden)  <span class="keywordflow">return</span> <span class="stringliteral">&#39;&#39;</span>;
+<a name="l00196"></a>00196                                 <span class="keywordflow">else</span>
+<a name="l00197"></a>00197                                 {
+<a name="l00198"></a>00198                                         <span class="keywordflow">if</span> (strlen($value) &lt; $params[0])
+<a name="l00199"></a>00199                                                 <span class="keywordflow">return</span> _(<span class="stringliteral">&#39;The value is too short&#39;</span>). <span class="stringliteral">&#39;(&lt; &#39;</span>. $params[0] ._(<span class="stringliteral">&#39;characters&#39;</span>).<span class="stringliteral">&#39;).&#39;</span>;
+<a name="l00200"></a>00200                                         <span class="keywordflow">if</span> (strlen($value) &gt; $params[1])
+<a name="l00201"></a>00201                                                 <span class="keywordflow">return</span> _(<span class="stringliteral">&#39;The value is too long&#39;</span>).  <span class="stringliteral">&#39;(&gt; &#39;</span>. $params[0] ._(<span class="stringliteral">&#39;characters&#39;</span>) .<span class="stringliteral">&#39;).&#39;</span>;
+<a name="l00202"></a>00202                                 }
+<a name="l00203"></a>00203                                 <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00204"></a>00204                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;email&#39;</span>:
+<a name="l00205"></a>00205                                 <span class="keywordflow">if</span> (!<a class="code" href="email_8php.html#a73637e760498c5cea55074896ec982ac">validEmail</a>($value))
+<a name="l00206"></a>00206                                         <span class="keywordflow">return</span> _(<span class="stringliteral">&#39;Invalid e-mail address.&#39;</span>);
+<a name="l00207"></a>00207                                 <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00208"></a>00208                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;equal&#39;</span>:
+<a name="l00209"></a>00209                                 <span class="keywordflow">if</span> ($value != <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>[$params[0]])
+<a name="l00210"></a>00210                                         <span class="keywordflow">return</span> _(<span class="stringliteral">&#39;The value doesn\&#39;t match it\&#39;s repetition.&#39;</span>);
+<a name="l00211"></a>00211                                 unset(<a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a>[$params[0]]);
+<a name="l00212"></a>00212                                 <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00213"></a>00213                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;int&#39;</span>:
+<a name="l00214"></a>00214                                 <span class="keywordflow">if</span> (intval($value) != $value)
+<a name="l00215"></a>00215                                         <span class="keywordflow">return</span> _(<span class="stringliteral">&#39;The value is not an integer.&#39;</span>);
+<a name="l00216"></a>00216                                 $value = intval($value);
+<a name="l00217"></a>00217                                 <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00218"></a>00218                         <span class="keywordflow">default</span>:
+<a name="l00219"></a>00219                                 <span class="keywordflow">return</span> <span class="stringliteral">&#39;Unknown validator: &#39;</span>. $validator .<span class="charliteral">&#39;.&#39;</span>;
+<a name="l00220"></a>00220                 }
+<a name="l00221"></a>00221         }
+<a name="l00222"></a>00222 
+<a name="l00223"></a><a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">00223</a>         <span class="keyword">public</span> function <a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">validateCharset</a>($char, $charset)
+<a name="l00224"></a>00224         {
+<a name="l00225"></a>00225                 <span class="keywordflow">switch</span> ($charset)
+<a name="l00226"></a>00226                 {
+<a name="l00227"></a>00227                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;alpha&#39;</span>:
+<a name="l00228"></a>00228                                 <span class="keywordflow">return</span> (<span class="keywordtype">bool</span>) preg_match(<span class="stringliteral">&#39;/(*UTF8)\pL/u&#39;</span>, $char);
+<a name="l00229"></a>00229                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;alnum&#39;</span>:
+<a name="l00230"></a>00230                                 <span class="keywordflow">return</span> $this-&gt;<a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">validateCharset</a>($char, <span class="stringliteral">&#39;alpha&#39;</span>) || $this-&gt;<a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">validateCharset</a>($char, <span class="stringliteral">&#39;digit&#39;</span>);
+<a name="l00231"></a>00231                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;name&#39;</span>:
+<a name="l00232"></a>00232                                 <span class="keywordflow">return</span> $this-&gt;<a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">validateCharset</a>($char, <span class="stringliteral">&#39;alpha&#39;</span>) || $this-&gt;<a class="code" href="classForm.html#a6af817575d8b517e39d75c95494a1b57">validateCharset</a>($char, <span class="stringliteral">&#39; \&#39;-.’&#39;</span>);
+<a name="l00233"></a>00233                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;white&#39;</span>:
+<a name="l00234"></a>00234                                 <span class="keywordflow">return</span> ctype_space($char);
+<a name="l00235"></a>00235                         <span class="keywordflow">case</span> <span class="stringliteral">&#39;&#39;</span>:
+<a name="l00236"></a>00236                                 <span class="keywordflow">return</span> $char === <span class="charliteral">&#39; &#39;</span>;
+<a name="l00237"></a>00237                         <span class="keywordflow">default</span>:
+<a name="l00238"></a>00238                                 <span class="keywordflow">if</span> (is_callable(<span class="stringliteral">&quot;ctype_$charset&quot;</span>))
+<a name="l00239"></a>00239                                 <span class="keywordflow">return</span> call_user_func_array(<span class="stringliteral">&quot;ctype_$charset&quot;</span>, array($char));
+<a name="l00240"></a>00240                                 <span class="keywordflow">return</span> strpos($charset, $char) !== <span class="keyword">false</span>;
+<a name="l00241"></a>00241                 }
+<a name="l00242"></a>00242         }
+<a name="l00243"></a>00243 }
+<a name="l00244"></a>00244 
+<a name="l00245"></a><a class="code" href="form_8php.html#a38d3d05e993dce971ae9af083f4902a7">00245</a> function <a class="code" href="form_8php.html#a38d3d05e993dce971ae9af083f4902a7">generateFormRows</a>($inputs, $previous=array())
+<a name="l00246"></a>00246 {
+<a name="l00247"></a>00247         $result = <span class="stringliteral">&#39;&#39;</span>;
+<a name="l00248"></a>00248         <span class="keywordflow">foreach</span> ($inputs as $row)
+<a name="l00249"></a>00249         {
+<a name="l00250"></a>00250                 <span class="keywordflow">if</span> (isset($row[<span class="stringliteral">&#39;name&#39;</span>]))  $arguments = $row;
+<a name="l00251"></a>00251                 <span class="keywordflow">else</span>  $arguments = array(<span class="stringliteral">&#39;type&#39;</span>=&gt;$row[0], <span class="stringliteral">&#39;name&#39;</span>=&gt;$row[1], <span class="stringliteral">&#39;description&#39;</span>=&gt;$row[2]);
+<a name="l00252"></a>00252                 <span class="keywordflow">if</span> (isset($arguments[<span class="stringliteral">&#39;readonly&#39;</span>]) &amp;&amp; $arguments[<span class="stringliteral">&#39;readonly&#39;</span>] &amp;&amp; isset($arguments[<span class="stringliteral">&#39;default&#39;</span>]))
+<a name="l00253"></a>00253                         ; <span class="comment">// old forms sometimes may have fields set in &#39;default&#39; instead of $previous DEPRECATED.</span>
+<a name="l00254"></a>00254                 <span class="keywordflow">else</span> <span class="keywordflow">if</span> (isset($previous[$arguments[<span class="stringliteral">&#39;name&#39;</span>]]) &amp;&amp; !is_null($previous[$arguments[<span class="stringliteral">&#39;name&#39;</span>]]))
+<a name="l00255"></a>00255                         $arguments[<span class="stringliteral">&#39;default&#39;</span>] = $previous[$arguments[<span class="stringliteral">&#39;name&#39;</span>]];
+<a name="l00256"></a>00256                 $result .= <a class="code" href="form_8php.html#a4569360da5e9495ff2456dbab40966c2">buildFormRow</a>($arguments);
+<a name="l00257"></a>00257         }
+<a name="l00258"></a>00258         <span class="keywordflow">return</span> $result;
+<a name="l00259"></a>00259 }
+<a name="l00260"></a>00260 
+<a name="l00261"></a><a class="code" href="form_8php.html#a439bc28817dc0df1cca41357c1d60b49">00261</a> define(<span class="stringliteral">&#39;VALUE_OTHER&#39;</span>, -66642);
+<a name="l00262"></a><a class="code" href="form_8php.html#a4569360da5e9495ff2456dbab40966c2">00262</a> function <a class="code" href="form_8php.html#a4569360da5e9495ff2456dbab40966c2">buildFormRow</a>($type, $name=NULL, $description=NULL, $default=NULL, $options=array(), $ignorePOST=<span class="keyword">false</span>)
+<a name="l00263"></a>00263 {
+<a name="l00264"></a>00264         global <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
+<a name="l00265"></a>00265         <span class="comment">// Handle named arguments.</span>
+<a name="l00266"></a>00266         <span class="keywordflow">if</span> (is_array($type) || $type instanceof ArrayObject)
+<a name="l00267"></a>00267                 <span class="keywordflow">foreach</span> ($type as $key =&gt; $val)
+<a name="l00268"></a>00268                         $$key = $val;
 <a name="l00269"></a>00269 
-<a name="l00270"></a>00270         $rtype = $type;
-<a name="l00271"></a>00271         <span class="keywordflow">if</span> (isset($_POST[$name]) &amp;&amp; !$ignorePOST)  $default = $_POST[$name];
-<a name="l00272"></a>00272 
-<a name="l00273"></a>00273         $row = <span class="stringliteral">&quot;&lt;tr id=&#39;row_$name&#39;&gt;&quot;</span>;
-<a name="l00274"></a>00274         <span class="keywordflow">if</span> ($readonly)
-<a name="l00275"></a>00275         {
-<a name="l00276"></a>00276                 <span class="keywordflow">if</span> (is_array($default))
-<a name="l00277"></a>00277                 {
-<a name="l00278"></a>00278                         $tmp = array();
-<a name="l00279"></a>00279                         <span class="keywordflow">if</span> (!empty($options))
-<a name="l00280"></a>00280                                 <span class="keywordflow">foreach</span> ($default as $d)  $tmp[]= $options[$d];
-<a name="l00281"></a>00281                         $default = implode(<span class="stringliteral">&#39;, &#39;</span>, $tmp);
-<a name="l00282"></a>00282                 }
-<a name="l00283"></a>00283                 <span class="keywordflow">if</span> ($type == <span class="stringliteral">&#39;textarea&#39;</span> || $type == <span class="stringliteral">&#39;richtextarea&#39;</span>)
-<a name="l00284"></a>00284                         $default = <span class="stringliteral">&#39;&lt;div class=&quot;descriptionBox&quot;&gt;&#39;</span>. <a class="code" href="template_8php.html#a4a7e99592a2690b33d53c9bcc8fd3008">parseUserHTML</a>($default) .<span class="stringliteral">&#39;&lt;/div&gt;&#39;</span>;
-<a name="l00285"></a>00285                 <span class="keywordflow">if</span> ($type == <span class="stringliteral">&#39;timestamp&#39;</span>)  $default = strftime(<span class="stringliteral">&#39;%Y-%m-%d %T&#39;</span>, $default);
-<a name="l00286"></a>00286                 $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;label&gt;$description&lt;/label&gt;&lt;/td&gt;&quot;</span>;
-<a name="l00287"></a>00287                 $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;span $properties&gt;$default&lt;/span&gt;&lt;/td&gt;&quot;</span>;
-<a name="l00288"></a>00288         }
-<a name="l00289"></a>00289         <span class="keywordflow">else</span> <span class="keywordflow">switch</span> ($type)
-<a name="l00290"></a>00290         {
-<a name="l00291"></a>00291                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;textarea&#39;</span>:
-<a name="l00292"></a>00292                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;richtextarea&#39;</span>:
-<a name="l00293"></a>00293                         $row .=  <span class="stringliteral">&quot;&lt;td colspan=&#39;2&#39;&gt;&quot;</span>;
-<a name="l00294"></a>00294                         $row .= <span class="stringliteral">&quot;&lt;label for=&#39;$name&#39;&gt;$description&lt;/label&gt;&quot;</span>;
-<a name="l00295"></a>00295                         $height = ($type==<span class="stringliteral">&#39;textarea&#39;</span>) ? 2 : 20;
-<a name="l00296"></a>00296                         $class  = ($type==<span class="stringliteral">&#39;textarea&#39;</span>) ? <span class="stringliteral">&#39;&#39;</span> : <span class="stringliteral">&#39;class=&quot;mceEditor&quot;&#39;</span>;
-<a name="l00297"></a>00297                         $row .= <span class="stringliteral">&quot;&lt;br/&gt;&lt;textarea rows=&#39;$height&#39; name=&#39;$name&#39; id=&#39;$name&#39; $class $properties&gt;&quot;</span>;
-<a name="l00298"></a>00298                         $row .= htmlspecialchars($default);
-<a name="l00299"></a>00299                         $row .= <span class="stringliteral">&quot;&lt;/textarea&gt;&quot;</span>;
-<a name="l00300"></a>00300                         $row .= <span class="stringliteral">&quot;&lt;/td&gt;&quot;</span>;
-<a name="l00301"></a>00301                         <span class="keywordflow">break</span>;
-<a name="l00302"></a>00302                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;readonly&#39;</span>:
-<a name="l00303"></a>00303                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;label&gt;$description&lt;/label&gt;&lt;/td&gt;&quot;</span>;
-<a name="l00304"></a>00304                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;span $properties&gt;$default&lt;/span&gt;&lt;/td&gt;&quot;</span>;
-<a name="l00305"></a>00305                         <span class="keywordflow">break</span>;
-<a name="l00306"></a>00306                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;select&#39;</span>:
-<a name="l00307"></a>00307                         <span class="keywordflow">if</span> (isset($other))
-<a name="l00308"></a>00308                         {
-<a name="l00309"></a>00309                                 $options[<a class="code" href="form_8php.html#a439bc28817dc0df1cca41357c1d60b49">VALUE_OTHER</a>] = <span class="stringliteral">&#39;inny...&#39;</span>;
-<a name="l00310"></a>00310                                 $otherIndex = count($options)-1;
-<a name="l00311"></a>00311                                 $properties .= <span class="stringliteral">&#39; onchange=&quot;$(\&#39;#row_&#39;</span>. $name .<span class="stringliteral">&#39;_other\&#39;).toggle(&#39;</span>.
-<a name="l00312"></a>00312                                         <span class="stringliteral">&#39;this.selectedIndex==&#39;</span>. $otherIndex .<span class="stringliteral">&#39;)&quot;&#39;</span>;
-<a name="l00313"></a>00313                         }
-<a name="l00314"></a>00314 
-<a name="l00315"></a>00315                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;label for=&#39;$name&#39;&gt;$description&lt;/label&gt;&lt;/td&gt;&quot;</span>;
-<a name="l00316"></a>00316                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;select name=&#39;$name&#39; id=&#39;$name&#39; $properties&gt;&quot;</span>;
-<a name="l00317"></a>00317                         $foundSelected = <span class="keyword">false</span>;
-<a name="l00318"></a>00318                         <span class="keywordflow">foreach</span> ($options as $val=&gt;$option)
-<a name="l00319"></a>00319                         {
-<a name="l00320"></a>00320                                 <span class="keywordflow">if</span> (!$foundSelected &amp;&amp; $val == <a class="code" href="form_8php.html#a439bc28817dc0df1cca41357c1d60b49">VALUE_OTHER</a>)
-<a name="l00321"></a>00321                                 {
-<a name="l00322"></a>00322                                         $selected = <span class="stringliteral">&#39;selected=&quot;selected&quot;&#39;</span>;
-<a name="l00323"></a>00323                                 }
-<a name="l00324"></a>00324                                 <span class="keywordflow">else</span> <span class="keywordflow">if</span> ($val == $default)
-<a name="l00325"></a>00325                                 {
-<a name="l00326"></a>00326                                         $selected = <span class="stringliteral">&#39;selected=&quot;selected&quot;&#39;</span>;
-<a name="l00327"></a>00327                                         $foundSelected = <span class="keyword">true</span>;
-<a name="l00328"></a>00328                                 }
-<a name="l00329"></a>00329                                 <span class="keywordflow">else</span> $selected = <span class="stringliteral">&#39;&#39;</span>;
-<a name="l00330"></a>00330                                 $row .= <span class="stringliteral">&quot;&lt;option value=&#39;$val&#39; $selected&gt;$option&lt;/option&gt;&quot;</span>;
-<a name="l00331"></a>00331                         }
-<a name="l00332"></a>00332 
-<a name="l00333"></a>00333                         <span class="keywordflow">if</span> (!$foundSelected &amp;&amp; $default &amp;&amp; !isset($other))
-<a name="l00334"></a>00334                                 $row .= <span class="stringliteral">&quot;&lt;option value=&#39;$default&#39; selected=&#39;selected&#39;&gt;&quot;</span>. _(<span class="stringliteral">&#39;other&#39;</span>) .<span class="stringliteral">&quot; ($default)&lt;/option&gt;&quot;</span>;
-<a name="l00335"></a>00335 
-<a name="l00336"></a>00336                         $row .= <span class="stringliteral">&quot;&lt;/select&gt;&lt;/td&gt;&quot;</span>;
-<a name="l00337"></a>00337                         <span class="keywordflow">break</span>;
-<a name="l00338"></a>00338                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;checkboxgroup&#39;</span>:
-<a name="l00339"></a>00339                         $i = 1;
-<a name="l00340"></a>00340                         $name = $name .<span class="stringliteral">&#39;[]&#39;</span>;
-<a name="l00341"></a>00341                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;label for=&#39;$name&#39;&gt;$description&lt;/label&gt;&lt;/td&gt;&lt;td&gt;&quot;</span>;
-<a name="l00342"></a>00342                         <span class="keywordflow">foreach</span> ($options as $val=&gt;$option)
-<a name="l00343"></a>00343                         {
-<a name="l00344"></a>00344                                 $row .= <span class="stringliteral">&quot;&lt;input type=&#39;checkbox&#39; class=&#39;checkbox&#39; name=&#39;$name&#39; value=&#39;$val&#39; &quot;</span>;
-<a name="l00345"></a>00345                                 <span class="keywordflow">if</span> (is_array($default) &amp;&amp; in_array($val, $default))  $row .= <span class="stringliteral">&#39;checked=&quot;checked&quot; &#39;</span>;
-<a name="l00346"></a>00346                                 $row .= <span class="stringliteral">&quot;/&gt;$option&quot;</span>;
-<a name="l00347"></a>00347                                 <span class="keywordflow">if</span> (!($i%3))  $row .= <span class="stringliteral">&quot;&lt;br/&gt;&quot;</span>;
-<a name="l00348"></a>00348                                 $i++;
-<a name="l00349"></a>00349                         }
-<a name="l00350"></a>00350                         $row .= <span class="stringliteral">&quot;&lt;/td&gt;&quot;</span>;
-<a name="l00351"></a>00351                         <span class="keywordflow">break</span>;
-<a name="l00352"></a>00352                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;custom&#39;</span>:
-<a name="l00353"></a>00353                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;label for=&#39;$name&#39;&gt;$description&lt;/label&gt;&lt;/td&gt;&lt;td&gt;$custom&lt;/td&gt;&quot;</span>;
-<a name="l00354"></a>00354                         <span class="keywordflow">break</span>;
-<a name="l00355"></a>00355                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;int&#39;</span>:
-<a name="l00356"></a>00356                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;timestamp&#39;</span>:
-<a name="l00357"></a>00357                         $type = <span class="stringliteral">&#39;text&#39;</span>;
-<a name="l00358"></a>00358                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;text&#39;</span>:
-<a name="l00359"></a>00359                 <span class="keywordflow">default</span>:
-<a name="l00360"></a>00360                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;label for=&#39;$name&#39;&gt;$description&lt;/label&gt;&lt;/td&gt;&quot;</span>;
-<a name="l00361"></a>00361                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;input type=&#39;$type&#39; name=&#39;$name&#39; id=&#39;$name&#39; $properties &quot;</span>;
-<a name="l00362"></a>00362                         <span class="keywordflow">if</span> ($type == <span class="stringliteral">&#39;checkbox&#39;</span>)
-<a name="l00363"></a>00363                         {
-<a name="l00364"></a>00364                                 <span class="keywordflow">if</span> (!empty($default) &amp;&amp; $default!=<span class="charliteral">&#39;0&#39;</span>)
-<a name="l00365"></a>00365                                         $row .= <span class="stringliteral">&#39; checked=&quot;checked&quot;&#39;</span>;
-<a name="l00366"></a>00366                                 $row .= <span class="stringliteral">&#39; value=&quot;1&quot;&#39;</span>;
-<a name="l00367"></a>00367                         }
-<a name="l00368"></a>00368                         <span class="keywordflow">else</span> <span class="keywordflow">if</span> (($rtype==<span class="stringliteral">&#39;int&#39;</span>) || $default)
-<a name="l00369"></a>00369                                 $row .= <span class="stringliteral">&#39; value=&quot;&#39;</span>. htmlspecialchars($default) .<span class="charliteral">&#39;&quot;&#39;</span>;
-<a name="l00370"></a>00370                         <span class="keywordflow">if</span> ($rtype == <span class="stringliteral">&#39;int&#39;</span>)  $row .= <span class="stringliteral">&#39; size=&quot;4&quot;&#39;</span>;
-<a name="l00371"></a>00371                         <span class="keywordflow">else</span> <span class="keywordflow">if</span> ($rtype == <span class="stringliteral">&#39;text&#39;</span> || $rtype == <span class="stringliteral">&#39;timestamp&#39;</span>)  $row .= <span class="stringliteral">&#39; class=&quot;text&quot;&#39;</span>;
-<a name="l00372"></a>00372                         $row .= <span class="stringliteral">&quot; /&gt;$text&quot;</span>;
-<a name="l00373"></a>00373                         <span class="keywordflow">if</span> ($rtype == <span class="stringliteral">&#39;timestamp&#39;</span>)  $row .= <span class="stringliteral">&#39;&lt;small&gt;&lt;i&gt;YYYY-MM-DD HH:MM&lt;/i&gt; &#39;</span>. _(<span class="stringliteral">&#39;or&#39;</span>) .<span class="stringliteral">&#39; &lt;i&gt;YYYY-MM-DD&lt;/i&gt;&lt;/small&gt;&#39;</span>;
-<a name="l00374"></a>00374                         $row .= <span class="stringliteral">&quot;&lt;/td&gt;&quot;</span>;
-<a name="l00375"></a>00375 
-<a name="l00376"></a>00376                         <span class="keywordflow">if</span> (!empty($autocomplete))
-<a name="l00377"></a>00377                         {
-<a name="l00378"></a>00378                                 <span class="keywordflow">foreach</span> ($autocomplete as &amp;$item)
-<a name="l00379"></a>00379                                         $item = json_encode($item);
-<a name="l00380"></a>00380                                 $autocomplete = implode(<span class="charliteral">&#39;,&#39;</span>, $autocomplete);
-<a name="l00381"></a>00381                                 $PAGE-&gt;jsOnLoad .= <span class="stringliteral">&#39;$(&quot;#&#39;</span>. $name .<span class="stringliteral">&#39;&quot;).autocomplete({minLength:1,source:[&#39;</span>. $autocomplete.<span class="stringliteral">&#39;]});&#39;</span>.<span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00382"></a>00382                         }
-<a name="l00383"></a>00383         }
-<a name="l00384"></a>00384 
-<a name="l00385"></a>00385         <span class="keywordflow">if</span> (isset($errors))
-<a name="l00386"></a>00386         {
-<a name="l00387"></a>00387                 $row .= <span class="stringliteral">&quot;&lt;td class=&#39;formError&#39;&gt;&lt;ul&gt;&quot;</span>;
-<a name="l00388"></a>00388                 <span class="keywordflow">foreach</span> ($errors as $e)
-<a name="l00389"></a>00389                 {
-<a name="l00390"></a>00390                         $row .= <span class="stringliteral">&quot;&lt;li&gt;$e&lt;/li&gt;&quot;</span>;
-<a name="l00391"></a>00391                 }
-<a name="l00392"></a>00392                 $row .= <span class="stringliteral">&quot;&lt;/ul&gt;&lt;/td&gt;&quot;</span>;
-<a name="l00393"></a>00393         }
-<a name="l00394"></a>00394 
-<a name="l00395"></a>00395         $row .= <span class="stringliteral">&quot;&lt;/tr&gt;&quot;</span>;
-<a name="l00396"></a>00396         <span class="keywordflow">if</span> (isset($other))
-<a name="l00397"></a>00397         {
-<a name="l00398"></a>00398                 $row .= <a class="code" href="form_8php.html#a4569360da5e9495ff2456dbab40966c2">buildFormRow</a>(array(<span class="stringliteral">&#39;name&#39;</span>=&gt;<span class="stringliteral">&quot;{$name}_other&quot;</span>, <span class="stringliteral">&#39;description&#39;</span>=&gt;<span class="stringliteral">&quot; &amp;nbsp; &amp;nbsp; &amp;nbsp; $other&quot;</span>,
-<a name="l00399"></a>00399                                         <span class="stringliteral">&#39;type&#39;</span>=&gt;<span class="stringliteral">&#39;text&#39;</span>, <span class="stringliteral">&#39;default&#39;</span>=&gt;$default));
-<a name="l00400"></a>00400                 global <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
-<a name="l00401"></a>00401                 <span class="keywordflow">if</span> ($foundSelected)
-<a name="l00402"></a>00402                         $PAGE-&gt;jsOnLoad .= <span class="stringliteral">&#39;document.getElementById(&quot;row_&#39;</span>. $name .<span class="stringliteral">&#39;_other&quot;).style.display = &quot;none&quot;;&#39;</span>;
-<a name="l00403"></a>00403         }
-<a name="l00404"></a>00404         <span class="keywordflow">return</span> $row;
-<a name="l00405"></a>00405 }
+<a name="l00270"></a>00270         <span class="keywordflow">if</span> (!isset($properties))  $properties = <span class="stringliteral">&#39;&#39;</span>;
+<a name="l00271"></a>00271         <span class="keywordflow">if</span> (!isset($readonly))    $readonly = <span class="keyword">false</span>;
+<a name="l00272"></a>00272         <span class="keywordflow">if</span> (!isset($text))        $text = <span class="stringliteral">&#39;&#39;</span>;
+<a name="l00273"></a>00273         <span class="keywordflow">if</span> (!isset($hidden))      $hidden = <span class="keyword">false</span>;
+<a name="l00274"></a>00274 
+<a name="l00275"></a>00275         <span class="keywordflow">if</span> ($hidden)  <span class="keywordflow">return</span> <span class="stringliteral">&#39;&#39;</span>;
+<a name="l00276"></a>00276 
+<a name="l00277"></a>00277         $rtype = $type;
+<a name="l00278"></a>00278         <span class="keywordflow">if</span> ($type == <span class="stringliteral">&#39;timestamp&#39;</span>)  $default = strftime(<span class="stringliteral">&#39;%Y-%m-%d %H:%M&#39;</span>, $default);
+<a name="l00279"></a>00279         <span class="keywordflow">if</span> (isset($_POST[$name]) &amp;&amp; !$ignorePOST)  $default = $_POST[$name];
+<a name="l00280"></a>00280 
+<a name="l00281"></a>00281         $row = <span class="stringliteral">&quot;&lt;tr id=&#39;row_$name&#39;&gt;&quot;</span>;
+<a name="l00282"></a>00282         <span class="keywordflow">if</span> ($readonly)
+<a name="l00283"></a>00283         {
+<a name="l00284"></a>00284                 <span class="keywordflow">if</span> (is_array($default))
+<a name="l00285"></a>00285                 {
+<a name="l00286"></a>00286                         $tmp = array();
+<a name="l00287"></a>00287                         <span class="keywordflow">if</span> (!empty($options))
+<a name="l00288"></a>00288                                 <span class="keywordflow">foreach</span> ($default as $d)  $tmp[]= $options[$d];
+<a name="l00289"></a>00289                         $default = implode(<span class="stringliteral">&#39;, &#39;</span>, $tmp);
+<a name="l00290"></a>00290                 }
+<a name="l00291"></a>00291                 <span class="keywordflow">if</span> ($type == <span class="stringliteral">&#39;textarea&#39;</span> || $type == <span class="stringliteral">&#39;richtextarea&#39;</span>)
+<a name="l00292"></a>00292                         $default = <span class="stringliteral">&#39;&lt;div class=&quot;descriptionBox&quot;&gt;&#39;</span>. <a class="code" href="template_8php.html#a4a7e99592a2690b33d53c9bcc8fd3008">parseUserHTML</a>($default) .<span class="stringliteral">&#39;&lt;/div&gt;&#39;</span>;
+<a name="l00293"></a>00293                 $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;label&gt;$description&lt;/label&gt;&lt;/td&gt;&quot;</span>;
+<a name="l00294"></a>00294                 $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;span $properties&gt;$default&lt;/span&gt;&lt;/td&gt;&quot;</span>;
+<a name="l00295"></a>00295         }
+<a name="l00296"></a>00296         <span class="keywordflow">else</span> <span class="keywordflow">switch</span> ($type)
+<a name="l00297"></a>00297         {
+<a name="l00298"></a>00298                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;textarea&#39;</span>:
+<a name="l00299"></a>00299                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;richtextarea&#39;</span>:
+<a name="l00300"></a>00300                         $row .=  <span class="stringliteral">&quot;&lt;td colspan=&#39;2&#39;&gt;&quot;</span>;
+<a name="l00301"></a>00301                         $row .= <span class="stringliteral">&quot;&lt;label for=&#39;$name&#39;&gt;$description&lt;/label&gt;&quot;</span>;
+<a name="l00302"></a>00302                         $height = ($type==<span class="stringliteral">&#39;textarea&#39;</span>) ? 2 : 20;
+<a name="l00303"></a>00303                         $class  = ($type==<span class="stringliteral">&#39;textarea&#39;</span>) ? <span class="stringliteral">&#39;&#39;</span> : <span class="stringliteral">&#39;class=&quot;mceEditor&quot;&#39;</span>;
+<a name="l00304"></a>00304                         $row .= <span class="stringliteral">&quot;&lt;br/&gt;&lt;textarea rows=&#39;$height&#39; name=&#39;$name&#39; id=&#39;$name&#39; $class $properties&gt;&quot;</span>;
+<a name="l00305"></a>00305                         $row .= htmlspecialchars($default);
+<a name="l00306"></a>00306                         $row .= <span class="stringliteral">&quot;&lt;/textarea&gt;&quot;</span>;
+<a name="l00307"></a>00307                         $row .= <span class="stringliteral">&quot;&lt;/td&gt;&quot;</span>;
+<a name="l00308"></a>00308                         <span class="keywordflow">break</span>;
+<a name="l00309"></a>00309                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;readonly&#39;</span>:
+<a name="l00310"></a>00310                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;label&gt;$description&lt;/label&gt;&lt;/td&gt;&quot;</span>;
+<a name="l00311"></a>00311                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;span $properties&gt;$default&lt;/span&gt;&lt;/td&gt;&quot;</span>;
+<a name="l00312"></a>00312                         <span class="keywordflow">break</span>;
+<a name="l00313"></a>00313                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;select&#39;</span>:
+<a name="l00314"></a>00314                         <span class="keywordflow">if</span> (isset($other))
+<a name="l00315"></a>00315                         {
+<a name="l00316"></a>00316                                 $options[<a class="code" href="form_8php.html#a439bc28817dc0df1cca41357c1d60b49">VALUE_OTHER</a>] = _(<span class="stringliteral">&#39;other...&#39;</span>);
+<a name="l00317"></a>00317                                 $otherIndex = count($options)-1;
+<a name="l00318"></a>00318                                 $properties .= <span class="stringliteral">&#39; onchange=&quot;$(\&#39;#row_&#39;</span>. $name .<span class="stringliteral">&#39;_other\&#39;).toggle(&#39;</span>.
+<a name="l00319"></a>00319                                         <span class="stringliteral">&#39;this.selectedIndex==&#39;</span>. $otherIndex .<span class="stringliteral">&#39;)&quot;&#39;</span>;
+<a name="l00320"></a>00320                         }
+<a name="l00321"></a>00321 
+<a name="l00322"></a>00322                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;label for=&#39;$name&#39;&gt;$description&lt;/label&gt;&lt;/td&gt;&quot;</span>;
+<a name="l00323"></a>00323                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;select name=&#39;$name&#39; id=&#39;$name&#39; $properties&gt;&quot;</span>;
+<a name="l00324"></a>00324                         $foundSelected = <span class="keyword">false</span>;
+<a name="l00325"></a>00325                         <span class="keywordflow">foreach</span> ($options as $val=&gt;$option)
+<a name="l00326"></a>00326                         {
+<a name="l00327"></a>00327                                 <span class="keywordflow">if</span> (!$foundSelected &amp;&amp; ($val == <a class="code" href="form_8php.html#a439bc28817dc0df1cca41357c1d60b49">VALUE_OTHER</a>))
+<a name="l00328"></a>00328                                 {
+<a name="l00329"></a>00329                                         $selected = <span class="stringliteral">&#39;selected=&quot;selected&quot;&#39;</span>;
+<a name="l00330"></a>00330                                 }
+<a name="l00331"></a>00331                                 <span class="keywordflow">else</span> <span class="keywordflow">if</span> ($val == $default)
+<a name="l00332"></a>00332                                 {
+<a name="l00333"></a>00333                                         $selected = <span class="stringliteral">&#39;selected=&quot;selected&quot;&#39;</span>;
+<a name="l00334"></a>00334                                         $foundSelected = <span class="keyword">true</span>;
+<a name="l00335"></a>00335                                 }
+<a name="l00336"></a>00336                                 <span class="keywordflow">else</span> $selected = <span class="stringliteral">&#39;&#39;</span>;
+<a name="l00337"></a>00337                                 $row .= <span class="stringliteral">&quot;&lt;option value=&#39;$val&#39; $selected&gt;$option&lt;/option&gt;&quot;</span>;
+<a name="l00338"></a>00338                         }
+<a name="l00339"></a>00339 
+<a name="l00340"></a>00340                         <span class="keywordflow">if</span> (!$foundSelected &amp;&amp; $default &amp;&amp; !isset($other))
+<a name="l00341"></a>00341                                 $row .= <span class="stringliteral">&quot;&lt;option value=&#39;$default&#39; selected=&#39;selected&#39;&gt;&quot;</span>. _(<span class="stringliteral">&#39;other&#39;</span>) .<span class="stringliteral">&quot; ($default)&lt;/option&gt;&quot;</span>;
+<a name="l00342"></a>00342 
+<a name="l00343"></a>00343                         $row .= <span class="stringliteral">&quot;&lt;/select&gt;&lt;/td&gt;&quot;</span>;
+<a name="l00344"></a>00344                         <span class="keywordflow">break</span>;
+<a name="l00345"></a>00345                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;checkboxgroup&#39;</span>:
+<a name="l00346"></a>00346                         $i = 1;
+<a name="l00347"></a>00347                         $name = $name .<span class="stringliteral">&#39;[]&#39;</span>;
+<a name="l00348"></a>00348                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;label for=&#39;$name&#39;&gt;$description&lt;/label&gt;&lt;/td&gt;&lt;td&gt;&quot;</span>;
+<a name="l00349"></a>00349                         <span class="keywordflow">foreach</span> ($options as $val=&gt;$option)
+<a name="l00350"></a>00350                         {
+<a name="l00351"></a>00351                                 $row .= <span class="stringliteral">&quot;&lt;input type=&#39;checkbox&#39; class=&#39;checkbox&#39; name=&#39;$name&#39; value=&#39;$val&#39; &quot;</span>;
+<a name="l00352"></a>00352                                 <span class="keywordflow">if</span> (is_array($default) &amp;&amp; in_array($val, $default))  $row .= <span class="stringliteral">&#39;checked=&quot;checked&quot; &#39;</span>;
+<a name="l00353"></a>00353                                 $row .= <span class="stringliteral">&quot;/&gt;$option&quot;</span>;
+<a name="l00354"></a>00354                                 <span class="keywordflow">if</span> (!($i%3))  $row .= <span class="stringliteral">&quot;&lt;br/&gt;&quot;</span>;
+<a name="l00355"></a>00355                                 $i++;
+<a name="l00356"></a>00356                         }
+<a name="l00357"></a>00357                         $row .= <span class="stringliteral">&quot;&lt;/td&gt;&quot;</span>;
+<a name="l00358"></a>00358                         <span class="keywordflow">break</span>;
+<a name="l00359"></a>00359                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;custom&#39;</span>:
+<a name="l00360"></a>00360                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;label for=&#39;$name&#39;&gt;$description&lt;/label&gt;&lt;/td&gt;&lt;td&gt;$custom&lt;/td&gt;&quot;</span>;
+<a name="l00361"></a>00361                         <span class="keywordflow">break</span>;
+<a name="l00362"></a>00362                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;int&#39;</span>:
+<a name="l00363"></a>00363                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;timestamp&#39;</span>:
+<a name="l00364"></a>00364                         $type = <span class="stringliteral">&#39;text&#39;</span>;
+<a name="l00365"></a>00365                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;text&#39;</span>:
+<a name="l00366"></a>00366                 <span class="keywordflow">default</span>:
+<a name="l00367"></a>00367                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;label for=&#39;$name&#39;&gt;$description&lt;/label&gt;&lt;/td&gt;&quot;</span>;
+<a name="l00368"></a>00368                         $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;input type=&#39;$type&#39; name=&#39;$name&#39; id=&#39;$name&#39; $properties &quot;</span>;
+<a name="l00369"></a>00369                         <span class="keywordflow">if</span> ($type == <span class="stringliteral">&#39;checkbox&#39;</span>)
+<a name="l00370"></a>00370                         {
+<a name="l00371"></a>00371                                 <span class="keywordflow">if</span> (!empty($default) &amp;&amp; $default!=<span class="charliteral">&#39;0&#39;</span>)
+<a name="l00372"></a>00372                                         $row .= <span class="stringliteral">&#39; checked=&quot;checked&quot;&#39;</span>;
+<a name="l00373"></a>00373                                 $row .= <span class="stringliteral">&#39; value=&quot;1&quot;&#39;</span>;
+<a name="l00374"></a>00374                         }
+<a name="l00375"></a>00375                         <span class="keywordflow">else</span> <span class="keywordflow">if</span> (($rtype==<span class="stringliteral">&#39;int&#39;</span>) || $default)
+<a name="l00376"></a>00376                                 $row .= <span class="stringliteral">&#39; value=&quot;&#39;</span>. htmlspecialchars($default) .<span class="charliteral">&#39;&quot;&#39;</span>;
+<a name="l00377"></a>00377                         <span class="keywordflow">if</span> ($rtype == <span class="stringliteral">&#39;int&#39;</span>)  $row .= <span class="stringliteral">&#39; size=&quot;4&quot;&#39;</span>;
+<a name="l00378"></a>00378                         <span class="keywordflow">else</span> <span class="keywordflow">if</span> ($rtype == <span class="stringliteral">&#39;text&#39;</span> || $rtype == <span class="stringliteral">&#39;timestamp&#39;</span>)  $row .= <span class="stringliteral">&#39; class=&quot;text&quot;&#39;</span>;
+<a name="l00379"></a>00379                         $row .= <span class="stringliteral">&quot; /&gt;$text&quot;</span>;
+<a name="l00380"></a>00380                         <span class="keywordflow">if</span> ($rtype == <span class="stringliteral">&#39;timestamp&#39;</span>)  $row .= <span class="stringliteral">&#39;&lt;small&gt;&lt;i&gt;YYYY-MM-DD HH:MM&lt;/i&gt; &#39;</span>. _(<span class="stringliteral">&#39;or&#39;</span>) .<span class="stringliteral">&#39; &lt;i&gt;YYYY-MM-DD&lt;/i&gt;&lt;/small&gt;&#39;</span>;
+<a name="l00381"></a>00381                         $row .= <span class="stringliteral">&quot;&lt;/td&gt;&quot;</span>;
+<a name="l00382"></a>00382 
+<a name="l00383"></a>00383                         <span class="keywordflow">if</span> (!empty($autocomplete))
+<a name="l00384"></a>00384                         {
+<a name="l00385"></a>00385                                 <span class="keywordflow">foreach</span> ($autocomplete as &amp;$item)
+<a name="l00386"></a>00386                                         $item = json_encode($item);
+<a name="l00387"></a>00387                                 $autocomplete = implode(<span class="charliteral">&#39;,&#39;</span>, $autocomplete);
+<a name="l00388"></a>00388                                 $PAGE-&gt;jsOnLoad .= <span class="stringliteral">&#39;$(&quot;#&#39;</span>. $name .<span class="stringliteral">&#39;&quot;).autocomplete({minLength:1,source:[&#39;</span>. $autocomplete.<span class="stringliteral">&#39;]});&#39;</span>.<span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00389"></a>00389                         }
+<a name="l00390"></a>00390         }
+<a name="l00391"></a>00391 
+<a name="l00392"></a>00392         <span class="keywordflow">if</span> (isset($errors))
+<a name="l00393"></a>00393         {
+<a name="l00394"></a>00394                 $row .= <span class="stringliteral">&quot;&lt;td class=&#39;formError&#39;&gt;&lt;ul&gt;&quot;</span>;
+<a name="l00395"></a>00395                 <span class="keywordflow">foreach</span> ($errors as $e)
+<a name="l00396"></a>00396                 {
+<a name="l00397"></a>00397                         $row .= <span class="stringliteral">&quot;&lt;li&gt;$e&lt;/li&gt;&quot;</span>;
+<a name="l00398"></a>00398                 }
+<a name="l00399"></a>00399                 $row .= <span class="stringliteral">&quot;&lt;/ul&gt;&lt;/td&gt;&quot;</span>;
+<a name="l00400"></a>00400         }
+<a name="l00401"></a>00401 
+<a name="l00402"></a>00402         $row .= <span class="stringliteral">&quot;&lt;/tr&gt;&quot;</span>;
+<a name="l00403"></a>00403         <span class="keywordflow">if</span> (isset($other))
+<a name="l00404"></a>00404         {
+<a name="l00405"></a>00405                 $row .= <a class="code" href="form_8php.html#a4569360da5e9495ff2456dbab40966c2">buildFormRow</a>(array(<span class="stringliteral">&#39;name&#39;</span>=&gt;<span class="stringliteral">&quot;{$name}_other&quot;</span>, <span class="stringliteral">&#39;description&#39;</span>=&gt;<span class="stringliteral">&quot; &amp;nbsp; &amp;nbsp; &amp;nbsp; $other&quot;</span>,
+<a name="l00406"></a>00406                                         <span class="stringliteral">&#39;type&#39;</span>=&gt;<span class="stringliteral">&#39;text&#39;</span>, <span class="stringliteral">&#39;default&#39;</span>=&gt;$default));
+<a name="l00407"></a>00407                 global <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
+<a name="l00408"></a>00408                 <span class="keywordflow">if</span> ($foundSelected)
+<a name="l00409"></a>00409                         $PAGE-&gt;jsOnLoad .= <span class="stringliteral">&#39;document.getElementById(&quot;row_&#39;</span>. $name .<span class="stringliteral">&#39;_other&quot;).style.display = &quot;none&quot;;&#39;</span>;
+<a name="l00410"></a>00410         }
+<a name="l00411"></a>00411         <span class="keywordflow">return</span> $row;
+<a name="l00412"></a>00412 }
 </pre></div></div>
 </div>
 <!-- window showing the filter options -->
@@ -481,7 +488,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Thu Aug 11 2011 for wwwApp by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Sat Aug 13 2011 for wwwApp by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

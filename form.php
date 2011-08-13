@@ -5,7 +5,7 @@
  *
  */
 
-class Form
+class Form implements ArrayAccess
 {
 	public $action = '';
 	public $rows = array();
@@ -24,18 +24,23 @@ class Form
 			if (is_int($id))
 				$this->addRow($row); // DEPRECATED, use parseTable to define rows.
 			else
-				$this->rows[$id]= $row;
+				$this->rows[$id]= new ArrayObject($row);
 
 	}
 
-	// DEPRECATED, use parseTable to define rows.
+	// DEPRECATED? prefer parseTable to define rows.
 	public function addRow($row) //or addRow($type, $name, $description, $readonly).
 	{
 		if (!is_array($row))
 			$row = func_get_args();
 		$row = arrayToAssoc($row, array('type','name','description','readonly'));
-		$this->rows[$row['name']]= $row;
+		$this->rows[$row['name']]= new ArrayObject($row);
 	}
+
+	public function offsetGet($offset)  { return $this->rows[$offset]; }
+	public function offsetSet($offset, $value)  { $this->rows[$offset] = $value; }
+	public function offsetExists($offset)  { return isset($this->rows[$offset]); }
+	public function offsetUnset($offset)  { unset($this->rows[$offset]); }
 
 	public function getHTML()
 	{
@@ -104,8 +109,10 @@ class Form
 			switch($row['type'])
 			{
 				case 'int':
-				case 'timestamp':
 					$value = intval($value);
+					break;
+				case 'timestamp':
+					$value = strtotime($value);
 					break;
 				case 'checkbox':
 					$value = empty($value) ? 0 : 1; // SQL would have problems with true/false.
@@ -256,7 +263,7 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 {
 	global $PAGE;
 	// Handle named arguments.
-	if (is_array($type))
+	if (is_array($type) || $type instanceof ArrayObject)
 		foreach ($type as $key => $val)
 			$$key = $val;
 
@@ -268,6 +275,7 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 	if ($hidden)  return '';
 
 	$rtype = $type;
+	if ($type == 'timestamp')  $default = strftime('%Y-%m-%d %H:%M', $default);
 	if (isset($_POST[$name]) && !$ignorePOST)  $default = $_POST[$name];
 
 	$row = "<tr id='row_$name'>";
@@ -282,7 +290,6 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 		}
 		if ($type == 'textarea' || $type == 'richtextarea')
 			$default = '<div class="descriptionBox">'. parseUserHTML($default) .'</div>';
-		if ($type == 'timestamp')  $default = strftime('%Y-%m-%d %T', $default);
 		$row .= "<td><label>$description</label></td>";
 		$row .= "<td><span $properties>$default</span></td>";
 	}
@@ -306,7 +313,7 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 		case 'select':
 			if (isset($other))
 			{
-				$options[VALUE_OTHER] = 'inny...';
+				$options[VALUE_OTHER] = _('other...');
 				$otherIndex = count($options)-1;
 				$properties .= ' onchange="$(\'#row_'. $name .'_other\').toggle('.
 					'this.selectedIndex=='. $otherIndex .')"';
@@ -317,7 +324,7 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 			$foundSelected = false;
 			foreach ($options as $val=>$option)
 			{
-				if (!$foundSelected && $val == VALUE_OTHER)
+				if (!$foundSelected && ($val == VALUE_OTHER))
 				{
 					$selected = 'selected="selected"';
 				}

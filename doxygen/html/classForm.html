@@ -73,6 +73,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classForm.html#a579aa5466971b4531857dae7d5ed260f">__construct</a> ($rows=array(), $action='')</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classForm.html#a7eb9f8601d59b270c029aa947db1d638">addRow</a> ($row)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classForm.html#aefbd7dc0c2223c1af5637ef3c974b24b">offsetGet</a> ($offset)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classForm.html#a21f629cbab598159a96646eab29fed4a">offsetSet</a> ($offset, $value)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classForm.html#aa0f7ad4c038d94700713c7705292ea9b">offsetExists</a> ($offset)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classForm.html#a6df97f533d353a1ca62cde164e03e858">offsetUnset</a> ($offset)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classForm.html#ae1bfa3eb01dfd8c23988ec74ac97d3b0">getHTML</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classForm.html#a893a8e41c98ad360281401ede8c48242">submitted</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classForm.html#ac530ae1428933b4dca9af774505cb27f">getColumns</a> ()</td></tr>
@@ -130,7 +134,7 @@ Public Attributes</h2></td></tr>
                         <span class="keywordflow">if</span> (is_int($id))
                                 $this-&gt;<a class="code" href="classForm.html#a7eb9f8601d59b270c029aa947db1d638">addRow</a>($row); <span class="comment">// DEPRECATED, use parseTable to define rows.</span>
                         <span class="keywordflow">else</span>
-                                $this-&gt;rows[$id]= $row;
+                                $this-&gt;rows[$id]= <span class="keyword">new</span> ArrayObject($row);
 
         }
 </pre></div>
@@ -159,7 +163,7 @@ Public Attributes</h2></td></tr>
                 <span class="keywordflow">if</span> (!is_array($row))
                         $row = func_get_args();
                 $row = <a class="code" href="utils_8php.html#a5d84b42e619618444a11590f91486f64">arrayToAssoc</a>($row, array(<span class="stringliteral">&#39;type&#39;</span>,<span class="stringliteral">&#39;name&#39;</span>,<span class="stringliteral">&#39;description&#39;</span>,<span class="stringliteral">&#39;readonly&#39;</span>));
-                $this-&gt;rows[$row[<span class="stringliteral">&#39;name&#39;</span>]]= $row;
+                $this-&gt;rows[$row[<span class="stringliteral">&#39;name&#39;</span>]]= <span class="keyword">new</span> ArrayObject($row);
         }
 </pre></div>
 </div>
@@ -189,7 +193,7 @@ Public Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="form_8php_source.html#l00151">151</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<p>Definition at line <a class="el" href="form_8php_source.html#l00158">158</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
 <div class="fragment"><pre class="fragment">        {
                 <span class="keywordflow">if</span> (!$assertion)
                 {
@@ -216,7 +220,7 @@ Public Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="form_8php_source.html#l00125">125</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<p>Definition at line <a class="el" href="form_8php_source.html#l00132">132</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
 <div class="fragment"><pre class="fragment">        {
                 global <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
                 <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a> = $this-&gt;<a class="code" href="classForm.html#a558854c597d60900c6fbbed08e7ada50">fetchValues</a>();
@@ -258,9 +262,9 @@ Public Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="form_8php_source.html#l00087">87</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<p>Definition at line <a class="el" href="form_8php_source.html#l00092">92</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
 
-<p>Referenced by <a class="el" href="form_8php_source.html#l00125">fetchAndValidateValues()</a>.</p>
+<p>Referenced by <a class="el" href="form_8php_source.html#l00132">fetchAndValidateValues()</a>.</p>
 <div class="fragment"><pre class="fragment">        {
 
                 <a class="code" href="classForm.html#adc5c979307f61b507077b4ee784e22d1">$values</a> = array();
@@ -280,8 +284,10 @@ Public Attributes</h2></td></tr>
                         <span class="keywordflow">switch</span>($row[<span class="stringliteral">&#39;type&#39;</span>])
                         {
                                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;int&#39;</span>:
-                                <span class="keywordflow">case</span> <span class="stringliteral">&#39;timestamp&#39;</span>:
                                         $value = intval($value);
+                                        <span class="keywordflow">break</span>;
+                                <span class="keywordflow">case</span> <span class="stringliteral">&#39;timestamp&#39;</span>:
+                                        $value = strtotime($value);
                                         <span class="keywordflow">break</span>;
                                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;checkbox&#39;</span>:
                                         $value = empty($value) ? 0 : 1; <span class="comment">// SQL would have problems with true/false.</span>
@@ -309,9 +315,9 @@ Public Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="form_8php_source.html#l00078">78</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<p>Definition at line <a class="el" href="form_8php_source.html#l00083">83</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
 
-<p>Referenced by <a class="el" href="form_8php_source.html#l00120">getFormId()</a>.</p>
+<p>Referenced by <a class="el" href="form_8php_source.html#l00127">getFormId()</a>.</p>
 <div class="fragment"><pre class="fragment">        {
                 $columns = array();
                 <span class="keywordflow">foreach</span> ($this-&gt;rows as $row)
@@ -336,9 +342,9 @@ Public Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="form_8php_source.html#l00120">120</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<p>Definition at line <a class="el" href="form_8php_source.html#l00127">127</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
 
-<p>Referenced by <a class="el" href="form_8php_source.html#l00040">getHTML()</a>, and <a class="el" href="form_8php_source.html#l00072">submitted()</a>.</p>
+<p>Referenced by <a class="el" href="form_8php_source.html#l00045">getHTML()</a>, and <a class="el" href="form_8php_source.html#l00077">submitted()</a>.</p>
 <div class="fragment"><pre class="fragment">        {
                 <span class="keywordflow">return</span> sha1($this-&gt;action . $this-&gt;<a class="code" href="classForm.html#ac530ae1428933b4dca9af774505cb27f">getColumns</a>());
         }
@@ -359,7 +365,7 @@ Public Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="form_8php_source.html#l00040">40</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<p>Definition at line <a class="el" href="form_8php_source.html#l00045">45</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
 <div class="fragment"><pre class="fragment">        {
                 $params = array(
                         <span class="stringliteral">&#39;action&#39;</span>      =&gt; $this-&gt;action,
@@ -393,6 +399,96 @@ Public Attributes</h2></td></tr>
 </pre></div>
 </div>
 </div>
+<a class="anchor" id="aa0f7ad4c038d94700713c7705292ea9b"></a><!-- doxytag: member="Form::offsetExists" ref="aa0f7ad4c038d94700713c7705292ea9b" args="($offset)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Form::offsetExists </td>
+          <td>(</td>
+          <td class="paramtype">$&#160;</td>
+          <td class="paramname"><em>offset</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="form_8php_source.html#l00042">42</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<div class="fragment"><pre class="fragment">{ <span class="keywordflow">return</span> isset($this-&gt;rows[$offset]); }
+</pre></div>
+</div>
+</div>
+<a class="anchor" id="aefbd7dc0c2223c1af5637ef3c974b24b"></a><!-- doxytag: member="Form::offsetGet" ref="aefbd7dc0c2223c1af5637ef3c974b24b" args="($offset)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Form::offsetGet </td>
+          <td>(</td>
+          <td class="paramtype">$&#160;</td>
+          <td class="paramname"><em>offset</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="form_8php_source.html#l00040">40</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<div class="fragment"><pre class="fragment">{ <span class="keywordflow">return</span> $this-&gt;rows[$offset]; }
+</pre></div>
+</div>
+</div>
+<a class="anchor" id="a21f629cbab598159a96646eab29fed4a"></a><!-- doxytag: member="Form::offsetSet" ref="a21f629cbab598159a96646eab29fed4a" args="($offset, $value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Form::offsetSet </td>
+          <td>(</td>
+          <td class="paramtype">$&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">$&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="form_8php_source.html#l00041">41</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<div class="fragment"><pre class="fragment">{ $this-&gt;rows[$offset] = $value; }
+</pre></div>
+</div>
+</div>
+<a class="anchor" id="a6df97f533d353a1ca62cde164e03e858"></a><!-- doxytag: member="Form::offsetUnset" ref="a6df97f533d353a1ca62cde164e03e858" args="($offset)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Form::offsetUnset </td>
+          <td>(</td>
+          <td class="paramtype">$&#160;</td>
+          <td class="paramname"><em>offset</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="form_8php_source.html#l00043">43</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<div class="fragment"><pre class="fragment">{ unset($this-&gt;rows[$offset]); }
+</pre></div>
+</div>
+</div>
 <a class="anchor" id="a893a8e41c98ad360281401ede8c48242"></a><!-- doxytag: member="Form::submitted" ref="a893a8e41c98ad360281401ede8c48242" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -407,7 +503,7 @@ Public Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="form_8php_source.html#l00072">72</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<p>Definition at line <a class="el" href="form_8php_source.html#l00077">77</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
 <div class="fragment"><pre class="fragment">        {
                 <span class="comment">// TODO Could add CSRF protection: just set $_SESSION[&#39;requestId&#39;] and check it here.</span>
                 <span class="keywordflow">return</span> isset($_POST[<span class="stringliteral">&#39;formid&#39;</span>]) &amp;&amp; ($_POST[<span class="stringliteral">&#39;formid&#39;</span>] == $this-&gt;<a class="code" href="classForm.html#a10e7052f8571da993bbfc5023277ccb6">getFormId</a>());
@@ -452,9 +548,9 @@ Public Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="form_8php_source.html#l00162">162</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<p>Definition at line <a class="el" href="form_8php_source.html#l00169">169</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
 
-<p>Referenced by <a class="el" href="form_8php_source.html#l00125">fetchAndValidateValues()</a>.</p>
+<p>Referenced by <a class="el" href="form_8php_source.html#l00132">fetchAndValidateValues()</a>.</p>
 <div class="fragment"><pre class="fragment">        {
                 global <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
                 <span class="keywordflow">switch</span> ($validator)
@@ -535,9 +631,9 @@ Public Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="form_8php_source.html#l00216">216</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<p>Definition at line <a class="el" href="form_8php_source.html#l00223">223</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
 
-<p>Referenced by <a class="el" href="form_8php_source.html#l00162">validate()</a>.</p>
+<p>Referenced by <a class="el" href="form_8php_source.html#l00169">validate()</a>.</p>
 <div class="fragment"><pre class="fragment">        {
                 <span class="keywordflow">switch</span> ($charset)
                 {
@@ -683,7 +779,7 @@ Public Attributes</h2></td></tr>
 
 <p>Definition at line <a class="el" href="form_8php_source.html#l00012">12</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
 
-<p>Referenced by <a class="el" href="form_8php_source.html#l00125">fetchAndValidateValues()</a>, <a class="el" href="form_8php_source.html#l00087">fetchValues()</a>, and <a class="el" href="form_8php_source.html#l00162">validate()</a>.</p>
+<p>Referenced by <a class="el" href="form_8php_source.html#l00132">fetchAndValidateValues()</a>, <a class="el" href="form_8php_source.html#l00092">fetchValues()</a>, and <a class="el" href="form_8php_source.html#l00169">validate()</a>.</p>
 
 </div>
 </div>
@@ -705,7 +801,7 @@ Public Attributes</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Thu Aug 11 2011 for wwwApp by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Sat Aug 13 2011 for wwwApp by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

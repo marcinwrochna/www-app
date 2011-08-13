@@ -91,7 +91,7 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="form_8php_source.html#l00254">254</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<p>Definition at line <a class="el" href="form_8php_source.html#l00261">261</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
 
 </div>
 </div>
@@ -145,13 +145,13 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="form_8php_source.html#l00255">255</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<p>Definition at line <a class="el" href="form_8php_source.html#l00262">262</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
 
-<p>Referenced by <a class="el" href="form_8php_source.html#l00238">generateFormRows()</a>.</p>
+<p>Referenced by <a class="el" href="form_8php_source.html#l00245">generateFormRows()</a>.</p>
 <div class="fragment"><pre class="fragment">{
         global <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
         <span class="comment">// Handle named arguments.</span>
-        <span class="keywordflow">if</span> (is_array($type))
+        <span class="keywordflow">if</span> (is_array($type) || $type instanceof ArrayObject)
                 <span class="keywordflow">foreach</span> ($type as $key =&gt; $val)
                         $$key = $val;
 
@@ -163,6 +163,7 @@ Functions</h2></td></tr>
         <span class="keywordflow">if</span> ($hidden)  <span class="keywordflow">return</span> <span class="stringliteral">&#39;&#39;</span>;
 
         $rtype = $type;
+        <span class="keywordflow">if</span> ($type == <span class="stringliteral">&#39;timestamp&#39;</span>)  $default = strftime(<span class="stringliteral">&#39;%Y-%m-%d %H:%M&#39;</span>, $default);
         <span class="keywordflow">if</span> (isset($_POST[$name]) &amp;&amp; !$ignorePOST)  $default = $_POST[$name];
 
         $row = <span class="stringliteral">&quot;&lt;tr id=&#39;row_$name&#39;&gt;&quot;</span>;
@@ -177,7 +178,6 @@ Functions</h2></td></tr>
                 }
                 <span class="keywordflow">if</span> ($type == <span class="stringliteral">&#39;textarea&#39;</span> || $type == <span class="stringliteral">&#39;richtextarea&#39;</span>)
                         $default = <span class="stringliteral">&#39;&lt;div class=&quot;descriptionBox&quot;&gt;&#39;</span>. <a class="code" href="template_8php.html#a4a7e99592a2690b33d53c9bcc8fd3008">parseUserHTML</a>($default) .<span class="stringliteral">&#39;&lt;/div&gt;&#39;</span>;
-                <span class="keywordflow">if</span> ($type == <span class="stringliteral">&#39;timestamp&#39;</span>)  $default = strftime(<span class="stringliteral">&#39;%Y-%m-%d %T&#39;</span>, $default);
                 $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;label&gt;$description&lt;/label&gt;&lt;/td&gt;&quot;</span>;
                 $row .= <span class="stringliteral">&quot;&lt;td&gt;&lt;span $properties&gt;$default&lt;/span&gt;&lt;/td&gt;&quot;</span>;
         }
@@ -201,7 +201,7 @@ Functions</h2></td></tr>
                 <span class="keywordflow">case</span> <span class="stringliteral">&#39;select&#39;</span>:
                         <span class="keywordflow">if</span> (isset($other))
                         {
-                                $options[<a class="code" href="form_8php.html#a439bc28817dc0df1cca41357c1d60b49">VALUE_OTHER</a>] = <span class="stringliteral">&#39;inny...&#39;</span>;
+                                $options[<a class="code" href="form_8php.html#a439bc28817dc0df1cca41357c1d60b49">VALUE_OTHER</a>] = _(<span class="stringliteral">&#39;other...&#39;</span>);
                                 $otherIndex = count($options)-1;
                                 $properties .= <span class="stringliteral">&#39; onchange=&quot;$(\&#39;#row_&#39;</span>. $name .<span class="stringliteral">&#39;_other\&#39;).toggle(&#39;</span>.
                                         <span class="stringliteral">&#39;this.selectedIndex==&#39;</span>. $otherIndex .<span class="stringliteral">&#39;)&quot;&#39;</span>;
@@ -212,7 +212,7 @@ Functions</h2></td></tr>
                         $foundSelected = <span class="keyword">false</span>;
                         <span class="keywordflow">foreach</span> ($options as $val=&gt;$option)
                         {
-                                <span class="keywordflow">if</span> (!$foundSelected &amp;&amp; $val == <a class="code" href="form_8php.html#a439bc28817dc0df1cca41357c1d60b49">VALUE_OTHER</a>)
+                                <span class="keywordflow">if</span> (!$foundSelected &amp;&amp; ($val == <a class="code" href="form_8php.html#a439bc28817dc0df1cca41357c1d60b49">VALUE_OTHER</a>))
                                 {
                                         $selected = <span class="stringliteral">&#39;selected=&quot;selected&quot;&#39;</span>;
                                 }
@@ -326,9 +326,9 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="form_8php_source.html#l00238">238</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
+<p>Definition at line <a class="el" href="form_8php_source.html#l00245">245</a> of file <a class="el" href="form_8php_source.html">form.php</a>.</p>
 
-<p>Referenced by <a class="el" href="form_8php_source.html#l00040">Form::getHTML()</a>.</p>
+<p>Referenced by <a class="el" href="form_8php_source.html#l00045">Form::getHTML()</a>.</p>
 <div class="fragment"><pre class="fragment">{
         $result = <span class="stringliteral">&#39;&#39;</span>;
         <span class="keywordflow">foreach</span> ($inputs as $row)
@@ -361,7 +361,7 @@ Functions</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Thu Aug 11 2011 for wwwApp by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Sat Aug 13 2011 for wwwApp by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

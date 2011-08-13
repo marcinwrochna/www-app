@@ -45,7 +45,7 @@ function actionEditProfile($uid = null)
 		role            => select;        role in current edition; $nadmin;   ;              notdb;
 		roles           => checkboxgroup; other roles;             $nadmin;   ;              notdb;
 		school          => text;          school/university;       false;     ;
-		graduationyear  => select;        graduation year;         false;     int;           other;
+		graduationyear  => select;        high school graduation year; false; int;           other;
 		howdoyouknowus  => text;          how do you know us?;     false;     ;
 		interests       => richtextarea;  interests;               false;     ;
 	");
@@ -182,24 +182,22 @@ function actionEditAdditionalInfo($uid = null)
 	if (userIs('lecturer'))
 		unset($inputs['parenttelephone']);
 
-	$starttime = strtotime('2011/08/08 00:00');
-	$mealhours = array(9=>_('breakfast'), 14=>_('dinner'), 19=>_('supper'));
+	$data = $DB->editions[$edition]->assoc('*');
+	$starttime = $data['begintime'];
+	$starttime -= 60*60*strftime('%H', $starttime);
+	$hours = explode(' ', $data['importanthours']);
 	$stayoptions = array();
-	// Workshops have 11 days [0..10].
-	// The 0th days begins late, with a supper, the 10th day ends early, with a breakfast.
-	$format = "%e. (%a) %H:%M";
-	$firsttime = $starttime+(0*24+19)*60*60;
-	$stayoptions[$firsttime] = strftime($format, $firsttime);
-	for ($day=1; $day<10; $day++)
-		foreach ($mealhours as $h=>$meal)
+	$inputs['staybegintime']['default'] = false;
+	for ($day=0; $starttime + $day*24*60*60 <= $data['endtime']; $day++)
+		foreach ($hours as $h)
 	{
 		$time = $starttime+($day*24+$h)*60*60;
-		$stayoptions[$time] = strftime($format .' ('. $meal .')', $time);
+		if ($time >= $data['begintime'] && $time <= $data['endtime'])
+			$stayoptions[$time] = strftime('%e. (%a) %H:%M', $time);
+		if (!$inputs['staybegintime']['default'])
+			$inputs['staybegintime']['default'] = $time;
+		$inputs['stayendtime']['default'] = $time;
 	}
-	$lasttime = $starttime+(10*24+9)*60*60;
-	$stayoptions[$lasttime] = strftime($format, $lasttime);
-	$inputs['staybegintime']['default'] = $firsttime;
-	$inputs['stayendtime']['default'] = $lasttime;
 	$inputs['staybegintime']['options'] = $stayoptions;
 	$inputs['stayendtime']['options']   = $stayoptions;
 

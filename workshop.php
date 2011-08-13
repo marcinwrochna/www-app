@@ -380,10 +380,7 @@ function actionEditWorkshop($wid)
 	global $USER, $PAGE, $DB;
 	$wid = intval($wid);
 	$new = ($wid == -1);
-	if ($new)
-	{
-		if (!userCan('createWorkshop'))  throw new PolicyException();
-	}
+	if ($new && !userCan('createWorkshop'))  throw new PolicyException();
 	else
 		if (!userCan('editWorkshop', getLecturers($wid)))  throw new PolicyException();
 
@@ -431,7 +428,9 @@ function actionEditWorkshop($wid)
 
 	if ($new)
 	{
-		$PAGE->addMessage(_('The deadline for workshop proposal submissions has expired. Fill the form at your own risk.'), 'warning');
+		if (time() > $DB->editions[getOption('currentEdition')]->get('proposaldeadline'))
+			$PAGE->addMessage(_('The deadline for workshop proposal submissions has expired. '.
+				'Fill the form at your own risk.'), 'warning');
 
 		$data = array(
 			'wid' => -1,

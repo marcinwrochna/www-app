@@ -103,23 +103,25 @@ Functions</h2></td></tr>
         $headers = <a class="code" href="utils_8php.html#ae70693a7d9a8484219fe57bdf2d2a46f">parseTable</a>(<span class="stringliteral">&#39;</span>
 <span class="stringliteral">                COLUMN            =&gt; tDESCRIPTION; ORDER;</span>
 <span class="stringliteral">                uid               =&gt; uid;          u.uid;</span>
-<span class="stringliteral">                name              =&gt; full name;    u.ordername;</span>
-<span class="stringliteral">                email             =&gt; e-mail;       u.email;</span>
+<span class="stringliteral">                name              =&gt; full name;    ordername;</span>
+<span class="stringliteral">                email             =&gt; e-mail;       email;</span>
 <span class="stringliteral">                roles             =&gt; roles;            rolecount DESC;</span>
-<span class="stringliteral">                lecturer          =&gt; L;            eu.lecturer DESC;</span>
-<span class="stringliteral">                qualified         =&gt; q;            eu.qualified DESC;</span>
-<span class="stringliteral">                motivationletter  =&gt; letter;       length(u.motivationletter) DESC;</span>
+<span class="stringliteral">                lecturer          =&gt; L;            lecturer;</span>
+<span class="stringliteral">                qualified         =&gt; q;            qualified;</span>
+<span class="stringliteral">                motivationletter  =&gt; letter;       length(motivationletter) DESC;</span>
 <span class="stringliteral">        &#39;</span>);
         $headers[<span class="stringliteral">&#39;motivationletter&#39;</span>][<span class="stringliteral">&#39;description&#39;</span>] .=
                 <span class="stringliteral">&#39;&lt;small &#39;</span>. <a class="code" href="template_8php.html#a9b9585537fe5238d4d5b54478251ccfa">getTipJS</a>(_(<span class="stringliteral">&#39;words in motivation letter&#39;</span>)) .<span class="stringliteral">&#39;&gt;[?]&lt;/small&gt;&#39;</span>;
 
 
         $PAGE-&gt;title = _(<span class="stringliteral">&#39;Users administration&#39;</span>);
+        <span class="comment">// We select -lecturer and -qualified because of SQL&#39;s stupid null sorting.</span>
         $users = $DB-&gt;query(<span class="stringliteral">&#39;</span>
-<span class="stringliteral">                SELECT u.uid, u.name, u.email, eu.lecturer, eu.qualified, u.motivationletter,</span>
-<span class="stringliteral">                        (SELECT COUNT(*) FROM table_user_roles ur WHERE ur.uid=u.uid) AS rolecount</span>
-<span class="stringliteral">                FROM table_users u, table_edition_users eu</span>
-<span class="stringliteral">                WHERE eu.uid=u.uid AND eu.edition = &#39;</span>. <a class="code" href="utils_8php.html#a86acce3c002ca1af709fd1b04f2f82fa">getOption</a>(<span class="stringliteral">&#39;currentEdition&#39;</span>) .<span class="stringliteral">&#39;</span>
+<span class="stringliteral">                SELECT u.uid, u.name, u.email, u.motivationletter,</span>
+<span class="stringliteral">                        (SELECT COUNT(*) FROM table_user_roles ur WHERE ur.uid=u.uid) AS rolecount,</span>
+<span class="stringliteral">                        (SELECT -eu.lecturer  FROM table_edition_users eu WHERE eu.uid=u.uid AND eu.edition = &#39;</span>. <a class="code" href="utils_8php.html#a86acce3c002ca1af709fd1b04f2f82fa">getOption</a>(<span class="stringliteral">&#39;currentEdition&#39;</span>) .<span class="stringliteral">&#39;) AS lecturer,</span>
+<span class="stringliteral">                        (SELECT -eu.qualified FROM table_edition_users eu WHERE eu.uid=u.uid AND eu.edition = &#39;</span>. <a class="code" href="utils_8php.html#a86acce3c002ca1af709fd1b04f2f82fa">getOption</a>(<span class="stringliteral">&#39;currentEdition&#39;</span>) .<span class="stringliteral">&#39;) AS qualified</span>
+<span class="stringliteral">                FROM table_users u</span>
 <span class="stringliteral">                ORDER BY &#39;</span>. implode(<span class="charliteral">&#39;,&#39;</span>, <a class="code" href="utils_8php.html#a0da0744a927ee4af264f38b1c2fce8bf">getUpdatedOrder</a>(<span class="stringliteral">&#39;users&#39;</span>, $headers, <span class="stringliteral">&#39;u.ordername&#39;</span>)));
         $users = $users-&gt;fetch_all();
 
@@ -153,11 +155,13 @@ Functions</h2></td></tr>
                 $row[<span class="stringliteral">&#39;motivationletter&#39;</span>] = str_word_count(strip_tags($row[<span class="stringliteral">&#39;motivationletter&#39;</span>]));
                 <span class="keywordflow">if</span> (!$row[<span class="stringliteral">&#39;motivationletter&#39;</span>])
                         $row[<span class="stringliteral">&#39;motivationletter&#39;</span>] = <span class="stringliteral">&#39;&#39;</span>;
-                <span class="keywordflow">if</span> ($row[<span class="stringliteral">&#39;lecturer&#39;</span>])
+                <span class="keywordflow">if</span> (isset($row[<span class="stringliteral">&#39;lecturer&#39;</span>]) &amp;&amp; $row[<span class="stringliteral">&#39;lecturer&#39;</span>])
                         $row[<span class="stringliteral">&#39;lecturer&#39;</span>]  =  <span class="stringliteral">&#39;&lt;span &#39;</span>. <a class="code" href="template_8php.html#a9b9585537fe5238d4d5b54478251ccfa">getTipJS</a>(_(<span class="stringliteral">&#39;lecturer&#39;</span>)) .<span class="charliteral">&#39;&gt;&#39;</span>. _(<span class="charliteral">&#39;L&#39;</span>) .<span class="stringliteral">&#39;&lt;/span&gt;&#39;</span>;
-                <span class="keywordflow">else</span>
+                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (isset($row[<span class="stringliteral">&#39;lecturer&#39;</span>]))
                         $row[<span class="stringliteral">&#39;lecturer&#39;</span>]  =  <span class="stringliteral">&#39;&lt;span &#39;</span>. <a class="code" href="template_8php.html#a9b9585537fe5238d4d5b54478251ccfa">getTipJS</a>(_(<span class="stringliteral">&#39;candidate&#39;</span>)) .<span class="charliteral">&#39;&gt;&#39;</span>. _(<span class="charliteral">&#39;c&#39;</span>) .<span class="stringliteral">&#39;&lt;/span&gt;&#39;</span>;
-                <span class="keywordflow">if</span> ($row[<span class="stringliteral">&#39;qualified&#39;</span>])
+                <span class="keywordflow">else</span>
+                        $row[<span class="stringliteral">&#39;lecturer&#39;</span>]  = <span class="stringliteral">&#39;&#39;</span>;
+                <span class="keywordflow">if</span> (isset($row[<span class="stringliteral">&#39;qualified&#39;</span>]) &amp;&amp; $row[<span class="stringliteral">&#39;qualified&#39;</span>])
                         $row[<span class="stringliteral">&#39;qualified&#39;</span>] =  <span class="stringliteral">&#39;&lt;span &#39;</span>. <a class="code" href="template_8php.html#a9b9585537fe5238d4d5b54478251ccfa">getTipJS</a>(_(<span class="stringliteral">&#39;qualified&#39;</span>)) .<span class="charliteral">&#39;&gt;&#39;</span>. _(<span class="charliteral">&#39;q&#39;</span>). <span class="stringliteral">&#39;&lt;/span&gt;&#39;</span>;
                 <span class="keywordflow">else</span>
                         $row[<span class="stringliteral">&#39;qualified&#39;</span>] = <span class="stringliteral">&#39;&#39;</span>;
@@ -188,7 +192,7 @@ Functions</h2></td></tr>
 <div class="memdoc">
 <p>Displays a summary about a user and a one-checkbox form - qualified or not. </p>
 
-<p>Definition at line <a class="el" href="admin_8php_source.html#l00120">120</a> of file <a class="el" href="admin_8php_source.html">admin.php</a>.</p>
+<p>Definition at line <a class="el" href="admin_8php_source.html#l00124">124</a> of file <a class="el" href="admin_8php_source.html">admin.php</a>.</p>
 <div class="fragment"><pre class="fragment">{
         global <a class="code" href="common_8php.html#a7dc56dc8b18ad37272b56fa7395bedef">$DB</a>, <a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
         <span class="keywordflow">if</span> (!<a class="code" href="user_2utils_8php.html#a1e9c8ed2c5ed2def1a367c9ffd04114b">userCan</a>(<span class="stringliteral">&#39;adminUsers&#39;</span>))  <span class="keywordflow">throw</span> <span class="keyword">new</span> <a class="code" href="classPolicyException.html">PolicyException</a>();
@@ -345,9 +349,9 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="admin_8php_source.html#l00201">201</a> of file <a class="el" href="admin_8php_source.html">admin.php</a>.</p>
+<p>Definition at line <a class="el" href="admin_8php_source.html#l00205">205</a> of file <a class="el" href="admin_8php_source.html">admin.php</a>.</p>
 
-<p>Referenced by <a class="el" href="profile_8php_source.html#l00151">actionEditAdditionalInfo()</a>, <a class="el" href="profile_8php_source.html#l00006">actionEditProfile()</a>, and <a class="el" href="admin_8php_source.html#l00120">actionEditUserStatus()</a>.</p>
+<p>Referenced by <a class="el" href="profile_8php_source.html#l00151">actionEditAdditionalInfo()</a>, <a class="el" href="profile_8php_source.html#l00006">actionEditProfile()</a>, and <a class="el" href="admin_8php_source.html#l00124">actionEditUserStatus()</a>.</p>
 <div class="fragment"><pre class="fragment">{
         global <a class="code" href="common_8php.html#a7dc56dc8b18ad37272b56fa7395bedef">$DB</a>;
         $prev = $DB-&gt;query(<span class="stringliteral">&#39;SELECT MAX(uid) FROM table_users WHERE uid&lt;$1&#39;</span>, $uid)-&gt;fetch();
@@ -387,7 +391,7 @@ Functions</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Thu Aug 11 2011 for wwwApp by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Sat Aug 13 2011 for wwwApp by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

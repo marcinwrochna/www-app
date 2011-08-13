@@ -1,15 +1,14 @@
-genderize-printf conflict.
 == Things that are just plain wrong ==
-doxygen
+polish genderize()-printf() conflict.
+doxygen everything
 installation - at least describe.
-notify.php - translate (emails- it requires we remember a user's language preference).
-tutoring.php - review (update depracated things), translate
-move hardcoded edition data to table_editions (start, end, meals, actionEditWorkshop's "deadline", ...)
+notify.php - translate (it sends emails, so it requires we remember a user's language preference).
+tutoring.php - review (update deprecated things), translate
 recheck permissions (grep userCan, userIs), check perms in task solution forms
 
 == Security ==
 parseUserHTML() - use HTMLPurifier, recheck if evrything applies either this or htmlspecialchars.
-Test aforementioned XSS-protection with (at least) 'Abćđœ\\n+Plus%25 '. "\n" .'"DQuoted" O\'Brian &&amp; <Company>';
+Test this XSS-protection with (at least) 'Abćđœ\\n+Plus%25 '. "\n" .'"DQuoted" O\'Brian &&amp; <Company>{{\\\'}}';
 automatically validate 'select' to contain one of the options (unless 'other' is set, of course).
 CSRF protection in $form->submitted();
 

@@ -27,10 +27,10 @@ function actionShowCorrelation()
 	{
 		$DB->query('
 			SELECT w.wid,w.title,
-				(SELECT COUNT(*) FROM w1_users u WHERE
-					EXISTS (SELECT * FROM w1_edition_users eu  WHERE u.uid=eu.uid AND edition=$1 AND qualified>0) AND
-					EXISTS (SELECT * FROM w1_workshop_users wu WHERE u.uid=wu.uid AND wu.wid=w.wid AND participant>=$5) AND
-					EXISTS (SELECT * FROM w1_workshop_users wu WHERE u.uid=wu.uid AND wu.wid=$2 AND participant>=$5)) AS cnt
+				(SELECT COUNT(*) FROM table_users u WHERE
+					EXISTS (SELECT * FROM table_edition_users eu  WHERE u.uid=eu.uid AND edition=$1 AND qualified>0) AND
+					EXISTS (SELECT * FROM table_workshop_users wu WHERE u.uid=wu.uid AND wu.wid=w.wid AND participant>=$5) AND
+					EXISTS (SELECT * FROM table_workshop_users wu WHERE u.uid=wu.uid AND wu.wid=$2 AND participant>=$5)) AS cnt
 			FROM table_workshops w
 			WHERE edition=$1 AND w.type=$3 AND w.status=$4
 			ORDER BY w.title',
@@ -192,37 +192,39 @@ function actionListDailyCounts()
 	global $DB,$PAGE;
 	if (!userCan('adminUsers'))  throw new PolicyException();
 	$PAGE->title = _('List of meal data');
-	$edition = getOption('currentEdition');
-	$starttime = strtotime('2011/08/08 00:00');
+	$edition = $DB->editions[getOption('currentEdition')]->assoc('*');
 
 	if (!isset($_GET['print']))
 		echo '<a class="right" href="?print">'. _('printable version') .'</a>';
 
-	$DB->query('SELECT COUNT(*) FROM w1_edition_users
+	$DB->query('SELECT COUNT(*) FROM table_edition_users
 		        WHERE edition=$1 AND qualified>0
 					AND (staybegintime IS NULL OR stayendtime IS NULL
 					     OR staybegintime < $2 OR stayendtime < $2)',
-				$edition, $starttime);
+				$edition['edition'], $edition['begintime']);
 	echo _('Number of qualified users who didn\'t specify their staying time: '). $DB->fetch();
 	echo ' ('. _('see') .' <a href="listPersonalData">'. _('list of personal data') .'</a>)<br/>';
 
 
-	$hours = array(3,9,14,19);
+	$hours = explode(' ', $edition['importanthours']);
 	$headers = array(_('day'));
 	foreach ($hours as $h)
 		$headers[]= "$h:00";
 	$rows = array();
-	for ($i=0; $i<=10; $i++) // Workshops have 11 days [0..10].
+	$starttime = $edition['begintime'];
+	$starttime -= 60*60*strftime('%H', $starttime);
+	for ($day=0; $starttime + $day*24*60*60 <= $edition['endtime']; $day++)
+
 	{
-		$time = $starttime + $i*24*3600;
-		$row = array(strftime("%a %e.", $time+9*3600));
-		$query = 'SELECT COUNT(*) FROM w1_edition_users
+		$time = $starttime + $day*24*60*60;
+		$row = array(strftime("%a %e.", $time+9*60*60));
+		$query = 'SELECT COUNT(*) FROM table_edition_users
 			      WHERE edition=$1 AND qualified > 0
 			            AND staybegintime<=$2 AND stayendtime>=$2
 			            AND isselfcatered=0
 			            ';
 		foreach ($hours as $h)
-			$row[]= $DB->query($query, $edition, $time+$h*3600)->fetch();
+			$row[]= $DB->query($query, $edition['edition'], $time+$h*3600)->fetch();
 		$rows[]= $row;
 	}
 	buildTableHTML($rows, $headers);
@@ -230,7 +232,7 @@ function actionListDailyCounts()
 	$tshirtsizes = array('XS','S','M','L','XL','XXL');
 	echo '<h4>' ._('T-shirt sizes') .'</h4>';
 	$rows = array();
-	$query = 'SELECT COUNT(*) FROM w1_users u WHERE '. sqlUserIsQualified() .' AND u.tshirtsize=$1';
+	$query = 'SELECT COUNT(*) FROM table_users u WHERE '. sqlUserIsQualified() .' AND u.tshirtsize=$1';
 	foreach ($tshirtsizes as $t)
 		$rows[]= array($t, $DB->query($query, $t)->fetch());
 	buildTableHTML($rows);

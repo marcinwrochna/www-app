@@ -170,37 +170,39 @@ Functions</h2></td></tr>
         global <a class="code" href="common_8php.html#a7dc56dc8b18ad37272b56fa7395bedef">$DB</a>,<a class="code" href="index_8php.html#ae1848ae8dc4014bc7c680e5504a8eef0">$PAGE</a>;
         <span class="keywordflow">if</span> (!<a class="code" href="user_2utils_8php.html#a1e9c8ed2c5ed2def1a367c9ffd04114b">userCan</a>(<span class="stringliteral">&#39;adminUsers&#39;</span>))  <span class="keywordflow">throw</span> <span class="keyword">new</span> <a class="code" href="classPolicyException.html">PolicyException</a>();
         $PAGE-&gt;title = _(<span class="stringliteral">&#39;List of meal data&#39;</span>);
-        $edition = <a class="code" href="utils_8php.html#a86acce3c002ca1af709fd1b04f2f82fa">getOption</a>(<span class="stringliteral">&#39;currentEdition&#39;</span>);
-        $starttime = strtotime(<span class="stringliteral">&#39;2011/08/08 00:00&#39;</span>);
+        $edition = $DB-&gt;editions[<a class="code" href="utils_8php.html#a86acce3c002ca1af709fd1b04f2f82fa">getOption</a>(<span class="stringliteral">&#39;currentEdition&#39;</span>)]-&gt;assoc(<span class="charliteral">&#39;*&#39;</span>);
 
         <span class="keywordflow">if</span> (!isset($_GET[<span class="stringliteral">&#39;print&#39;</span>]))
                 echo <span class="stringliteral">&#39;&lt;a class=&quot;right&quot; href=&quot;?print&quot;&gt;&#39;</span>. _(<span class="stringliteral">&#39;printable version&#39;</span>) .<span class="stringliteral">&#39;&lt;/a&gt;&#39;</span>;
 
-        $DB-&gt;query(<span class="stringliteral">&#39;SELECT COUNT(*) FROM w1_edition_users</span>
+        $DB-&gt;query(<span class="stringliteral">&#39;SELECT COUNT(*) FROM table_edition_users</span>
 <span class="stringliteral">                        WHERE edition=$1 AND qualified&gt;0</span>
 <span class="stringliteral">                                        AND (staybegintime IS NULL OR stayendtime IS NULL</span>
 <span class="stringliteral">                                             OR staybegintime &lt; $2 OR stayendtime &lt; $2)&#39;</span>,
-                                $edition, $starttime);
+                                $edition[<span class="stringliteral">&#39;edition&#39;</span>], $edition[<span class="stringliteral">&#39;begintime&#39;</span>]);
         echo _(<span class="stringliteral">&#39;Number of qualified users who didn\&#39;t specify their staying time: &#39;</span>). $DB-&gt;fetch();
         echo <span class="stringliteral">&#39; (&#39;</span>. _(<span class="stringliteral">&#39;see&#39;</span>) .<span class="stringliteral">&#39; &lt;a href=&quot;listPersonalData&quot;&gt;&#39;</span>. _(<span class="stringliteral">&#39;list of personal data&#39;</span>) .<span class="stringliteral">&#39;&lt;/a&gt;)&lt;br/&gt;&#39;</span>;
 
 
-        $hours = array(3,9,14,19);
+        $hours = explode(<span class="charliteral">&#39; &#39;</span>, $edition[<span class="stringliteral">&#39;importanthours&#39;</span>]);
         $headers = array(_(<span class="stringliteral">&#39;day&#39;</span>));
         <span class="keywordflow">foreach</span> ($hours as $h)
                 $headers[]= <span class="stringliteral">&quot;$h:00&quot;</span>;
         $rows = array();
-        <span class="keywordflow">for</span> ($i=0; $i&lt;=10; $i++) <span class="comment">// Workshops have 11 days [0..10].</span>
+        $starttime = $edition[<span class="stringliteral">&#39;begintime&#39;</span>];
+        $starttime -= 60*60*strftime(<span class="stringliteral">&#39;%H&#39;</span>, $starttime);
+        <span class="keywordflow">for</span> ($day=0; $starttime + $day*24*60*60 &lt;= $edition[<span class="stringliteral">&#39;endtime&#39;</span>]; $day++)
+
         {
-                $time = $starttime + $i*24*3600;
-                $row = array(strftime(<span class="stringliteral">&quot;%a %e.&quot;</span>, $time+9*3600));
-                $query = <span class="stringliteral">&#39;SELECT COUNT(*) FROM w1_edition_users</span>
+                $time = $starttime + $day*24*60*60;
+                $row = array(strftime(<span class="stringliteral">&quot;%a %e.&quot;</span>, $time+9*60*60));
+                $query = <span class="stringliteral">&#39;SELECT COUNT(*) FROM table_edition_users</span>
 <span class="stringliteral">                              WHERE edition=$1 AND qualified &gt; 0</span>
 <span class="stringliteral">                                    AND staybegintime&lt;=$2 AND stayendtime&gt;=$2</span>
 <span class="stringliteral">                                    AND isselfcatered=0</span>
 <span class="stringliteral">                                    &#39;</span>;
                 <span class="keywordflow">foreach</span> ($hours as $h)
-                        $row[]= $DB-&gt;query($query, $edition, $time+$h*3600)-&gt;fetch();
+                        $row[]= $DB-&gt;query($query, $edition[<span class="stringliteral">&#39;edition&#39;</span>], $time+$h*3600)-&gt;fetch();
                 $rows[]= $row;
         }
         <a class="code" href="template_8php.html#a3bbebc058e2a5749c5129ef04f2db578">buildTableHTML</a>($rows, $headers);
@@ -208,7 +210,7 @@ Functions</h2></td></tr>
         $tshirtsizes = array(<span class="stringliteral">&#39;XS&#39;</span>,<span class="charliteral">&#39;S&#39;</span>,<span class="charliteral">&#39;M&#39;</span>,<span class="charliteral">&#39;L&#39;</span>,<span class="stringliteral">&#39;XL&#39;</span>,<span class="stringliteral">&#39;XXL&#39;</span>);
         echo <span class="stringliteral">&#39;&lt;h4&gt;&#39;</span> ._(<span class="stringliteral">&#39;T-shirt sizes&#39;</span>) .<span class="stringliteral">&#39;&lt;/h4&gt;&#39;</span>;
         $rows = array();
-        $query = <span class="stringliteral">&#39;SELECT COUNT(*) FROM w1_users u WHERE &#39;</span>. <a class="code" href="summary_8php.html#a63074bc210dc044f5dc0fe9f5f334eb1">sqlUserIsQualified</a>() .<span class="stringliteral">&#39; AND u.tshirtsize=$1&#39;</span>;
+        $query = <span class="stringliteral">&#39;SELECT COUNT(*) FROM table_users u WHERE &#39;</span>. <a class="code" href="summary_8php.html#a63074bc210dc044f5dc0fe9f5f334eb1">sqlUserIsQualified</a>() .<span class="stringliteral">&#39; AND u.tshirtsize=$1&#39;</span>;
         <span class="keywordflow">foreach</span> ($tshirtsizes as $t)
                 $rows[]= array($t, $DB-&gt;query($query, $t)-&gt;fetch());
         <a class="code" href="template_8php.html#a3bbebc058e2a5749c5129ef04f2db578">buildTableHTML</a>($rows);
@@ -309,10 +311,10 @@ Functions</h2></td></tr>
         {
                 $DB-&gt;query(<span class="stringliteral">&#39;</span>
 <span class="stringliteral">                        SELECT w.wid,w.title,</span>
-<span class="stringliteral">                                (SELECT COUNT(*) FROM w1_users u WHERE</span>
-<span class="stringliteral">                                        EXISTS (SELECT * FROM w1_edition_users eu  WHERE u.uid=eu.uid AND edition=$1 AND qualified&gt;0) AND</span>
-<span class="stringliteral">                                        EXISTS (SELECT * FROM w1_workshop_users wu WHERE u.uid=wu.uid AND wu.wid=w.wid AND participant&gt;=$5) AND</span>
-<span class="stringliteral">                                        EXISTS (SELECT * FROM w1_workshop_users wu WHERE u.uid=wu.uid AND wu.wid=$2 AND participant&gt;=$5)) AS cnt</span>
+<span class="stringliteral">                                (SELECT COUNT(*) FROM table_users u WHERE</span>
+<span class="stringliteral">                                        EXISTS (SELECT * FROM table_edition_users eu  WHERE u.uid=eu.uid AND edition=$1 AND qualified&gt;0) AND</span>
+<span class="stringliteral">                                        EXISTS (SELECT * FROM table_workshop_users wu WHERE u.uid=wu.uid AND wu.wid=w.wid AND participant&gt;=$5) AND</span>
+<span class="stringliteral">                                        EXISTS (SELECT * FROM table_workshop_users wu WHERE u.uid=wu.uid AND wu.wid=$2 AND participant&gt;=$5)) AS cnt</span>
 <span class="stringliteral">                        FROM table_workshops w</span>
 <span class="stringliteral">                        WHERE edition=$1 AND w.type=$3 AND w.status=$4</span>
 <span class="stringliteral">                        ORDER BY w.title&#39;</span>,
@@ -390,7 +392,7 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="summary_8php_source.html#l00239">239</a> of file <a class="el" href="summary_8php_source.html">summary.php</a>.</p>
+<p>Definition at line <a class="el" href="summary_8php_source.html#l00241">241</a> of file <a class="el" href="summary_8php_source.html">summary.php</a>.</p>
 
 <p>Referenced by <a class="el" href="summary_8php_source.html#l00190">actionListDailyCounts()</a>, and <a class="el" href="summary_8php_source.html#l00095">actionListPersonalData()</a>.</p>
 <div class="fragment"><pre class="fragment">{
@@ -417,7 +419,7 @@ Functions</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Thu Aug 11 2011 for wwwApp by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Sat Aug 13 2011 for wwwApp by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

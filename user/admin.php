@@ -47,23 +47,25 @@ function actionAdminUsers()
 	$headers = parseTable('
 		COLUMN            => tDESCRIPTION; ORDER;
 		uid               => uid;          u.uid;
-		name              => full name;    u.ordername;
-		email             => e-mail;       u.email;
+		name              => full name;    ordername;
+		email             => e-mail;       email;
 		roles             => roles;	       rolecount DESC;
-		lecturer          => L;            eu.lecturer DESC;
-		qualified         => q;            eu.qualified DESC;
-		motivationletter  => letter;       length(u.motivationletter) DESC;
+		lecturer          => L;            lecturer;
+		qualified         => q;            qualified;
+		motivationletter  => letter;       length(motivationletter) DESC;
 	');
 	$headers['motivationletter']['description'] .=
 		'<small '. getTipJS(_('words in motivation letter')) .'>[?]</small>';
 
 
 	$PAGE->title = _('Users administration');
+	// We select -lecturer and -qualified because of SQL's stupid null sorting.
 	$users = $DB->query('
-		SELECT u.uid, u.name, u.email, eu.lecturer, eu.qualified, u.motivationletter,
-			(SELECT COUNT(*) FROM table_user_roles ur WHERE ur.uid=u.uid) AS rolecount
-		FROM table_users u, table_edition_users eu
-		WHERE eu.uid=u.uid AND eu.edition = '. getOption('currentEdition') .'
+		SELECT u.uid, u.name, u.email, u.motivationletter,
+			(SELECT COUNT(*) FROM table_user_roles ur WHERE ur.uid=u.uid) AS rolecount,
+			(SELECT -eu.lecturer  FROM table_edition_users eu WHERE eu.uid=u.uid AND eu.edition = '. getOption('currentEdition') .') AS lecturer,
+			(SELECT -eu.qualified FROM table_edition_users eu WHERE eu.uid=u.uid AND eu.edition = '. getOption('currentEdition') .') AS qualified
+		FROM table_users u
 		ORDER BY '. implode(',', getUpdatedOrder('users', $headers, 'u.ordername')));
 	$users = $users->fetch_all();
 
@@ -97,11 +99,13 @@ function actionAdminUsers()
 		$row['motivationletter'] = str_word_count(strip_tags($row['motivationletter']));
 		if (!$row['motivationletter'])
 			$row['motivationletter'] = '';
-		if ($row['lecturer'])
+		if (isset($row['lecturer']) && $row['lecturer'])
 			$row['lecturer']  =  '<span '. getTipJS(_('lecturer')) .'>'. _('L') .'</span>';
-		else
+		else if (isset($row['lecturer']))
 			$row['lecturer']  =  '<span '. getTipJS(_('candidate')) .'>'. _('c') .'</span>';
-		if ($row['qualified'])
+		else
+			$row['lecturer']  = '';
+		if (isset($row['qualified']) && $row['qualified'])
 			$row['qualified'] =  '<span '. getTipJS(_('qualified')) .'>'. _('q'). '</span>';
 		else
 			$row['qualified'] = '';

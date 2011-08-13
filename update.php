@@ -404,4 +404,16 @@ switch ($version)
 		$DB->query('UPDATE w1_role_permissions SET role=\'candidate\' WHERE role=\'uczestnik\'');
 		setVersion(49);
 	case(49):
+		$DB->query('ALTER TABLE w1_editions ADD COLUMN begintime int');
+		$DB->query('ALTER TABLE w1_editions ADD COLUMN endtime int');
+		$DB->query('ALTER TABLE w1_editions ADD COLUMN importanthours varchar(50)');
+		$DB->query('ALTER TABLE w1_editions ADD COLUMN proposaldeadline int');
+		$DB->query('UPDATE w1_editions SET begintime=$1 WHERE edition=6', strtotime('2010/08/19 18:00'));
+		$DB->query('UPDATE w1_editions SET begintime=$1 WHERE edition=7', strtotime('2011/08/08 18:00'));
+		$DB->query('UPDATE w1_editions SET endtime=$1 WHERE edition=6', strtotime('2010/08/29 10:00'));
+		$DB->query('UPDATE w1_editions SET endtime=$1 WHERE edition=7', strtotime('2011/08/18 10:00'));
+		$DB->query('UPDATE w1_editions SET proposaldeadline=$1 WHERE edition=7', strtotime('2011/05/15 10:00'));
+		$DB->query('UPDATE w1_editions SET importanthours=$1', '3 9 14 19');
+		setVersion(50);
+	case(50):
 }

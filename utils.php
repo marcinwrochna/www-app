@@ -70,7 +70,8 @@ function actionHomepage()
 		qualify            => Wait for results.;  You have been qualified.; ;
 		fillAdditionalInfo => Fill;           You filled;    the additional info form.;       editAdditionalInfo;
 	');
-	$did['solveTasks']['commonText'] .= ' ('. _('before') .' '. '10 lipca' .').';
+	$did['solveTasks']['commonText'] .= ' ('. _('before') .' '.
+		fixedStrftime(_('%e %B'), strtotime('2011/07/10')) .').';
 
 	$did['applyAsParticipant']['done'] = $didApplyAsParticipant;
 	$did['applyAsParticipant']['enabled'] = !$didApplyAsLecturer;
@@ -129,10 +130,14 @@ function actionHomepage()
 		writeDescription   => Write;          You wrote;     a decription for users on wikidot;
 		checkTasks         => ;               ;              ;
 	');
-	$did['proposeWorkshop']['commonText'] .= ' ('. _('before') .' '. '15 kwietnia' .').';
-	$did['writeDescription']['commonText'] .= ' ('. _('before') .' '. '1 maja' .').';
+	$did['proposeWorkshop']['commonText'] .= ' ('. _('before') .' '.
+		fixedStrftime(_('%e %B'), $DB->editions[getOption('currentEdition')]->get('proposaldeadline')) .').';
+	$did['writeDescription']['commonText'] .= ' ('. _('before') .' '.
+		fixedStrftime(_('%e %B'), strtotime('2011/05/01')) .').';
 	$did['checkTasks']['notDoneText'] =
-		sprintf(_('Write (before %s) and check solutions to (before %s)'), '10 maja', '10 lipca');
+		sprintf(_('Write (before %s) and check solutions to (before %s)'),
+		fixedStrftime(_('%e %B'), strtotime('2011/05/10')),
+		fixedStrftime(_('%e %B'), strtotime('2011/07/10')));
 	$did['checkTasks']['doneText'] = _('You wrote and checked solutions to');
 	$did['checkTasks']['commonText']  = _('qualification tasks.');
 
@@ -302,35 +307,73 @@ function getOption($name)
 
 function actionEditOptions()
 {
+	global $DB, $PAGE;
 	if (!userCan('editOptions'))  throw new PolicyException();
-	$form = new Form();
+	$PAGE->title = _('Settings');
 
-	global $DB;
+	echo '<h3>'. _('Current workshops edition') .'</h3>';
+	$form = new Form(parseTable('
+		NAME             => TYPE;      tDESCRIPTION;
+		begintime        => timestamp; Workshops\' start time;
+		endtime          => timestamp; Workshops\' finish time;
+		importanthours   => text;      Hours about which we want to have statistics, space separated (e.g. type 3  to know how many persons will need accomodation every night, 9 for breakfast, ...).;
+		proposaldeadline => timestamp; Deadline for proposals (soft);
+	'));
+	if ($form->submitted())
+	{
+		$values = $form->fetchAndValidateValues();
+		if ($form->valid)
+		{
+			$DB->editions[getOption('currentEdition')]->update($values);
+			$PAGE->addMessage(_('Saved.'), 'success');
+		}
+	}
+	$form->columnWidth = '33%';
+	$form->values = $DB->editions[getOption('currentEdition')]->assoc($form->getColumns());
+	echo $form->getHTML();
+
+	echo '<h3>'. _('Global settings'). '</h3>';
+	$form = new Form();
 	$options = $DB->query('SELECT * FROM table_options ORDER BY name');
 	foreach ($options as $r)
 	{
-		$form->addRow($r['type'], $r['name'], $r['description']);
+		$form->addRow($r['type'], $r['name'], $r['description']); // TODO deprecated form?
 		$form->values[$r['name']] = $r['value'];
 	}
+
+	$form['currentEdition']['type'] = 'select';
+	$editions = $DB->query('SELECT edition FROM table_editions')->fetch_column();
+	foreach ($editions as $e)
+		$form['currentEdition']['options'] = array_combine($editions, $editions);
+	$form['currentEdition']['other'] = _('use a new number to create a new edition');
+	$form['currentEdition']['validation'] = 'int';
+
 	if (isset($form->values['gmailOAuthAccessToken']))
 		$form->values['gmailOAuthAccessToken'] =
 			substr($form->values['gmailOAuthAccessToken'],0, 16) . '...';
 
-	global $PAGE;
-	$PAGE->title = _('Settings');
-	$form->action = 'editOptionsForm'; // TODO deprecated form.
+	if ($form->submitted())
+	{
+		$values = $form->fetchAndValidateValues();
+		if ($form->valid)
+		{
+			$ed = $values['currentEdition'];
+			if (!isset($DB->editions[$ed]))
+			{
+				$row = $DB->editions[getOption('currentEdition')]->assoc('*');
+				$row['edition'] = $ed;
+				$DB->editions[]= $row;
+				$PAGE->addMessage(sprintf(_('Created edition %d.'), $ed), 'success');
+			}
+			foreach ($values as $name=>$value)
+				if ($DB->options[$name]->get('type') != 'readonly')
+					$DB->options[$name] = array('value' => $value);
+			$PAGE->addMessage(_('Saved global settings.'), 'success');
+			logUser('admin setting');
+			callAction('editOptions');
+		}
+	}
 	echo $form->getHTML();
-}
-
-function actionEditOptionsForm()
-{
-	global $DB, $PAGE;
-	foreach ($_POST as $name=>$value)
-		if ($DB->options[$name]->get('type') != 'readonly')
-				$DB->options[$name] = array('value' => $value);
-	$PAGE->addMessage(_('Saved settings.'), 'success');
-	logUser('admin setting');
-	callAction('editOptions');
 }
 
 function actionDatabaseRaw()
@@ -497,4 +540,26 @@ function dbg($o)
 {
 	global $PAGE;
 	$PAGE->addMessage(htmlspecialchars(json_encode($o)));
+}
+
+/**
+ * Equal to strftime, but with correctly inflected month names in polish.
+ */
+function fixedStrftime($format, $timestamp)
+{
+	$polish = array(
+		'styczeń'     => 'stycznia',
+		'luty'        => 'lutego',
+		'marzec'      => 'marca',
+		'kwiecień'    => 'kwietnia',
+		'maj'         => 'maja',
+		'czerwiec'    => 'czerwca',
+		'lipiec'      => 'lipca',
+		'sierpień'    => 'sierpnia',
+		'wrzesień'    => 'września',
+		'październik' => 'października',
+		'listopad'    => 'listopada',
+		'grudzień'    => 'grudnia'
+	);
+	return str_replace(array_keys($polish), array_values($polish), strftime($format, $timestamp));
 }
