@@ -8,7 +8,10 @@ CGI and Perl for latex and upload status bar
 		mimetex isn't beautiful, jsmath matured very much,
 		uber-upload is uber-complicated, TinyMCE now features a HTML upload handler).
 === Configuration ===
-Fill config.php.template and move to "config.php".
+Create a database and fill it with install.sql.
+Fill config.php.template and move to "config.php". You should probably try to minimalize its chmod.
+Run the application and login as root. You can create an account for you or change root's name and login.
+Check the options in menu->administration->options.
 
 == Utilities ==
 === internationalization ===
