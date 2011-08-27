@@ -45,7 +45,7 @@ function actionEditProfile($uid = null)
 		role            => select;        role in current edition; $nadmin;   ;              notdb;
 		roles           => checkboxgroup; other roles;             $nadmin;   ;              notdb;
 		school          => text;          school/university;       false;     ;
-		graduationyear  => select;        high school graduation year; false; int;           other;
+		graduationyear  => select;        high school graduation year; false; int;           other=>;
 		howdoyouknowus  => text;          how do you know us?;     false;     ;
 		interests       => richtextarea;  interests;               false;     ;
 	");
@@ -139,9 +139,15 @@ function actionEditProfile($uid = null)
 	if ($admin)
 	{
 		if ($form->values['confirm'] > 0)
+		{
 			$form->values['logged'] = _('the user hasn\'t confirmed his e-mail yet');
+			$form['logged']['type'] = 'text';
+		}
 		else if ($form->values['logged'] == 0)
+		{
 			$form->values['logged'] = _('the user hasn\'t logged in yet');
+			$form['logged']['type'] = 'text';
+		}
 	}
 
 	return print $form->getHTML();

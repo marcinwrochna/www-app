@@ -32,17 +32,18 @@ abstract class DB
 	// Enable " $DB->tablename : DBTable " syntax.
 	public function &__get($name)
 	{
-		return $this->tables[TABLE_PREFIX . $name];
+		$table = TABLE_PREFIX . $name;
+		if (isset($this->tables[$table]) && is_object($this->tables[$table]))
+			return $this->tables[$table];
+		else
+			throw new KnownException(sprintf(_('Undefined database table <i>%s</i> (prefix is <i>%s</i>).'), $name, TABLE_PREFIX));
 	}
 
 	// Enable " $DB->tablename($pkey_col1, $pkey_col2) : DBRow " syntax
 	// TODO replace array parameter with func_get_args().
 	public function __call($name, $args)
 	{
-		if (is_object($this->{$name}))
 			return $this->{$name}->offsetGet($args);
-		else
-			throw new KnownException(sprintf(_('Table %s doesn\'t exist.'), "<i>\$DB->$name()</i>"));
 	}
 
 	public function num_rows()  { return $this->lastResult->count(); }

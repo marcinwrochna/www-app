@@ -7,6 +7,7 @@ tutoring.php - review (update deprecated things), translate
 recheck permissions (grep userCan, userIs), check perms in task solution forms
 
 == Security ==
+gender in profile can be set to anything
 parseUserHTML() - use HTMLPurifier, recheck if evrything applies either this or htmlspecialchars.
 Test this XSS-protection with (at least) 'Abćđœ\\n+Plus%25 '. "\n" .'"DQuoted" O\'Brian &&amp; <Company>{{\\\'}}';
 automatically validate 'select' to contain one of the options (unless 'other' is set, of course).
