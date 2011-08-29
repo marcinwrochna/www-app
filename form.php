@@ -181,8 +181,8 @@ class Form implements ArrayAccess
 						$good = $good || $this->validateCharset($char, $p);
 					if (!$good)
 						return sprintf(_('Invalid character: "%s", position %d.'),
-							$i + 1,
-							htmlspecialchars($char)
+							htmlspecialchars($char),
+							$i + 1
 						);
 				}
 				return true;

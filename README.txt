@@ -22,8 +22,11 @@ Strings to be translated are either:
 - defined in a parseTable column with a t modifier.
 When you add/change a string to be translated, run
 	cd locale; php updateTranslations.php;
-and edit the .po files, prefferably with an editor like poEdit.
+and edit the .po files, prefferably with an editor like poEdit
+(poedit will automatically compile to a .mo file).
 	poedit locale/pl_PL/LC_MESSAGES/messages.po
+You may have to restart Apache when loading a new translation!
+	service httpd restart
 
 === icons map ===
 Whenever you add/edit an icon in images/icons/, run
@@ -35,7 +38,7 @@ For details see mapIcons.py.
 
 == License ==
 The code is licensed under the MIT license (without additional clauses).
-As permissive as it is, if you're still unwilling to comply, I probably won't sue you, I only
+As permissive as it is, if you're still unwilling to comply, I probably won't sue you ;), I only
 expect you to kindly send an e-mail to mwrochna+www at gmail so I know my work is of some use.
 
 PHP/HTML/JS components used:

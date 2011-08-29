@@ -73,8 +73,9 @@ function gender($m='y', $f='a', $gender='user') // TODO it's only used in gender
  */
 function genderize($s, $gender='user')
 {
-	$s = str_replace('%ś', gender('eś','aś',$gender), $s);
-	$s = str_replace('%', gender('y','a',$gender), $s);
+	$s = str_replace('$ś', gender('eś','aś',$gender), $s);
+	$s = str_replace('$y', gender('y','a',$gender), $s);
+	$s = str_replace('$a', gender('','a',$gender), $s);
 	return $s;
 }
 

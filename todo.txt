@@ -1,19 +1,20 @@
+login on registration success.
+
 == Things that are just plain wrong ==
 polish genderize()-printf() conflict.
 doxygen everything
-installation - at least describe.
 notify.php - translate (it sends emails, so it requires we remember a user's language preference).
 tutoring.php - review (update deprecated things), translate
 recheck permissions (grep userCan, userIs), check perms in task solution forms
 
 == Security ==
-gender in profile can be set to anything
 parseUserHTML() - use HTMLPurifier, recheck if evrything applies either this or htmlspecialchars.
 Test this XSS-protection with (at least) 'Abćđœ\\n+Plus%25 '. "\n" .'"DQuoted" O\'Brian &&amp; <Company>{{\\\'}}';
-automatically validate 'select' to contain one of the options (unless 'other' is set, of course).
+automatically validate 'select' to contain one of the options (unless 'other' is set, of course) (e.g. gender in profile can be set to anything).
 CSRF protection in $form->submitted();
 
 == Features ==
+REQUESTED: profile pictures (and thus a public listUsers and showUser)
 update tinymce
 replace uber-upload with TinyMCE's html5 uploader?
 replace mimetext with jsmath?

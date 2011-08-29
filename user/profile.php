@@ -114,10 +114,13 @@ function actionEditProfile($uid = null)
 					$DB->user_roles[]= array('uid'=>$uid,'role'=>$role);
 			}
 			// ordername of 'Tom Marvolo Riddle' is 'Riddle Tom Marvolo 666'.
-			$nameParts = explode(' ', $values['name']);
-			array_unshift($nameParts, array_pop($nameParts));
-			$nameParts[]= $uid;
-			$values['ordername'] = implode(' ', $nameParts);
+			if (isset($values['name']))
+			{
+				$nameParts = explode(' ', $values['name']);
+				array_unshift($nameParts, array_pop($nameParts));
+				$nameParts[]= $uid;
+				$values['ordername'] = implode(' ', $nameParts);
+			}
 
 			$DB->users[$uid]->update($values);
 			$PAGE->addMessage(_('Saved.'), 'success');
@@ -266,15 +269,15 @@ function actionEditMotivationLetter()
 		NAME               => TYPE;
 		motivationletter   => richtextarea;
 	');
-	$inputs['motivationletter']['description'] = sprintf(_(
-			'Write (in %d - 300 words)<br/>'.
+	$inputs['motivationletter']['description'] = sprintf(genderize(_(
+			'Write (in %d - %d words)<br/>'.
 			'1. What do you expect from these workshops?<br/>'.
 			'2. What are your interests in science?<br/>'.
 			'3. (Optional) Would you like to make a short (15 min.) presentation?<br/>'.
 			'<small>Tell us something about a topic you would choose, or (if you have no good idea)<br/>'.
-			'describe as precisely as possible what would you suggest you\'d like to talk about.</br>'.
-			'(This will be taken into account in case we get many good applications).</small>'),
-		getOption('motivationLetterWords'));
+			'describe as precisely as possible what would you suggest you\'d like to talk about.<br/>'.
+			'(This will be taken into account in case we get many good applications).</small>')),
+		getOption('motivationLetterWords'), 300);
 	$form = new Form($inputs);
 
 	if ($form->submitted())
