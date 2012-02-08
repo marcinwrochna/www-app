@@ -3,8 +3,6 @@
  *	database/db.php
  */
 
-include_once('test.php');
-
 abstract class DB
 {
 	public $lastResult = null;

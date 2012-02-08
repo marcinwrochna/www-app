@@ -1,4 +1,4 @@
-login on registration success.
+show "no tasks, check wikidot" 
 
 == Things that are just plain wrong ==
 polish genderize()-printf() conflict.

@@ -173,7 +173,7 @@ function actionEditAdditionalInfo($uid = null)
 		$uid = intval($USER['uid']);
 	}
 	if (!$DB->edition_users($edition, $uid)->count())
-		throw KnownException(_('You should first sign up as a participant or lecturer.'));
+		throw new KnownException(_('You should first sign up as a participant or lecturer.'));
 
 	$inputs = parseTable('
 		NAME            => TYPE;     tDESCRIPTION;                                         VALIDATION

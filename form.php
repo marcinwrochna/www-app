@@ -262,11 +262,12 @@ define('VALUE_OTHER', -66642);
 function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $options=array(), $ignorePOST=false)
 {
 	global $PAGE;
-	// Handle named arguments.
+	// Handle named arguments. 
+	$properties = $readonly = $text = $hidden = $other = $errors = $autocomplete = $custom = null;
 	if (is_array($type) || $type instanceof ArrayObject)
 		foreach ($type as $key => $val)
 			$$key = $val;
-
+			
 	if (!isset($properties))  $properties = '';
 	if (!isset($readonly))    $readonly = false;
 	if (!isset($text))        $text = '';

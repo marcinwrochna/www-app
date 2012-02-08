@@ -23,7 +23,7 @@ abstract class DB_SQL extends DB
 		else
 			$result = $this->query_params($query, array($params));
 
-		if ($result === false)  throw new DbException($errorString);
+		if ($result === false)  throw new DbException($this->last_error());
 		$class = 'DBResult_'. $this->driver;
 		$this->lastResult = new $class($this, $result);
 		return $this->lastResult;

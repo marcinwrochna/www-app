@@ -9,12 +9,12 @@ require_once('utils.php');
 class Enum implements ArrayAccess, IteratorAggregate
 {
 	private static $enumTypes = array();
-	public static function define($enumName, array $items, $default)
+	public static function defineEnum($enumName, array $items, $default)
 	{
 		self::$enumTypes[$enumName]= new Enum($items, $default);
 		$function = 'function enum'. ucfirst($enumName) .'($i=null)'.
 		'{ return Enum::get(\''. $enumName .'\', $i); }';
-		eval($function);
+		//eval($function);
 	}
 
 	public static function get($enumName, $keyOrId = null)
@@ -78,7 +78,7 @@ class EnumItem extends ArrayObject
 	}
 }
 
-Enum::define('participantStatus',
+Enum::defineEnum('participantStatus',
 	parseTable('
 		KEY          => #ID; tDESCRIPTION;                  bCAN_RESIGN; ICON;            tEXPLANATION;
 		none         => 0;   unassociated;                  false;       ;                You aren\'t signed up for this workshop block.;
@@ -90,8 +90,9 @@ Enum::define('participantStatus',
 	'),
 	array('description'=>'???', 'canResign'=>false)
 );
+function enumParticipantStatus($i=null) { return Enum::get('participantStatus', $i); }
 
-Enum::define('blockStatus',
+Enum::defineEnum('blockStatus',
 	parseTable('
 		KEY        => #ID; tDECISION;          tSTATUS;
 		new        => 0;   new;                to be considered;
@@ -101,8 +102,9 @@ Enum::define('blockStatus',
 	'),
 	array('decision'=>_('unknown'), 'status'=>_('unknown'))
 );
+function enumBlockStatus($i=null) { return Enum::get('blockStatus', $i); }
 
-Enum::define('blockType',
+Enum::defineEnum('blockType',
 	parseTable('
 		KEY          => #ID; tSHORT;    tDESCRIPTION;
 		lightLecture => 0;   light;     light lecture;
@@ -110,8 +112,9 @@ Enum::define('blockType',
 	'),
 	array('description'=>'???')
 );
+function enumBlockType($i=null) { return Enum::get('blockType', $i); }
 
-Enum::define('subject',
+Enum::defineEnum('subject',
 	parseTable('
 		KEY         => ICON; tDESCRIPTION;                #ORDER_WEIGHT;
 		mathematics => m;    mathematics;                 -1;
@@ -122,8 +125,9 @@ Enum::define('subject',
 	'),
 	array('description'=>'???')
 );
+function enumSubject($i=null) { return Enum::get('subject', $i); }
 
-Enum::define('solutionStatus',
+Enum::defineEnum('solutionStatus',
 	parseTable('
 		KEY      => #ID; tDESCRIPTION;            ICON;
 		none     => 0;   none;                    solution-none.gif;
@@ -133,3 +137,4 @@ Enum::define('solutionStatus',
  	'),
  	array('description' => '???')
 );
+function enumSolutionStatus($i=null) { return Enum::get('solutionStatus', $i); }

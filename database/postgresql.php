@@ -16,6 +16,7 @@ class DB_PostgreSQL extends DB_SQL
 			FROM pg_class
 			WHERE
 				relname LIKE $1 AND
+				relowner NOT IN (SELECT usesysid FROM pg_user WHERE usename=\'postgres\') AND
 				relkind = \'r\'
 			',
 			TABLE_PREFIX.'%'

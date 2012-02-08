@@ -186,7 +186,7 @@ function actionHomepage()
 function buildTodoElement($element)
 {
 	global $USER;
-	// arguments: 'done', 'enabled', 'action', 'doneText', 'notDoneText', 'commonText'
+	$done = false; $enabled = false; $action = null; $doneText = $notDoneText = $commonText = '';
 	foreach ($element as $key => $val)
 		$$key = $val;
 
@@ -439,6 +439,8 @@ function parseTable($description, $gettext = 'gettext')
 	$rows = explode("\n", $description);
 	$result = array();
 	$i = 0;
+	$headers = array();
+	$keyHeader = null;
 	foreach ($rows as $row)
 	{
 		// Skip empty lines.
@@ -456,7 +458,6 @@ function parseTable($description, $gettext = 'gettext')
 		if ($i == 0)
 		{
 			$keyHeader = allCapsToCamelCase($key);
-			$headers = array();
 			foreach ($fields as &$h)
 			{
 				if ($h[0] == '#' || $h[0] == 'b' || $h[0] == 't')

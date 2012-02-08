@@ -188,7 +188,7 @@ function listWorkshops($which, $where, $columns)
 			 "list${which}Workshops?subject=$subject");
 		}
 
-		$row['title'] = "<a href='showWorkshop(${row['wid']})'>${row['title']}</a>";
+		$row['title'] = '<a href="showWorkshop('. $row['wid'] .')">'. $row['title'] .'</a>';
 
 		$row['participants'] = '';
 		if (userCan('showWorkshopParticipants', getLecturers($row['wid'])))
@@ -209,7 +209,7 @@ function listWorkshops($which, $where, $columns)
 
 		echo "<tr class='$class'>";
 		foreach ($columns as $c)
-			echo "<td>${row[$c]}</td>";
+			echo '<td>'. $row[$c] .'</td>';
 		echo "</tr>";
 	}
 	echo "</tbody></table>";

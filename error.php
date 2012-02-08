@@ -213,9 +213,7 @@ class DbException extends KnownException
 {
 	function __construct($s, $n=E_USER_ERROR)
 	{
-		global $DB;
-		$s .= ' <h4>Database</h4><pre>'. $DB->last_error() .'</pre>';
-		parent::__construct($s,$n);
+		parent::__construct("<h4>Database</h4><pre>$s</pre>",$n);
 	}
 }
 

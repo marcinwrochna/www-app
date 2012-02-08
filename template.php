@@ -107,7 +107,7 @@ class SimpleTemplate
 function parseUserHTML($html) {
 	// TODO high: prevent XSS attacks with HTMLPurifier.
 	// Parse [tex]code[/tex] into <img src="pathtorenderer.cgi?code"/>.
-	preg_match_all("#\[tex\](.*?)\[/tex\]#si",$html,$tex_matches);
+	preg_match_all("#\\[tex\\](.*?)\\[/tex\\]#si",$html,$tex_matches);
 	for ($i=0; $i < count($tex_matches[0]); $i++) {
 		$pos = strpos($html, $tex_matches[0][$i]); // TODO low: this seems stupid?
 		$len = strlen($tex_matches[0][$i]);
@@ -115,7 +115,8 @@ function parseUserHTML($html) {
 		$url = 'http://'. $_SERVER['HTTP_HOST'] . '/cgi-bin/mimetex.cgi?';
 		//urlencode($latex_formula)
 		$url .= htmlspecialchars($latex_formula, ENT_QUOTES);
-		$img = "<img src='$url' alt='formuła latexa' align='absmiddle'/>";
+		$img = "<img src='$url' alt='[tex]". htmlspecialchars($latex_formula, ENT_QUOTES) .
+			"[/tex](". _('missing picture'). ")' class='latex' align='absmiddle'/>";
 		$html = substr_replace($html, $img,$pos,$len);
 	}
 
@@ -126,7 +127,7 @@ function parseUserHTML($html) {
 		$end = strpos($html, '--&gt;', $pos+2);
 		global $PAGE;
 		if ($end === false)
-			$PAGE->addMessage('Nie znaleziono zamykającego elementu w wklejeniu z Worda.', 'exception');
+			$PAGE->addMessage('MSWord copy-paste closing tag not found.', 'exception');
 		$end += strlen('--&gt;');
 		$html = substr_replace($html, '', $pos, $end-$pos);
 		$offset = $pos;

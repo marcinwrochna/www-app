@@ -427,7 +427,7 @@ function actionShowTaskSolutions($wid, $uid)
 	$form = new Form($inputs);
 	if ($form->submitted())
 	{
-		$valued = $form->fetchAndValidateValues();
+		$values = $form->fetchAndValidateValues();
 		if ($form->valid)
 		{
 			$DB->workshop_users($wid,$uid)->update($values);
@@ -466,7 +466,7 @@ function actionShowTaskSolutions($wid, $uid)
 			');
 			$inputs['status']['options'] = enumSolutionStatus()->assoc('id','description');
 			$form = new Form($inputs);
-			$form->action = "editSolutionsGradeForm($wid;$uid;$tid;${sol['submitted']})";
+			$form->action = "editSolutionsGradeForm($wid;$uid;$tid;". $sol['submitted'] .")";
 			$form->values = $sol;
 
 			echo '<div class="descriptionBox">';

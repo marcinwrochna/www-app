@@ -25,7 +25,7 @@ function actionShowCorrelation()
 	echo '</tr>';
 	foreach ($workshops as $w)
 	{
-		$DB->query('
+		$rows = $DB->query('
 			SELECT w.wid,w.title,
 				(SELECT COUNT(*) FROM table_users u WHERE
 					EXISTS (SELECT * FROM table_edition_users eu  WHERE u.uid=eu.uid AND edition=$1 AND qualified>0) AND
@@ -40,7 +40,8 @@ function actionShowCorrelation()
 		echo '<tr class="'. $class .'" id="w'. $w['wid']. '">';
 		echo '<td><b>'. $w['wid'] .'</b></td><td>'. $w['title'] .'</td>';
 		$tdclass = 'third';
-		while ($row = $DB->fetch_assoc()) {
+		foreach ($rows as $row)
+		{
 			echo '<td class="'. $tdclass .'" id="w'.$row['wid'].'_w'.$w['wid'].'">';
 			if ($row['wid'] == $w['wid'])
 				echo '<span class="diagonal">';
