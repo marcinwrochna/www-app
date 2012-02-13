@@ -4,7 +4,6 @@
  * Requires PHP 5.2?: eval, ArrayAccess, IteratorAggregate, ArrayObject
  */
 require_once('utils.php');
-// TODO translate, po-parse parseTables and templates.
 
 class Enum implements ArrayAccess, IteratorAggregate
 {
@@ -12,8 +11,8 @@ class Enum implements ArrayAccess, IteratorAggregate
 	public static function defineEnum($enumName, array $items, $default)
 	{
 		self::$enumTypes[$enumName]= new Enum($items, $default);
-		$function = 'function enum'. ucfirst($enumName) .'($i=null)'.
-		'{ return Enum::get(\''. $enumName .'\', $i); }';
+		//$function  = 'function enum'. ucfirst($enumName) .'($i=null)';
+		//$function .= '{ return Enum::get(\''. $enumName .'\', $i); }';
 		//eval($function);
 	}
 
@@ -98,7 +97,7 @@ Enum::defineEnum('blockStatus',
 		new        => 0;   new;                to be considered;
 		undetailed => 1;   details requested;  details requested;
 		rejected   => 2;   poor;               initially considered;
-		accepted   => 4;   accepted;           initially considered;
+		accepted   => 4;   approved;           initially considered;
 	'),
 	array('decision'=>_('unknown'), 'status'=>_('unknown'))
 );

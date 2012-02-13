@@ -19,6 +19,14 @@ function is_assoc(&$array) {
 	return false;
 }
 
+if (!function_exists('lcfirst')) // PHP < 5.3
+{
+	function lcfirst($s)
+	{
+		return strtolower(substr($s,0,1)) . substr($s,1);
+	}
+}
+
 // Returns camelCase when given ALL_CAPS.
 function allCapsToCamelCase($s)
 {
@@ -316,7 +324,7 @@ function actionEditOptions()
 		NAME             => TYPE;      tDESCRIPTION;
 		begintime        => timestamp; Workshops\' start time;
 		endtime          => timestamp; Workshops\' finish time;
-		importanthours   => text;      Hours about which we want to have statistics, space separated (e.g. type 3  to know how many persons will need accomodation every night, 9 for breakfast, ...).;
+		importanthours   => text;      Hours selectable in \'staying time\', space separated (e.g. type 3 to know how many persons will need accomodation every night, 9 for breakfasts, ...).;
 		proposaldeadline => timestamp; Deadline for proposals (soft);
 	'));
 	if ($form->submitted())

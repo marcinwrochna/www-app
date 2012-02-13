@@ -262,12 +262,12 @@ define('VALUE_OTHER', -66642);
 function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $options=array(), $ignorePOST=false)
 {
 	global $PAGE;
-	// Handle named arguments. 
+	// Handle named arguments.
 	$properties = $readonly = $text = $hidden = $other = $errors = $autocomplete = $custom = null;
 	if (is_array($type) || $type instanceof ArrayObject)
 		foreach ($type as $key => $val)
 			$$key = $val;
-			
+
 	if (!isset($properties))  $properties = '';
 	if (!isset($readonly))    $readonly = false;
 	if (!isset($text))        $text = '';
@@ -282,12 +282,19 @@ function buildFormRow($type, $name=NULL, $description=NULL, $default=NULL, $opti
 	$row = "<tr id='row_$name'>";
 	if ($readonly)
 	{
-		if (is_array($default))
+		if (is_array($default)) // Checkboxgroup
 		{
 			$tmp = array();
 			if (!empty($options))
 				foreach ($default as $d)  $tmp[]= $options[$d];
 			$default = implode(', ', $tmp);
+		}
+		else if ($type == 'select')
+		{
+			if (array_key_exists($default, $options))
+				$default = $options[$default];
+			else
+				$default = _('other') ." ($default)";
 		}
 		if ($type == 'textarea' || $type == 'richtextarea')
 			$default = '<div class="descriptionBox">'. parseUserHTML($default) .'</div>';

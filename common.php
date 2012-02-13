@@ -14,14 +14,23 @@ session_start();
 
 // Init internationalization.
 // TODO support language change.
-putenv('LC_ALL=pl_PL.UTF-8');
-setlocale(LC_ALL, 'pl_PL.utf8', 'pl_PL.UTF-8','pl_PL.UTF8','pl.UTF8','pl.UTF-8','pl_PL','pl');
+if (isset($_GET['lang']) && ($_GET['lang'] == 'en'))
+{
+	putenv('LC_ALL=en_US.UTF-8');
+	setlocale(LC_ALL, 'en_US.utf8', 'en_US.UTF-8','en_US.UTF8','en.UTF8','en.UTF-8','en_US','en');
+}
+else
+{
+	putenv('LC_ALL=pl_PL.UTF-8');
+	setlocale(LC_ALL, 'pl_PL.utf8', 'pl_PL.UTF-8','pl_PL.UTF8','pl.UTF8','pl.UTF-8','pl_PL','pl');
+}
 mb_internal_encoding('UTF-8');
 mb_language('uni'); // UTF-8.
 date_default_timezone_set('Europe/Warsaw');
 bindtextdomain('messages', './locale');
 bind_textdomain_codeset('messages', 'UTF-8');
 textdomain('messages');
+
 
 // Error reporting and debug verbosity.
 require_once('error.php');

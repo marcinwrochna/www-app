@@ -66,13 +66,15 @@ function gender($m='y', $f='a', $gender='user') // TODO it's only used in gender
  * Inflect words in a translated string to account for a user's grammatical gender.
  * English doesn't need it, so the string is left unchanged.
  * Currently only Polish is supported - if a string returned by gettext() contains
- * the special character %, a part will be replaced with the appropriate suffix.
+ * the special character $, a part will be replaced with the appropriate suffix.
  * @param $s string returned by gettext() (_(), n_() or ngettext()).
- * @param $gender (optional) Defaults to $USER['gender']. Should be 'f' or 'm',
+ * @param $gender (optional) Defaults to $USER['gender']. Should be 'f','m' or 'p' (plural),
  * 	other strings are treated as 'm'.
  */
 function genderize($s, $gender='user')
 {
+	if ($gender == 'p')
+		return str_replace('ł$a', 'li', str_replace('$y', 'ych', $s));
 	$s = str_replace('$ś', gender('eś','aś',$gender), $s);
 	$s = str_replace('$y', gender('y','a',$gender), $s);
 	$s = str_replace('$a', gender('','a',$gender), $s);

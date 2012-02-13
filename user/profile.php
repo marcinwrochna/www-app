@@ -129,6 +129,8 @@ function actionEditProfile($uid = null)
 	}
 
 	$form->values = $DB->users[$uid]->assoc($form->getColumns() .',"confirm"');
+	if (isset($form['registered']))
+		$form['registered']['description'] = genderize($form['registered']['description'], $form->values['gender']);
 	$roles = $DB->query('SELECT role FROM table_user_roles WHERE uid=$1', $uid);
 	$form->values['roles'] = array_intersect($roles->fetch_column(), array_keys($inputs['roles']['options']));
 	$row = $DB->edition_users($currentEdition, $uid);
@@ -172,8 +174,23 @@ function actionEditAdditionalInfo($uid = null)
 		if (!userCan('editAdditionalInfo'))  throw new PolicyException();
 		$uid = intval($USER['uid']);
 	}
+
+	$r = $DB->users[$uid]->assoc('pesel,address,telephone,parenttelephone,gatherplace,tshirtsize,comments,name');
+
+	$PAGE->title = _('Additional info');
+	if ($admin)  $PAGE->title = $r['name'] .' - '. $PAGE->title;
+
+	if (userCan('adminUsers'))
+		$PAGE->headerTitle = getUserHeader($uid, $r['name'], 'editAdditionalInfo');
+
 	if (!$DB->edition_users($edition, $uid)->count())
-		throw new KnownException(_('You should first sign up as a participant or lecturer.'));
+	{
+		if ($admin)
+			$PAGE->addMessage(_('The user hasn\'t signed up for this edition yet.'));
+		else
+			$PAGE->addMessage(_('You should first sign up as a participant or lecturer.'));
+		return;
+	}
 
 	$inputs = parseTable('
 		NAME            => TYPE;     tDESCRIPTION;                                         VALIDATION
@@ -240,15 +257,14 @@ function actionEditAdditionalInfo($uid = null)
 		}
 	}
 
-	$r = $DB->users[$uid]->assoc('pesel,address,telephone,parenttelephone,gatherplace,tshirtsize,comments,name');
 	if (is_null($r['tshirtsize']))  $r['tshirtsize'] = 'L';
 	$r += $DB->edition_users($edition,$uid)->assoc(implode(',',$editionColumns));
 
-	$PAGE->title = _('Additional info');
-	if ($admin)  $PAGE->title = $r['name'] .' - '. $PAGE->title;
-
-	if (userCan('adminUsers'))
-		$PAGE->headerTitle = getUserHeader($uid, $r['name'], 'editAdditionalInfo');
+	$stayoptions = array_keys($stayoptions);
+	if (!in_array($r['staybegintime'], $stayoptions))
+		$r['staybegintime'] = $stayoptions[0];
+	if (!in_array($r['stayendtime'], $stayoptions))
+		$r['stayendtime'] = $stayoptions[count($stayoptions) - 1];
 
 	$form->values = $r;
 	$form->columnWidth = '25%';

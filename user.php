@@ -215,6 +215,7 @@ function actionRegister()
 		'To confirm your registration, open the following link:\n%s\n\n'.
 		'(If you didn\'t sign up, just ignore this email.)\n'),
 			$_SERVER['HTTP_HOST'], $link);
+	$mail = str_replace('\n', "\n", $mail);
 	sendMail(_('New user account'), $mail, array(array($values['name'],$values['email'])));
 	$PAGE->headerTitle = '';
 	$PAGE->addMessage(_('Your account has been successfully created. '.

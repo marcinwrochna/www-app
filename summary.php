@@ -203,8 +203,11 @@ function actionListDailyCounts()
 					AND (staybegintime IS NULL OR stayendtime IS NULL
 					     OR staybegintime < $2 OR stayendtime < $2)',
 				$edition['edition'], $edition['begintime']);
-	echo _('Number of qualified users who didn\'t specify their staying time: '). $DB->fetch();
+	echo _('Number of qualified users who didn\'t specify their staying time:').' '. $DB->fetch();
 	echo ' ('. _('see') .' <a href="listPersonalData">'. _('list of personal data') .'</a>)<br/>';
+	$DB->query('SELECT COUNT(*) FROM table_edition_users
+		        WHERE edition=$1 AND qualified>0 AND isselfcatered>0', $edition['edition']);
+	echo _('Number of qualified users who will get accommodation and meals on their own:').' '. $DB->fetch();
 
 
 	$hours = explode(' ', $edition['importanthours']);

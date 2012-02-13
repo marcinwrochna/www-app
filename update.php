@@ -182,27 +182,27 @@ switch ($version)
 		// Oh, postgres supports renames, how nice :P
 		$DB->query('ALTER TABLE table_workshop_domain RENAME TO table_workshop_subjects');
 			$DB->query('ALTER INDEX table_workshop_domain_pkey RENAME TO table_workshop_subjects_pkey');
-			$DB->query('ALTER SEQUENCE w1_workshop_domain_wid_seq RENAME TO table_workshop_subjects_wid_seq');
+			$DB->query('ALTER TABLE w1_workshop_domain_wid_seq RENAME TO table_workshop_subjects_wid_seq');
+			// Postgres >8.1?
+			//$DB->query('ALTER SEQUENCE w1_workshop_domain_wid_seq RENAME TO table_workshop_subjects_wid_seq');
 		$DB->query('ALTER TABLE table_workshop_subjects RENAME COLUMN domain TO subject');
 		$DB->query('ALTER TABLE table_edition_user RENAME TO table_edition_users');
 			$DB->query('ALTER INDEX table_edition_user_pkey RENAME TO table_edition_users_pkey');
 		$DB->query('ALTER TABLE table_workshop_user RENAME TO table_workshop_users');
 			$DB->query('ALTER INDEX table_workshop_user_pkey RENAME TO table_workshop_users_pkey');
 		$DB->query('ALTER TABLE table_edition_users ADD COLUMN staybegintime int');
-		$DB->query('UPDATE table_edition_users eu SET staybegintime = (SELECT staybegin FROM table_users u WHERE eu.uid=u.uid)');
+		$DB->query('UPDATE table_edition_users SET staybegintime = (SELECT staybegin FROM table_users u WHERE table_edition_users.uid=u.uid)');
 		$DB->query('ALTER TABLE table_edition_users ADD COLUMN stayendtime int');
-		$DB->query('UPDATE table_edition_users eu SET stayendtime = (SELECT stayend FROM table_users u WHERE eu.uid=u.uid)');
-		$DB->query('UPDATE table_edition_users eu SET staybegintime = staybegintime*60*60+$1 WHERE edition=7', strtotime('2011/08/08 00:00'));
-		$DB->query('UPDATE table_edition_users eu SET stayendtime = stayendtime*60*60+$1 WHERE edition=7', strtotime('2011/08/08 00:00'));
-		$DB->query('UPDATE table_edition_users eu SET staybegintime = staybegintime*60*60+$1 WHERE edition=6', strtotime('2010/08/19 00:00'));
-		$DB->query('UPDATE table_edition_users eu SET stayendtime = stayendtime*60*60+$1 WHERE edition=6', strtotime('2010/08/19 00:00'));
+		$DB->query('UPDATE table_edition_users SET stayendtime = (SELECT stayend FROM table_users u WHERE table_edition_users.uid=u.uid)');
+		$DB->query('UPDATE table_edition_users SET staybegintime = staybegintime*60*60+$1 WHERE edition=7', strtotime('2011/08/08 00:00'));
+		$DB->query('UPDATE table_edition_users SET stayendtime = stayendtime*60*60+$1 WHERE edition=7', strtotime('2011/08/08 00:00'));
+		$DB->query('UPDATE table_edition_users SET staybegintime = staybegintime*60*60+$1 WHERE edition=6', strtotime('2010/08/19 00:00'));
+		$DB->query('UPDATE table_edition_users SET stayendtime = stayendtime*60*60+$1 WHERE edition=6', strtotime('2010/08/19 00:00'));
 		$DB->query('ALTER TABLE table_edition_users ADD COLUMN isselfcatered int');
-		$DB->query('UPDATE table_edition_users eu SET isselfcatered = (SELECT isselfcatered FROM table_users u WHERE eu.uid=u.uid)');
-		$DB->query('ALTER TABLE table_edition_users ADD COLUMN isselfcatered int');
-		$DB->query('UPDATE table_edition_users eu SET isselfcatered = (SELECT isselfcatered FROM table_users u WHERE eu.uid=u.uid)');
+		$DB->query('UPDATE table_edition_users SET isselfcatered = (SELECT isselfcatered FROM table_users u WHERE table_edition_users.uid=u.uid)');
 		$DB->query('ALTER TABLE table_users DROP COLUMN isselfcatered');
 		$DB->query('ALTER TABLE table_edition_users ADD COLUMN lastmodification int');
-		$DB->query('UPDATE table_edition_users eu SET lastmodification = (SELECT lastmodification FROM table_users u WHERE eu.uid=u.uid)');
+		$DB->query('UPDATE table_edition_users SET lastmodification = (SELECT lastmodification FROM table_users u WHERE table_edition_users.uid=u.uid)');
 		$DB->query('ALTER TABLE table_users DROP COLUMN lastmodification');
 		$DB->query('ALTER TABLE table_users DROP COLUMN staybegin');
 		$DB->query('ALTER TABLE table_users DROP COLUMN stayend');
@@ -236,4 +236,8 @@ switch ($version)
 		$DB->query('UPDATE w1_editions SET importanthours=$1', '3 9 14 19');
 		setVersion(50);
 	case(50):
+		insertPermission('admin', 'seeWorkshopStatus');
+		insertPermission('qualified lecturer', 'seeWorkshopStatus');
+		setVersion(51);
+	case(51):
 }

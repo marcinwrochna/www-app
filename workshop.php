@@ -167,7 +167,7 @@ function listWorkshops($which, $where, $columns)
 	foreach ($workshops as $row)
 	{
 		$status = enumBlockStatus(intval($row['status']));
-		$row['status'] = userCan('changeWorkshopStatus') ? $status->decision : $status->status;
+		$row['status'] = userCan('seeWorkshopStatus') ? $status->decision : $status->status;
 		$row['status'] = str_replace(' ','&nbsp;', $row['status']);
 
 		$row['lecturers'] = array();
@@ -194,9 +194,8 @@ function listWorkshops($which, $where, $columns)
 		if (userCan('showWorkshopParticipants', getLecturers($row['wid'])))
 		{
 			$tip = '';
-			// TODO i18n polish plural -ych
 			foreach (enumParticipantStatus() as $statusName => $status)
-				$tip .= str_replace('%','ych',$status->description) .': '. $row["count_$statusName"] .'<br/>';
+				$tip .= genderize($status->description, 'p') .': '. $row["count_$statusName"] .'<br/>';
 			$row['participants'] .= '<a '. getTipJS($tip) .'>';
 			$row['participants'] .= ($row['count_accepted'] + $row['count_autoaccepted']) .'</a>';
 		}
@@ -213,6 +212,9 @@ function listWorkshops($which, $where, $columns)
 		echo "</tr>";
 	}
 	echo "</tbody></table>";
+
+	if (count($workshops) == 0)
+		echo _('No workshops have been accepted for this edition yet.');
 }
 
 /**
@@ -320,8 +322,13 @@ function actionShowWorkshop($wid = null)
 		echo $form->getHTML();
 		echo '<br/>';
 	}
-	else if (userCan('showWorkshopDetails', $lecturers)) {
-		 echo _('Status:') .' '. enumBlockStatus($data['status'])->status .'<br/><br/>';
+	else if (userCan('showWorkshopDetails', $lecturers))
+	{
+		if (userCan('seeWorkshopStatus'))
+			$status = enumBlockStatus($data['status'])->decision;
+		else
+			$status = enumBlockStatus($data['status'])->status;
+		 echo _('Status:') ." $status<br/><br/>";
 	}
 	// Edit-workshop button.
 	if (userCan('editWorkshop', $lecturers))
@@ -381,8 +388,7 @@ function actionEditWorkshop($wid)
 	$wid = intval($wid);
 	$new = ($wid == -1);
 	if ($new && !userCan('createWorkshop'))  throw new PolicyException();
-	else
-		if (!userCan('editWorkshop', getLecturers($wid)))  throw new PolicyException();
+	else if (!$new && !userCan('editWorkshop', getLecturers($wid)))  throw new  PolicyException();
 
 	$inputs = parseTable('
 		NAME        => TYPE;          tDESCRIPTION;                   VALIDATION;
@@ -413,6 +419,8 @@ function actionEditWorkshop($wid)
 		_('non-standard durations should be<br/> consulted with the organizers.')
 		 .')</span>';
 
+	// $inputs['title']['properties'] = 'onchange="$(\'#link\').value = this.value; alert(this.value);"';
+
 
 	$PAGE->title = $new ? _('Propose a new workshop block') : _('Edit a workshop block');
 	if (!$new)
@@ -423,7 +431,10 @@ function actionEditWorkshop($wid)
 	{
 		$values = $form->fetchAndValidateValues();
 		if ($form->valid)
+		{
 			submitEditWorkshopForm($wid, $values);
+			$new = false;
+		}
 	}
 
 	if ($new)
@@ -476,7 +487,7 @@ function actionEditWorkshop($wid)
 }
 
 
-function submitEditWorkshopForm($wid, $values)
+function submitEditWorkshopForm(&$wid, $values)
 {
 	global $USER, $DB, $PAGE;
 	$new = ($wid==-1);
@@ -506,9 +517,10 @@ function submitEditWorkshopForm($wid, $values)
 			'participant'=>enumParticipantStatus('lecturer')->id);
 		if (!empty($_POST['subjects']))
 			foreach ($_POST['subjects'] as $d)
-				$DB->workshop_subject[]= array('wid'=>$wid, 'subject'=>$d);
+				$DB->workshop_subjects[]= array('wid'=>$wid, 'subject'=>$d);
 		$PAGE->addMessage(_('Your proposal has been submitted.'), 'success');
 		logUser('workshop new', $wid);
+		callAction('editWorkshop', array($wid), true);
 	}
 	else
 	{
@@ -535,7 +547,7 @@ function actionEditWorkshopLecturers($wid)
 			'name' => 'uid'. $lecturer,
 			'type' => 'custom',
 			'description' => getUserBadge($lecturer, true),
-			'custom'=>"<a href='removeWorkshopLecturer($wid;$lecturer)'>[". _('remove'). "</a>"
+			'custom'=>"<a href='removeWorkshopLecturer($wid;$lecturer)'>[". _('remove'). "]</a>"
 		);
 
 	$inputs['lecturer']= array(
@@ -583,7 +595,9 @@ function actionRemoveWorkshopLecturer($wid, $uid, $confirm = false)
 	else
 	{
 		$DB->query('DELETE FROM table_workshop_users WHERE wid=$1 AND uid=$2', $wid, $uid);
-		$PAGE->addMessage('The user has been removed from lecturers here.', 'success');
+		$PAGE->addMessage(_('The user has been removed from lecturers here.'), 'success');
+		if ($uid == $USER['uid'])
+			callAction('listOwnWorkshops', null, true);
 	}
 	callAction('editWorkshopLecturers', array($wid));
 }
@@ -647,6 +661,8 @@ function actionAddWorkshopLecturer($wid, $lecturer, $confirm = false)
 			$PAGE->addMessage(_('Added user to lecturers.'), 'success');
 		}
 	}
+
+	callAction('editWorkshopLecturers', array($wid));
 }
 
 

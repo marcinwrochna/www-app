@@ -25,7 +25,7 @@ When you add/change a string to be translated, run
 and edit the .po files, prefferably with an editor like poEdit
 (poedit will automatically compile to a .mo file).
 	poedit locale/pl_PL/LC_MESSAGES/messages.po
-You may have to restart Apache when loading a new translation!
+You may have to restart Apache when loading a new translation! (segfaults otherwise)
 	service httpd restart
 
 === icons map ===

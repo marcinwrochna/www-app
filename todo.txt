@@ -1,7 +1,6 @@
-show "no tasks, check wikidot" 
+show "no tasks, check wikidot"
 
 == Things that are just plain wrong ==
-polish genderize()-printf() conflict.
 doxygen everything
 notify.php - translate (it sends emails, so it requires we remember a user's language preference).
 tutoring.php - review (update deprecated things), translate
@@ -26,17 +25,15 @@ make printable tables through buildTableHTML
 export those tables to GoogleDocs API?
 tinymce <code> (for task solutions - at least handle indentation)
 make email X-Sender tag (or lack of it) explicit in email.php
-give the staff the possibility to impersonate a Tester user.
 log impersonations
 better SELECT, DB_Slice?
 make the app more open - publish lists, user profiles, ...
+date form fields (e.g. in actionEditOptions).
 
 == Code style ==
 notify.php: change $email to either $content or $address, because it's misleading
-replace in_array... with userIs('role');
 rename table_workshop_user.participant? table_options->table_settings? table_edition_users.lecturer->islecturer, qualified->isqualified?
 transfer lists of constants to enum.php
-change <form> to new Form()
 checkUserCanEditTasks() seems stupid
 
 == Bugs ==

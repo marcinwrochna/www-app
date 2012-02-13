@@ -266,7 +266,7 @@ function buildParticipantList($wid)
 	$countDescription = array();
 	foreach (enumParticipantStatus() as $statusName => $status)
 		if ($statusName != 'none' || $counts[$status->id])
-		$countDescription[]= str_replace('%','ych',$status->description) .': '. $counts[$status->id]; // TODO i18n polish plural -ych
+		$countDescription[]= genderize($status->description, 'p') .': '. $counts[$status->id]; // TODO i18n polish plural -ych
 
 
 	echo '<h3 style="display:inline-block">'. _('Signups') .'</h3>';
@@ -326,7 +326,7 @@ function actionShowPointsTable()
 		getOption('currentEdition'));
 	$data = $DB->fetch_all();
 	if (empty($data))
-		return print 'No data (noone was graded yet).';
+		return print _('No data (no one has been graded yet).');
 
 	$dataByUid = array();
 	$titles = array();

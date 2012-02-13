@@ -5,6 +5,7 @@
 		buildUberUploadBody() - return the form and divs used by UberUploader
 		buildUberUploadHead() - return <script> and other tags to be placed in <head>
 */
+set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__).'/..');
 require_once(dirname(__FILE__).'/../common.php');
 require_once(dirname(__FILE__).'/../template.php');
 global $_INI, $_CONFIG;
@@ -76,10 +77,10 @@ function buildUberUploaderBody()
 		</div>
 	<?php
 	return  $template->finish();
-}	
-	
+}
+
 function buildUberUploadHead($path_to_redirect)
-{		
+{
 	global $_INI, $_CONFIG;
 	$params = $_INI + $_CONFIG;
 	$params['path_to_css_file'] = '../../../uploader/'. $params['path_to_css_file'];
@@ -92,7 +93,7 @@ function buildUberUploadHead($path_to_redirect)
 	//$params['path_to_upload_script'] = '../../../uploader/'. $params['path_to_upload_script'];
 	$template = new SimpleTemplate($params);
 	?>
-		
+
 		<!-- Please do not remove this tag: Uber-Uploader Ver 6.8.1 http://uber-uploader.sourceforge.net -->
 		<link rel="stylesheet" type="text/css" href="%path_to_css_file%">
 		<script language="JavaScript" type="text/JavaScript" src="%path_to_jquery%"></script>
@@ -142,7 +143,7 @@ function buildUberUploadHead($path_to_redirect)
 					JQ("#upload_stats_toggle").attr("title", "Pokaż statystyki");
 				}
 			});
-		</script>	
+		</script>
 	<?php
 	return  $template->finish();
 }
@@ -159,15 +160,15 @@ function getUploadInfo()
 	$xml_parser->parseFeed();                                      // Parse upload_id.redirect file
 	// Display message if the XML parser encountered an error
 	if ($xml_parser->getError())  throw new KnownException($xml_parser->getErrorMsg());
-	
+
 	$_XML_DATA = $xml_parser->getXMLData();                        // Get xml data from the xml parser
 	$_CONFIG_DATA = getConfigData($_XML_DATA);                     // Get config data from the xml data
 	$_POST_DATA  = getPostData($_XML_DATA);                        // Get post data from the xml data
 	$_FILE_DATA = getFileData($_XML_DATA);                         // Get file data from the xml data
-	
+
 	$files = array();
 	foreach ($_FILE_DATA as $slot => $fileinfo)
-	{	
+	{
 		$file = get_object_vars($fileinfo);
 		$file['realname'] = $_POST_DATA[$slot];
 		$files[] = $file;
@@ -182,18 +183,18 @@ function getUploadInfo()
 	}
 	//POST {"myuploaddir":"uploader\/files\/","upfile_1273473433362":"shortkehrli.txt"}
 	//FILE {"upfile_1273473364588":{"slot":"upfile_1273473364588","name":"shortkehrli.txt","size":"24714","type":"text\/plain","status":"1","status_desc":"OK"}}
-	
+
 	return $files;
 }
 
-function formatBytes($bytes, $precision = 2) { 
-    $units = array('B', 'kB', 'MB', 'GB', 'TB'); 
-   
-    $bytes = max($bytes, 0); 
-    $pow = floor(($bytes ? log($bytes) : 0) / log(1024)); 
-    $pow = min($pow, count($units) - 1); 
-   
-    $bytes /= pow(1024, $pow); 
-   
-    return round($bytes, $precision) . ' ' . $units[$pow]; 
-} 
+function formatBytes($bytes, $precision = 2) {
+    $units = array('B', 'kB', 'MB', 'GB', 'TB');
+
+    $bytes = max($bytes, 0);
+    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+    $pow = min($pow, count($units) - 1);
+
+    $bytes /= pow(1024, $pow);
+
+    return round($bytes, $precision) . ' ' . $units[$pow];
+}

@@ -61,7 +61,7 @@ function actionAdminUsers()
 	$PAGE->title = _('Users administration');
 	// We select -lecturer and -qualified because of SQL's stupid null sorting.
 	$users = $DB->query('
-		SELECT u.uid, u.name, u.email, u.motivationletter,
+		SELECT u.uid, u.name, u.email, u.motivationletter, u.gender,
 			(SELECT COUNT(*) FROM table_user_roles ur WHERE ur.uid=u.uid) AS rolecount,
 			(SELECT -eu.lecturer  FROM table_edition_users eu WHERE eu.uid=u.uid AND eu.edition = '. getOption('currentEdition') .') AS lecturer,
 			(SELECT -eu.qualified FROM table_edition_users eu WHERE eu.uid=u.uid AND eu.edition = '. getOption('currentEdition') .') AS qualified
@@ -100,19 +100,19 @@ function actionAdminUsers()
 		if (!$row['motivationletter'])
 			$row['motivationletter'] = '';
 		if (isset($row['lecturer']) && $row['lecturer'])
-			$row['lecturer']  =  '<span '. getTipJS(_('lecturer')) .'>'. _('L') .'</span>';
+			$row['lecturer']  =  '<span '. getTipJS(genderize(_('lecturer'),$row['gender'])) .'>'. _('L') .'</span>';
 		else if (isset($row['lecturer']))
-			$row['lecturer']  =  '<span '. getTipJS(_('candidate')) .'>'. _('c') .'</span>';
+			$row['lecturer']  =  '<span '. getTipJS(genderize(_('candidate'),$row['gender'])) .'>'. _('c') .'</span>';
 		else
 			$row['lecturer']  = '';
 		if (isset($row['qualified']) && $row['qualified'])
-			$row['qualified'] =  '<span '. getTipJS(_('qualified')) .'>'. _('q'). '</span>';
+			$row['qualified'] =  '<span '. getTipJS(genderize(_('qualified'),$row['gender'])) .'>'. _('q'). '</span>';
 		else
 			$row['qualified'] = '';
 		$row[]= '<a href="editProfile('. $row['uid'] .')">'. _('profile') .'</a>
 		         <a href="editUserStatus('. $row['uid'] .')">'. _('status') .'</a>
 		         <a href="editAdditionalInfo('. $row['uid'] .')">'. _('info'). '</a>';
-
+		unset($row['gender']);
 		$rows[]= $row;
 	}
 	buildTableHTML($rows, $headers);
@@ -130,6 +130,7 @@ function actionEditUserStatus($uid)
 
 	$user = $DB->users[$uid]->assoc('uid,login,name,school,graduationyear,gender,'.
 	 'interests,motivationletter');
+	$user['motivationletter'] = parseUserHTML($user['motivationletter']);
 	$user['badge'] = getUserBadge($uid, true);
 
 	$PAGE->title = $user['name'] .' - '. _('qualification');
