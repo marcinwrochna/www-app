@@ -1,4 +1,5 @@
 show "no tasks, check wikidot"
+some emails may require $message = str_replace('\n', "\n", $message); ?
 
 == Things that are just plain wrong ==
 doxygen everything

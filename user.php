@@ -288,8 +288,8 @@ function actionPasswordReset()
 	echo _('Type your username or e-mail address. You\'ll recevie a message with a new password.');
 	$form = new Form(parseTable('
 		NAME   => TYPE; tDESCRIPTION; VALIDATION;
-		login  => text; username;     char(name digit);
-		email  => text; e-mail;       email;
+		login  => text; username;     charset(name digit);
+		email  => text; e-mail;       ;
 	'));
 
 	if (!$form->submitted())
@@ -317,6 +317,7 @@ function actionPasswordReset()
 		$login, $address, $password,
 		'http://'. $_SERVER['HTTP_HOST'] . ABSOLUTE_PATH_PREFIX .'reportBug\n'
 	);
+	$message = str_replace('\n', "\n", $message);
 	sendMail(_('New password'), $message, $address);
 	$DB->users[$uid]->update(array('password'=>passHash($password)));
 	$PAGE->addMessage(_('An e-mail message with the new password has been sent.'), 'success');

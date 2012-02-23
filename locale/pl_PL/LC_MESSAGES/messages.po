@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wwwApp 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-02-13 13:01+0100\n"
-"PO-Revision-Date: 2012-02-13 13:01+0100\n"
+"POT-Creation-Date: 2012-02-23 23:13+0100\n"
+"PO-Revision-Date: 2012-02-23 23:13+0100\n"
 "Last-Translator: Marcin Wrochna <mwrochna+gettext@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl\n"
@@ -551,11 +551,11 @@ msgstr ""
 "Jeśli nie wiesz o co chodzi, zgłoś nadużycie:\\n"
 "%s\\n"
 
-#: user.php:320
+#: user.php:321
 msgid "New password"
 msgstr "Nowe hasło"
 
-#: user.php:322
+#: user.php:323
 msgid "An e-mail message with the new password has been sent."
 msgstr "Wysłano e-maila z nowym hasłem."
 
