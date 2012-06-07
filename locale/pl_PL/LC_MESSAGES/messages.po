@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wwwApp 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-02-23 23:13+0100\n"
-"PO-Revision-Date: 2012-02-23 23:13+0100\n"
+"POT-Creation-Date: 2012-04-10 16:47+0200\n"
+"PO-Revision-Date: 2012-04-10 16:47+0100\n"
 "Last-Translator: Marcin Wrochna <mwrochna+gettext@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl\n"
@@ -592,8 +592,13 @@ msgstr "Chcesz tylko uczestniczyć w warsztatach?"
 
 #: utils.php:126
 #: utils.php:183
+msgid "Create an account"
+msgstr "Utwórz konto"
+
+#: utils.php:126
+#: utils.php:183
 msgid "log in"
-msgstr "zaloguj"
+msgstr "zaloguj się"
 
 #: utils.php:146
 #, php-format

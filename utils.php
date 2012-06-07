@@ -79,7 +79,7 @@ function actionHomepage()
 		fillAdditionalInfo => Fill;           You filled;    the additional info form.;       editAdditionalInfo;
 	');
 	$did['solveTasks']['commonText'] .= ' ('. _('before') .' '.
-		fixedStrftime(_('%e %B'), strtotime('2011/07/10')) .').';
+		fixedStrftime(_('%e %B'), strtotime('2012/07/14')) .').';
 
 	$did['applyAsParticipant']['done'] = $didApplyAsParticipant;
 	$did['applyAsParticipant']['enabled'] = !$didApplyAsLecturer;
@@ -123,7 +123,7 @@ function actionHomepage()
 
 	echo '<h4>'. _('Want to participate in workshops only?') .'</h4><ul class="todoList">';
 	if (!userIs('registered'))
-		echo '<li><a href="register">'. ('Create an account'). '</a>/'. _('log in') .'.</li>';
+		echo '<li><a href="register">'. _('Create an account'). '</a>/'. _('log in') .'.</li>';
 	foreach ($did as &$d)
 		echo buildTodoElement($d);
 	echo '</ul><br/>';
@@ -141,11 +141,11 @@ function actionHomepage()
 	$did['proposeWorkshop']['commonText'] .= ' ('. _('before') .' '.
 		fixedStrftime(_('%e %B'), $DB->editions[getOption('currentEdition')]->get('proposaldeadline')) .').';
 	$did['writeDescription']['commonText'] .= ' ('. _('before') .' '.
-		fixedStrftime(_('%e %B'), strtotime('2011/05/01')) .').';
+		fixedStrftime(_('%e %B'), strtotime('2012/04/28')) .').';
 	$did['checkTasks']['notDoneText'] =
 		sprintf(_('Write (before %s) and check solutions to (before %s)'),
-		fixedStrftime(_('%e %B'), strtotime('2011/05/10')),
-		fixedStrftime(_('%e %B'), strtotime('2011/07/10')));
+		fixedStrftime(_('%e %B'), strtotime('2012/05/12')),
+		fixedStrftime(_('%e %B'), strtotime('2012/07/20')));
 	$did['checkTasks']['doneText'] = _('You wrote and checked solutions to');
 	$did['checkTasks']['commonText']  = _('qualification tasks.');
 
@@ -180,7 +180,7 @@ function actionHomepage()
 
 	echo '<h4>'. _('Want to give a workshop block?') .'</h4><ul class="todoList">';
 	if (!userIs('registered'))
-		echo '<li><a href="register">'. ('Create an account'). '</a>/'. _('log in') .'.</li>';
+		echo '<li><a href="register">'. _('Create an account'). '</a>/'. _('log in') .'.</li>';
 	foreach ($did as &$d)
 		echo buildTodoElement($d);
 	echo '</ul>';

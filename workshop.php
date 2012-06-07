@@ -414,7 +414,7 @@ function actionEditWorkshop($wid)
 	$inputs['type']['options'] = enumBlockType()->assoc('key','description');
 
 	$inputs['type']['properties'] = 'onchange="$(\'#row_duration\').toggle(this.selectedIndex=='. enumBlockType('workshop')->id .');"';
-	$inputs['duration']['options'] = array(6=>'9h (6x1.5h)', 9=>'13.5h (9x1.5h)');
+	$inputs['duration']['options'] = array(4=>'6h (4x1.5h)', 6=>'9h (6x1.5h)');
 	$inputs['duration']['other'] = '[x1,5h]<span class="left">('.
 		_('non-standard durations should be<br/> consulted with the organizers.')
 		 .')</span>';
