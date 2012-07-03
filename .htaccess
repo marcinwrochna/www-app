@@ -4,7 +4,10 @@ RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^(.*)$           -                                                [last,L,NE]
 # Pass doxygen.
-RewriteRule ^doxygen           -                                                [last,L,NE]
+RewriteRule ^doxygen         -                                                [last,L,NE]
+# Pass some fixed files that don't exists (to standard 404)
+RewriteRule ^crossdomain.xml       -                                          [last,L,NE]
+RewriteRule ^sitemap.xml           -                                          [last,L,NE]
 
 
 

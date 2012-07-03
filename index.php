@@ -47,7 +47,10 @@ function callAction($action, $args = array(), $redirect = true)
 	if (is_callable($action))
 		call_user_func_array($action, $args);
 	else
+	{
+		header('HTTP/1.0 404 Not Found');
 		throw new KnownException('Nieznana akcja.');
+	}
 }
 
 try
