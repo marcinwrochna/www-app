@@ -36,8 +36,12 @@ $file = $_GET['f'];
 	
 	// Output the file.
 	header("Content-Transfer-Encoding: binary");
-	header('Content-Type: ' .  mime_content_type($path));
-	header('Content-Length: ' . filesize($path));
+	//header('Content-Type: '. mime_content_type($path)); // Deprecated, replaced by Fileinfo PECL extension, which doesn't work on netmark.
+	//$finfo = finfo_open(FILEINFO_MIME_TYPE);
+	//header('Content-Type: '.  finfo_file($finfo, $path));
+	//finfo_close($finfo);
+	//header('Content-Type: '. system('file -b --mime-type "'. $path .'"')); // Doesn't work on netmark.
+	header('Content-Length: '. filesize($path));
 	$parts = explode('/',$path);
 	//header('Content-Disposition: attachment; filename="'.array_pop($parts).'"');
 	readfile($path);
