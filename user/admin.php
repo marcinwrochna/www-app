@@ -130,6 +130,7 @@ function actionEditUserStatus($uid)
 
 	$user = $DB->users[$uid]->assoc('uid,login,name,school,graduationyear,gender,'.
 	 'interests,motivationletter');
+	$user['interests'] = parseUserHTML($user['interests']);
 	$user['motivationletter'] = parseUserHTML($user['motivationletter']);
 	$user['badge'] = getUserBadge($uid, true);
 

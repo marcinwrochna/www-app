@@ -31,6 +31,8 @@
 		buildMenuBox($title, $items) - builds a menu box, checks permissions
 */
 
+require_once 'htmlpurifier/library/HTMLPurifier.auto.php';
+
 class SimpleTemplate
 {
 	public $variables;
@@ -132,6 +134,10 @@ function parseUserHTML($html) {
 		$html = substr_replace($html, '', $pos, $end-$pos);
 		$offset = $pos;
 	}
+
+	$config = HTMLPurifier_Config::createDefault();
+	$purifier = new HTMLPurifier($config);
+	$html = $purifier->purify($html);
 
 	return $html;
 }
