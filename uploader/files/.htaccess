@@ -1,0 +1,16 @@
+<Limit GET POST>
+	Order Allow,Deny
+	deny from all
+</Limit>
+
+SetHandler default-handler
+
+#RemoveType application/x-httpd-php .php
+#AddType application/x-httpd-php-source .php
+
+Options -ExecCGI -Includes
+
+#RemoveHandler .php .phtml .php3
+#RemoveType .php .phtml .php3
+
+php_flag engine off

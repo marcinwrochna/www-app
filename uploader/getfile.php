@@ -2,7 +2,15 @@
 require_once dirname(__FILE__).'/ubr.php';
 $file = $_GET['f'];
 
-	$path = dirname(__FILE__).'/files/'. $file;
+	$prefix = dirname(__FILE__).'/files/';
+	$path = realpath($prefix . $file);
+	if (stripos($path, $prefix) !== 0 || stripos($path, $prefix .'.htaccess') !== false)
+	{
+		header("HTTP/1.1 403 Forbidden", 1, 403);
+		echo "403. You have been eaten by a grue.";
+		exit;
+	}
+
 	// Manage cache. If browser has a version of the file, check if it's the same.
 	$fileMTime = filemtime($path);
 	$eTag = md5_file($path);
