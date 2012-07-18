@@ -33,7 +33,7 @@ function buildTaskList($wid)
 	$participant = enumParticipantStatus(intval($participant));
 	$isParticipant = $participant->inArray('candidate', 'accepted', 'rejected');
 
-	echo '<table class="tasks">';
+	echo '<div class="tableWrapper"><table class="tasks">';
 	$tasks = $DB->query('SELECT * FROM table_tasks WHERE wid=$1 ORDER BY tid', $wid);
 	foreach ($tasks as $task)
 	{
@@ -68,7 +68,7 @@ function buildTaskList($wid)
 		echo '<tr><td colspan="2">'.
 			getButton(_('add a task'), "createTask($wid)", 'plugin-add.png').
 			'</td></tr>';
-	echo '</table><br/>';
+	echo '</table></div><br/>';
 	if (!userCan('editTasks', $lecturers) && userCan('editWorkshop', $lecturers))
 		echo '<i>'. _('Your workshops await acceptance.') .'</i>';
 	return $template->finish();
@@ -174,6 +174,7 @@ function actionEditSolution($wid, $tid)
 	$isCandidate = ($participant == enumParticipantStatus('candidate')->id);
 
 	$task = $DB->tasks($wid, $tid)->assoc('*');
+	if (!$task)  throw new KnownException(sprintf(_('Invalid task id: #%d (workshop #%d).'), $tid, $wid));
 	$DB->query('SELECT * FROM table_task_solutions
 		WHERE wid=$1 AND tid=$2 AND uid=$3
 		ORDER BY submitted DESC',

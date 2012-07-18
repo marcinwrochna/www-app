@@ -107,7 +107,7 @@ class SimpleTemplate
 }
 
 function parseUserHTML($html) {
-	// TODO high: prevent XSS attacks with HTMLPurifier.
+	// TODO: test prevention of XSS attacks with HTMLPurifier.
 	// Parse [tex]code[/tex] into <img src="pathtorenderer.cgi?code"/>.
 	preg_match_all("#\\[tex\\](.*?)\\[/tex\\]#si",$html,$tex_matches);
 	for ($i=0; $i < count($tex_matches[0]); $i++) {
@@ -138,6 +138,8 @@ function parseUserHTML($html) {
 	$config = HTMLPurifier_Config::createDefault();
 	$purifier = new HTMLPurifier($config);
 	$html = $purifier->purify($html);
+
+	$html = '<span class="userHTML">'. $html .'</span>';
 
 	return $html;
 }

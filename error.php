@@ -166,10 +166,12 @@ function errorHandler($errno, $errstr='', $errfile='', $errline='')
 		{
 			$level = ob_get_level();
 			for ($i=0; $i<$level; $i++) @ob_end_clean();
+			if ($errno instanceof KnownException)
+				header('HTTP/1.1 '. $errno->status);
 			$logMessage = '';
 			$parsed = @errorParse($errno,$errstr,$errfile,$errline,$logMessage);
 			echo "<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"><body>$parsed</body></html>";
-			$mail ="token@token.homelinux.com";
+			$mail = 'token@token.homelinux.com';
 			if (ERROR_EMAIL)  sendMail('warsztatyWWW error', $logMessage, ERROR_EMAIL_ADDRESS);
 		}
 	}
@@ -203,8 +205,10 @@ function getArgument($arg)
 
 class KnownException extends Exception
 {
-	function __construct($s, $n=E_USER_ERROR)
+	public $status;
+	function __construct($s, $status='500 Internal Server Error', $n=E_USER_ERROR)
 	{
+		$this->status = $status;
 		parent::__construct($s,$n);
 	}
 }
@@ -213,17 +217,18 @@ class DbException extends KnownException
 {
 	function __construct($s, $n=E_USER_ERROR)
 	{
-		parent::__construct("<h4>Database</h4><pre>$s</pre>",$n);
+		$s = "<h4>Database</h4><pre>$s</pre>";
+		parent::__construct($s, '500 Internal Server Error', $n);
 	}
 }
 
-class PolicyException extends KnownException
+class PolicyException extends KnownException /* These are caught in index.php not to spill anything. */
 {
 	function __construct($s=null, $n=E_USER_ERROR)
 	{
 		if (is_null($s))
 			$s = _('Access forbidden.');
-		parent::__construct($s,$n);
+		parent::__construct($s, '403 Forbidden', $n);
 	}
 }
 

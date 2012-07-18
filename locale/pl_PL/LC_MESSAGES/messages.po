@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wwwApp 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-10 16:47+0200\n"
-"PO-Revision-Date: 2012-04-10 16:47+0100\n"
+"POT-Creation-Date: 2012-07-18 12:01+0200\n"
+"PO-Revision-Date: 2012-07-18 12:06+0100\n"
 "Last-Translator: Marcin Wrochna <mwrochna+gettext@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl\n"
@@ -29,7 +29,7 @@ msgstr "Błąd"
 msgid "Oops, we're sorry, something exploded. Our team of kittens is working on the problem."
 msgstr "Ups, proszę wybaczyć, coś wybuchło."
 
-#: error.php:225
+#: error.php:230
 msgid "Access forbidden."
 msgstr "Odmowa dostępu."
 
@@ -202,12 +202,12 @@ msgid "Qualification tasks"
 msgstr "Zadania kwalifikacyjne"
 
 #: tasks.php:23
-#: tasks.php:386
+#: tasks.php:387
 msgid "This is a place where you can add information concerning all tasks, how to submit solutions, etc. You may, for example, attach a pdf with all the tasks. If you won't be able to check tasks during some period, write about it here."
 msgstr "Tu możesz dodać informacje dot. wszystkich zadań, jak wysyłać rozwiązania, itp. Możesz np. załączyć pdf'a z treściami zadań. Jeśli przez pewien czas nie będziesz w stanie sprawdzać rozwiązań, napisz tu o tym."
 
 #: tasks.php:27
-#: workshop.php:335
+#: workshop.php:336
 msgid "edit"
 msgstr "edytuj"
 
@@ -244,8 +244,8 @@ msgid "Edit qualification task"
 msgstr "Edycja zadania kwalifikacyjnego"
 
 #: tasks.php:116
-#: tasks.php:212
-#: workshop.php:565
+#: tasks.php:213
+#: workshop.php:566
 msgid "back"
 msgstr "wróć"
 
@@ -270,141 +270,146 @@ msgstr "Usuwanie zadania"
 msgid "Task %d. deleted."
 msgstr "Usunięto zadanie %d."
 
-#: tasks.php:187
+#: tasks.php:177
+#, php-format
+msgid "Invalid task id: #%d (workshop #%d)."
+msgstr "Nieznane id zadania: #%d (warsztaty #%d)."
+
+#: tasks.php:188
 msgid "Task solution"
 msgstr "Rozwiązanie zadania"
 
-#: tasks.php:202
+#: tasks.php:203
 msgid "Edit your solution"
 msgstr "Edytuj rozwiązanie"
 
-#: tasks.php:204
+#: tasks.php:205
 #: user/admin.php:113
-#: tasks.php:417
+#: tasks.php:418
 #: column:'description'
 #: row:'participant'
-#: tasks.php:461
+#: tasks.php:462
 #: row:'status'
 #: workshop.php:92
 #: column:'th'
 msgid "status"
 msgstr "status"
 
-#: tasks.php:206
-#: tasks.php:492
-#: tasks.php:461
+#: tasks.php:207
+#: tasks.php:493
+#: tasks.php:462
 #: column:'description'
 #: row:'grade'
 msgid "grade"
 msgstr "ocena"
 
-#: tasks.php:208
-#: user/admin.php:164
+#: tasks.php:209
+#: user/admin.php:165
 msgid "comment"
 msgstr "komentarz"
 
-#: tasks.php:213
+#: tasks.php:214
 #, php-format
 msgid "Task %d. from %s"
 msgstr "Zadanie %d. z %s"
 
-#: tasks.php:217
-#: tasks.php:219
+#: tasks.php:218
+#: tasks.php:220
 #: column:'description'
 #: row:'solution'
 msgid "solution"
 msgstr "rozwiązanie"
 
-#: tasks.php:223
+#: tasks.php:224
 msgid "The editor allows you to attach files."
 msgstr "Edytor umożliwia załączanie plików."
 
-#: tasks.php:241
-#: tasks.php:434
+#: tasks.php:242
+#: tasks.php:435
 #: utils.php:336
-#: workshop.php:532
+#: workshop.php:533
 #: user/profile.php:126
 #: user/profile.php:255
 msgid "Saved."
 msgstr "Zapisano."
 
-#: tasks.php:272
+#: tasks.php:273
 msgid "Signups"
 msgstr "Zapisy"
 
-#: tasks.php:276
+#: tasks.php:277
 msgid "participant"
 msgstr "uczestnik"
 
-#: tasks.php:278
-#: tasks.php:417
+#: tasks.php:279
+#: tasks.php:418
 #: column:'description'
 #: row:'points'
 msgid "points"
 msgstr "punkty"
 
-#: tasks.php:278
+#: tasks.php:279
 msgid "overall"
 msgstr "ogólnie"
 
-#: tasks.php:305
+#: tasks.php:306
 msgid "see & grade solutions"
 msgstr "zobacz i oceń rozwiązania"
 
-#: tasks.php:313
+#: tasks.php:314
 msgid "from staff: "
 msgstr "z kadry:"
 
-#: tasks.php:321
+#: tasks.php:322
 msgid "Summary of points"
 msgstr "Podsumowanie punktów"
 
-#: tasks.php:329
+#: tasks.php:330
 msgid "No data (no one has been graded yet)."
 msgstr "Brak danych (nikogo jeszcze nie oceniono)."
 
-#: tasks.php:369
+#: tasks.php:370
 #: workshop.php:92
 #: column:'th'
 #: row:'title'
 msgid "title"
 msgstr "tytuł"
 
-#: tasks.php:380
+#: tasks.php:381
 msgid "Comments concerning tasks"
 msgstr "Komentarz do zadań"
 
-#: tasks.php:440
+#: tasks.php:441
 msgid "Task solutions"
 msgstr "Rozwiązania zadania"
 
-#: tasks.php:442
+#: tasks.php:443
 msgid "Overall"
 msgstr "Ogólnie"
 
-#: tasks.php:450
+#: tasks.php:451
 msgid "Task"
 msgstr "Zadanie"
 
-#: tasks.php:456
+#: tasks.php:457
 msgid "No solution."
 msgstr "Brak rozwiązania."
 
-#: tasks.php:460
-#: tasks.php:489
+#: tasks.php:461
+#: tasks.php:490
 msgid "submitted"
 msgstr "nadesłano"
 
-#: tasks.php:485
+#: tasks.php:486
 msgid "older solutions"
 msgstr "starze rozwiązania"
 
-#: tasks.php:520
+#: tasks.php:521
 #, php-format
 msgid "Task %d graded."
 msgstr "Oceniono zadanie %d."
 
-#: template.php:119
+#: template.php:121
 msgid "missing picture"
 msgstr "brakuje obrazka"
 
@@ -712,10 +717,14 @@ msgid "No workshops have been accepted for this edition yet."
 msgstr "Nie zaakceptowano jeszcze żadnych warsztatów na tę edycję."
 
 #: workshop.php:240
+msgid "No workshop id given."
+msgstr "Nie podano id warsztatów."
+
+#: workshop.php:244
 msgid "Workshop not found."
 msgstr "Nie znaleziono bloku warsztatowego."
 
-#: workshop.php:257
+#: workshop.php:258
 #: user/profile.php:65
 msgid "Lecturer"
 msgid_plural "Lecturers"
@@ -723,149 +732,149 @@ msgstr[0] "Prowadzący"
 msgstr[1] "Prowadzący"
 msgstr[2] "Prowadzący"
 
-#: workshop.php:291
-#: workshop.php:366
+#: workshop.php:292
+#: workshop.php:367
 msgid "sign out"
 msgstr "wypisz się"
 
-#: workshop.php:293
-#: workshop.php:368
+#: workshop.php:294
+#: workshop.php:369
 msgid "sign up"
 msgstr "zapisz się"
 
-#: workshop.php:298
+#: workshop.php:299
 msgid "Proposal"
-msgstr "Porpozycja"
+msgstr "Propozycja"
 
-#: workshop.php:303
-#: workshop.php:331
+#: workshop.php:304
+#: workshop.php:332
 msgid "Status:"
 msgstr "Status:"
 
-#: workshop.php:317
+#: workshop.php:318
 msgid "Changed workshop block status."
 msgstr "Zmieniono status bloku warsztatowego."
 
-#: workshop.php:351
-#: workshop.php:279
-#: template workshop.php:357
+#: workshop.php:352
+#: workshop.php:280
+#: template workshop.php:358
 msgid "signups and tasks"
 msgstr "zapisy i zadania"
 
-#: workshop.php:362
+#: workshop.php:363
 msgid "Your status:"
 msgstr "Twój status:"
 
-#: workshop.php:405
+#: workshop.php:406
 #: user/profile.php:52
 msgid "change"
 msgstr "zmień"
 
-#: workshop.php:408
+#: workshop.php:409
 msgid "Topics addressed, difficulty, scope of material, what will you do (theoretical problems, coding, experiments, ...). We encourage possibly detailed descriptions."
 msgstr "Poruszana tematyka, trudność, zakres materiału, co będziesz robić (teoretyczne problemy, kodzenie, eksperymenty, ...). Zachęcamy do możliwie wyczerpujących opisów."
 
-#: workshop.php:419
+#: workshop.php:420
 msgid "non-standard durations should be<br/> consulted with the organizers."
 msgstr "niestandardowe długości<br/> konsultować z organizatorami."
 
-#: workshop.php:425
+#: workshop.php:426
 msgid "Propose a new workshop block"
 msgstr "Zaproponuj nowy blok warsztatowy"
 
-#: workshop.php:425
+#: workshop.php:426
 msgid "Edit a workshop block"
 msgstr "Edytuj blok warsztatowy"
 
-#: workshop.php:427
+#: workshop.php:428
 msgid "view"
 msgstr "zobacz"
 
-#: workshop.php:443
+#: workshop.php:444
 msgid "The deadline for workshop proposal submissions has expired. Fill the form at your own risk."
 msgstr "Deadline zgłaszania propozycji warsztatów minął. Wypełniasz na własną odpowiedzialność."
 
-#: workshop.php:474
+#: workshop.php:475
 msgid "You'll be able to add more lecturers later, by editing this workshop block."
 msgstr "Więcej prowadzących można dodać później, edytując warsztaty."
 
-#: workshop.php:521
+#: workshop.php:522
 msgid "Your proposal has been submitted."
 msgstr "Twoja propozycja została wysłana."
 
-#: workshop.php:550
+#: workshop.php:551
 msgid "remove"
 msgstr "usuń"
 
-#: workshop.php:556
+#: workshop.php:557
 msgid "Full name or uid"
 msgstr "Imię i nazwisko lub uid"
 
-#: workshop.php:564
+#: workshop.php:565
 msgid "Add/remove lecturers"
 msgstr "Dodaj/usuń prowadzących"
 
-#: workshop.php:574
+#: workshop.php:575
 msgid "Add"
 msgstr "Dodaj"
 
-#: workshop.php:587
+#: workshop.php:588
 msgid "The user is not a lecturer."
 msgstr "Użytkownik nie jest prowadzącym."
 
-#: workshop.php:590
+#: workshop.php:591
 msgid "Are you sure you want to remove yourself from lecturers?"
 msgstr "Czy na pewno chcesz usunąć siebie z prowadzących?"
 
-#: workshop.php:591
-#: workshop.php:651
+#: workshop.php:592
+#: workshop.php:652
 msgid "yes"
 msgstr "tak"
 
-#: workshop.php:592
-#: workshop.php:652
+#: workshop.php:593
+#: workshop.php:653
 msgid "cancel"
 msgstr "anuluj"
 
-#: workshop.php:598
+#: workshop.php:599
 msgid "The user has been removed from lecturers here."
 msgstr "Użytkownik został usunięty z prowadzących te zajęcia."
 
-#: workshop.php:614
+#: workshop.php:615
 #: user/profile.php:17
 msgid "User not found."
 msgstr "Nie znaleziono użytkownika."
 
-#: workshop.php:637
+#: workshop.php:638
 #, php-format
 msgid "Fuzzy-matched user #%d"
 msgstr "Niedokładnie dopasowano użytkownika #%d"
 
-#: workshop.php:642
+#: workshop.php:643
 msgid "The user you selected already is a lecturer here."
 msgstr "Wskazany użytkownik już jest tu prowadzącym."
 
-#: workshop.php:649
+#: workshop.php:650
 msgid "The user already signed up as a participant. Sign him out and add to lecturers?"
 msgstr "Wskazany użytkownik już zapisał się tu jako uczestnik. Wypisać i dodać do prowadzących?"
 
-#: workshop.php:661
+#: workshop.php:662
 msgid "Added user to lecturers."
 msgstr "Dodano użytkownika do prowadzących."
 
-#: workshop.php:685
+#: workshop.php:686
 msgid "You're already signed up for this workshop block."
 msgstr "Już zapisał$ś się na ten blok warsztatowy."
 
-#: workshop.php:689
+#: workshop.php:690
 msgid "Signed up for a workshop block."
 msgstr "Zapisano na blok warsztatowy."
 
-#: workshop.php:701
+#: workshop.php:702
 msgid "Your can't resign from your status: "
 msgstr "Nie możesz zrezygnować ze swojego statusu:"
 
-#: workshop.php:703
+#: workshop.php:704
 msgid "Resigned from workshop block."
 msgstr "Zrezygnowano z bloku warsztatowego."
 
@@ -922,7 +931,7 @@ msgid "q"
 msgstr "q"
 
 #: user/admin.php:112
-#: user/admin.php:219
+#: user/admin.php:220
 #: user/profile.php:19
 #: user.php:141
 #: column:'title'
@@ -934,46 +943,46 @@ msgstr "profil"
 msgid "info"
 msgstr "info"
 
-#: user/admin.php:136
+#: user/admin.php:137
 msgid "qualification"
 msgstr "kwalifikacja"
 
-#: user/admin.php:153
+#: user/admin.php:154
 msgid "Workshops"
 msgstr "Warsztaty"
 
-#: user/admin.php:179
+#: user/admin.php:180
 msgid "Qualified"
 msgstr "Zakwalifikowan$y"
 
-#: user/admin.php:185
+#: user/admin.php:186
 msgid "The user didn't candidate as a participant nor lecturer."
 msgstr "Użytkownik nie kandydował jako uczestnik ani prowadzący."
 
-#: user/admin.php:191
+#: user/admin.php:192
 msgid "Saved"
 msgstr "Zapisano"
 
-#: user/admin.php:212
+#: user/admin.php:213
 msgid "back to the list"
 msgstr "wróć do listy"
 
-#: user/admin.php:214
+#: user/admin.php:215
 msgid "next"
 msgstr "następny"
 
-#: user/admin.php:216
+#: user/admin.php:217
 msgid "previous"
 msgstr "poprzedni"
 
-#: user/admin.php:220
+#: user/admin.php:221
 #: user.php:141
 #: column:'title'
 #: row:'editAdditionalInfo'
 msgid "additional info"
 msgstr "dodatkowe informacje"
 
-#: user/admin.php:221
+#: user/admin.php:222
 msgid "qualification status"
 msgstr "status kwalifikacji"
 
@@ -1062,7 +1071,7 @@ msgid "applies to Olsztyn residents, for example"
 msgstr "dotyczy np. mieszkańców Olsztyna"
 
 #: user/profile.php:281
-#: user/admin.php:147
+#: user/admin.php:148
 #: template
 msgid "Motivation letter"
 msgstr "List motywacyjny"
@@ -1078,7 +1087,7 @@ msgstr "Zapisano list motywacyjny."
 
 #: user/utils.php:51
 msgid "Fill in <a href=\"editProfile\">your profile</a> first!"
-msgstr "Fill Najpierw wypełnij <a href=\"editProfile\">profil</a>!"
+msgstr "Najpierw wypełnij <a href=\"editProfile\">profil</a>!"
 
 #: user/utils.php:101
 msgid "edit profile"
@@ -1299,13 +1308,13 @@ msgstr "które"
 msgid "the task"
 msgstr "treść zadania"
 
-#: tasks.php:417
+#: tasks.php:418
 #: column:'description'
 #: row:'admincomment'
 msgid "a comment for admins only"
 msgstr "komentarz tylko dla organizatorów"
 
-#: tasks.php:461
+#: tasks.php:462
 #: column:'description'
 #: row:'feedback'
 msgid "feedback"
@@ -1661,56 +1670,56 @@ msgstr "czas [1.5h]"
 msgid "signups"
 msgstr "zapisy"
 
-#: workshop.php:393
+#: workshop.php:394
 #: column:'description'
 #: row:'title'
 msgid "Title"
 msgstr "Tytuł"
 
-#: workshop.php:393
+#: workshop.php:394
 #: column:'description'
 #: row:'lecturers'
 msgid "Lecturers"
 msgstr "Prowadzący"
 
-#: workshop.php:393
+#: workshop.php:394
 #: column:'description'
 #: row:'description'
 msgid "Description"
 msgstr "Opis"
 
-#: workshop.php:393
+#: workshop.php:394
 #: column:'description'
 #: row:'subjects'
 msgid "Subject"
 msgstr "Dział"
 
-#: workshop.php:393
+#: workshop.php:394
 #: column:'description'
 #: row:'type'
 msgid "Type"
 msgstr "Rodzaj"
 
-#: workshop.php:393
+#: workshop.php:394
 #: column:'description'
 #: row:'duration'
-#: workshop.php:283
+#: workshop.php:284
 #: template
 msgid "Duration"
 msgstr "Czas trwania"
 
-#: workshop.php:393
+#: workshop.php:394
 #: column:'description'
 #: row:'link'
 msgid "Link to description on wikidot"
 msgstr "Link do opisu na wikidot"
 
-#: workshop.php:278
-#: template workshop.php:356
+#: workshop.php:279
+#: template workshop.php:357
 msgid "description"
 msgstr "opis"
 
-#: workshop.php:284
+#: workshop.php:285
 #: template
 msgid "see the description on wikidot"
 msgstr "zobacz opis na wikidot"
@@ -1805,17 +1814,17 @@ msgstr "role"
 msgid "letter"
 msgstr "list"
 
-#: user/admin.php:142
+#: user/admin.php:143
 #: template
 msgid "graduation year"
 msgstr "rok zdania matury"
 
-#: user/admin.php:145
+#: user/admin.php:146
 #: template
 msgid "Interests"
 msgstr "Zainteresowania"
 
-#: user/admin.php:168
+#: user/admin.php:169
 #: template
 msgid "details"
 msgstr "szczegóły"

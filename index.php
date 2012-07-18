@@ -84,6 +84,7 @@ try
 }
 catch (PolicyException $e)
 {
+	header('HTTP/1.1 403 Forbidden');
 	$buffer->finish();
 	$PAGE->content = '';
 	$PAGE->topContent = '';

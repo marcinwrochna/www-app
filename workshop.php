@@ -237,10 +237,11 @@ function getLecturers($wid)
 function actionShowWorkshop($wid = null)
 {
 	global $USER, $DB, $PAGE;
-	if (is_null($wid))  throw new KnownException(_('Workshop not found.')); // Handle deprecated links.
+	if (is_null($wid))  throw new KnownException(_('No workshop id given.'), '400 Bad Request'); // Handle deprecated links.
 	$wid = intval($wid);
 
 	$data = $DB->workshops[$wid]->assoc('*');
+	if (!$data)  throw new KnownException(_('Workshop not found.'), '404 Not Found');
 	$data['title'] = htmlspecialchars($data['title']);
 	$data['type'] = ucfirst(enumBlockType(intval($data['type']))->description);
 	$data['description'] = parseUserHTML($data['description']);
@@ -274,10 +275,10 @@ function actionShowWorkshop($wid = null)
 	$PAGE->headerTitle = '';
 	$template = new SimpleTemplate($data);
 	?>
-		<span class='left'>%wid%.&nbsp;</span><h2>%title% <div class='tabs'>
+		<span class='left'>%wid%.&nbsp;</span><h2>%title% <span class='tabs'>
 			<a class='selected'>{{description}}</a>
 			<a href="showWorkshopTasks(%wid%)">{{signups and tasks}}</a>
-		</div></h2>
+		</span></h2>
 		%type%: %subjects%.<br/>
 		%by%<br/>
 		{{Duration}}: %duration% × 1,5 godz.<br/>
@@ -352,10 +353,10 @@ function actionShowWorkshopTasks($wid)
 	$PAGE->headerTitle = '';
 	$template = new SimpleTemplate($data);
 	?>
-		<span class='left'>%wid%.&nbsp;</span><h2>%title% <div class='tabs'>
+		<span class='left'>%wid%.&nbsp;</span><h2>%title% <span class='tabs'>
 			<a href='showWorkshop(%wid%)'>{{description}}</a>
 			<a class='selected'>{{signups and tasks}}</a>
-		</div></h2>
+		</span></h2>
 	<?php
 	echo $template->finish(true);
 
@@ -383,12 +384,12 @@ function actionCreateWorkshop()
 
 function actionEditWorkshop($wid)
 {
-	if (!assertProfileFilled())  return;
 	global $USER, $PAGE, $DB;
 	$wid = intval($wid);
 	$new = ($wid == -1);
 	if ($new && !userCan('createWorkshop'))  throw new PolicyException();
 	else if (!$new && !userCan('editWorkshop', getLecturers($wid)))  throw new  PolicyException();
+	if (!assertProfileFilled())  return;
 
 	$inputs = parseTable('
 		NAME        => TYPE;          tDESCRIPTION;                   VALIDATION;
