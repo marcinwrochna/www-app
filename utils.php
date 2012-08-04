@@ -118,7 +118,19 @@ function actionHomepage()
 	$didEverything = $did['signupForWorkshops']['done'] && $did['writeMotLetter']['done'];
 	$did['qualify']['enabled'] = ($didEverything || $didQualify) && $didApplyAsParticipant;
 
-	$did['fillAdditionalInfo']['done'] = null; // TODO
+
+	if ($didApply)
+	{
+		$r = $DB->users[$USER['uid']]->assoc('pesel,address,telephone,parenttelephone');
+		$isselfcatered = $DB->edition_users($edition,$USER['uid'])->get('isselfcatered');
+		$filled = true;
+		if (strlen($r['pesel']) != 11)
+			$filled  = false;
+		foreach ($r as $value)
+			if (strlen($value) < 5)
+				$filled = false;
+	}
+	$did['fillAdditionalInfo']['done'] = $didApply && ($isselfcatered || $filled);
 	$did['fillAdditionalInfo']['enabled'] = $did['qualify']['done'] && $didApplyAsParticipant;
 
 	echo '<h4>'. _('Want to participate in workshops only?') .'</h4><ul class="todoList">';
