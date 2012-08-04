@@ -208,8 +208,8 @@ class KnownException extends Exception
 	public $status;
 	function __construct($s, $status='500 Internal Server Error', $n=E_USER_ERROR)
 	{
-		$this->status = $status;
 		parent::__construct($s,$n);
+		$this->status = $status;
 	}
 }
 

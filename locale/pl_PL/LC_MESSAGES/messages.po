@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wwwApp 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-18 12:01+0200\n"
-"PO-Revision-Date: 2012-07-18 12:06+0100\n"
+"POT-Creation-Date: 2012-07-19 13:16+0200\n"
+"PO-Revision-Date: 2012-07-19 13:16+0100\n"
 "Last-Translator: Marcin Wrochna <mwrochna+gettext@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl\n"
@@ -84,6 +84,10 @@ msgstr "inne..."
 #: form.php:388
 msgid "or"
 msgstr "lub"
+
+#: index.php:50
+msgid "Unknown action requested."
+msgstr "Nieznana akcja."
 
 #: summary.php:12
 msgid "Correlation matrix"
