@@ -11,7 +11,8 @@ define('GOOGLE_ANALYTICS_ACCOUNT', false); // E.g. 'UA-12345678-9'.
 define('TABLE_PREFIX', 'w1_'); // Shouldn't be empty.
 define('DB_DRIVER', 'PostgreSQL'); // Currently only PostgreSQL is available.
 define('DB_CONNECTION_STRING', 'host=localhost user=www dbname=www'); // As in pg_connect().
-// Emails
+// Emails and logs
+define('ERROR_LOG', false); // False or absolute path to writable text file.
 define('ERROR_EMAIL', false); // Send an email in case of any error.
 define('ERROR_EMAIL_ADDRESS', 'mwrochna+wwwerror@gmail.com');
 define('BUGREPORT_EMAIL_ADDRESS', 'mwrochna+wwwbugreport@gmail.com');

@@ -122,7 +122,7 @@ function actionHomepage()
 	if ($didApply)
 	{
 		$r = $DB->users[$USER['uid']]->assoc('pesel,address,telephone,parenttelephone');
-		$isselfcatered = $DB->edition_users($edition,$USER['uid'])->get('isselfcatered');
+		$isselfcatered = $DB->edition_users($currentEdition,$USER['uid'])->get('isselfcatered');
 		$filled = true;
 		if (strlen($r['pesel']) != 11)
 			$filled  = false;
@@ -151,7 +151,7 @@ function actionHomepage()
 		checkTasks         => ;               ;              ;
 	');
 	$did['proposeWorkshop']['commonText'] .= ' ('. _('before') .' '.
-		fixedStrftime(_('%e %B'), $DB->editions[getOption('currentEdition')]->get('proposaldeadline')) .').';
+		fixedStrftime(_('%e %B'), $DB->editions[$currentEdition]->get('proposaldeadline')) .').';
 	$did['writeDescription']['commonText'] .= ' ('. _('before') .' '.
 		fixedStrftime(_('%e %B'), strtotime('2012/04/28')) .').';
 	$did['checkTasks']['notDoneText'] =
@@ -291,8 +291,10 @@ function actionReportBugForm()
 	<pre><?php print_r($USER) ?></pre>
 	</body></html><?php
 
-	logUser('bugreport'); // Log first, in case of email failure.
-	sendMail('Zgłoszono problem', $template->finish(), BUGREPORT_EMAIL_ADDRESS, true);
+	$message = $template->finish();
+	errorLog($message); // Log first, in case of email failure.
+	logUser('bugreport');
+	sendMail('Zgłoszono problem', $message, BUGREPORT_EMAIL_ADDRESS, true);
 	$PAGE->addMessage('Wysłane. Dzięki!', 'success');
 }
 

@@ -67,6 +67,7 @@ function actionShowLog()
 			<thead><tr><th>{{when}}</th><th>{{who}}</th><th>{{what}}</th><th>{{which}}</th></tr></thead>
 			%rows%
 		</table>
+		<a href="showErrorLog">error log</a>
 		</div>
 	<?php
 	echo $template->finish(true);

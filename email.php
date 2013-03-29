@@ -52,92 +52,101 @@ require_once 'Zend/Oauth/Token/Access.php';
 
 function sendMail($subject, $content, $to, $isHTML = false)
 {
-	if (EMAIL_METHOD == 'display')
+	try
 	{
-		$message = "
-			Gdyby nie włączone debugowanie, wysłano by maila:<br/>
-			SUBJECT: <i>$subject<i><br/>
-			TO: <i>". json_encode($to) ."</i><br/>
-			CONTENT(html=". json_encode($isHTML) ."):<br/>
-			$content
-		";
-		global $PAGE;
-		if ($PAGE)
-			$PAGE->addMessage($message);
-		else
-			echo $message;
-	}
-	/*
-	// unmaintained (doesn't support $from = array(array('John','a@a'),...))
-	else if (EMAIL_METHOD == 'simple')
-	{
-		if (!$isHTML)
-			$content .= "\n__\nEmail automatycznie wysłany z ". $_SERVER['HTTP_HOST'];
-		$from = 'noreply@warsztatywww.nstrefa.pl';
-		ini_set("sendmail_from", $from);
-		mail($to, "[WWW][app] $subject", $content , "From: $from", "-f$from");
-	}
-	*/
-
-	else if (EMAIL_METHOD == 'gmail')
-	{
-		$email_address = getOption('gmailOAuthEmail');
-		if (!$isHTML)
-			$content .= "\n__\nEmail automatycznie wysłany z ". $_SERVER['HTTP_HOST'];
-
-		$config = new Zend_Oauth_Config();
-		$config->setOptions(getGoogleOAuthOptions());
-		// Could try-catch here (for 'access disallowed'?)
-		$config->setToken(unserialize(base64_decode(getOption('gmailOAuthAccessToken'))));
-		$config->setRequestMethod('GET');
-		$url = 'https://mail.google.com/mail/b/' . $email_address . '/smtp/';
-
-		$httpUtility = new Zend_Oauth_Http_Utility();
-		$params = $httpUtility->assembleParams($url, $config);
-		ksort($params);
-		$oauthParams = array();
-		foreach ($params as $key => $value)
-			if (strpos($key, 'oauth_') === 0)
-				$oauthParams []= $key . '="' . urlencode($value) . '"';
-		$initClientRequest = 'GET ' . $url . ' ' . implode(',', $oauthParams);
-
-		$config = array(
-			'ssl' => 'ssl',
-			'port' => '465',
-			'auth' => 'xoauth',
-			'xoauth_request' => base64_encode($initClientRequest)
-		);
-		$transport = new Zend_Mail_Transport_Smtp('smtp.gmail.com', $config);
-		$mail = new Zend_Mail('UTF-8');
-		if ($isHTML)  $mail->setBodyHTML($content);
-		else          $mail->setBodyText($content);
-		$mail->setFrom($email_address, 'Aplikacja WWW');
-		if (is_array($to))
-			foreach ($to as $t)
-				$mail->addTo($t[1], $t[0]);
-		else  $mail->addTo($to);
-		$mail->setSubject("[WWW][app] $subject");
-		$mail->send($transport);
-
-		/* If you ever needed to access IMAP this way too: */
-		//require_once 'Zend/Mail/Protocol/Imap.php';
-		//require_once 'Zend/Mail/Storage/Imap.php';
+		if (EMAIL_METHOD == 'display')
+		{
+			$message = "
+				Gdyby nie włączone debugowanie, wysłano by maila:<br/>
+				SUBJECT: <i>$subject</i><br/>
+				TO: <i>". json_encode($to) ."</i><br/>
+				CONTENT(html=". json_encode($isHTML) ."):<br/>
+				$content
+			";
+			global $PAGE;
+			if ($PAGE)
+				$PAGE->addMessage($message);
+			else
+				echo $message;
+		}
 		/*
-		$imap = new Zend_Mail_Protocol_Imap('imap.gmail.com', '993', true);
-		$authenticateParams = array('XOAUTH', base64_encode($initClientRequest));
-		$imap->requestAndResponse('AUTHENTICATE', $authenticateParams);
-
-		$storage = new Zend_Mail_Storage_Imap($imap);
-
-		echo '<html><head><title>2legged OAuth test</title></head><body>';
-		echo '<h1>Total messages: ' . $storage->countMessages() . "</h1>\n";
-
-		echo 'First five messages: <ul>';
-		for ($i = 1; $i <= $storage->countMessages() && $i <= 5; $i++ )
-			echo '<li>' . htmlentities($storage->getMessage($i)->subject) . "</li>\n";
-		echo '</ul>';
-		echo '</body></html>';
+		// unmaintained (doesn't support $from = array(array('John','a@a'),...))
+		else if (EMAIL_METHOD == 'simple')
+		{
+			if (!$isHTML)
+				$content .= "\n__\nEmail automatycznie wysłany z ". $_SERVER['HTTP_HOST'];
+			$from = 'noreply@warsztatywww.nstrefa.pl';
+			ini_set("sendmail_from", $from);
+			mail($to, "[WWW][app] $subject", $content , "From: $from", "-f$from");
+		}
 		*/
+
+		else if (EMAIL_METHOD == 'gmail')
+		{
+			$email_address = getOption('gmailOAuthEmail');
+			if (!$isHTML)
+				$content .= "\n__\nEmail automatycznie wysłany z ". $_SERVER['HTTP_HOST'];
+
+			$config = new Zend_Oauth_Config();
+			$config->setOptions(getGoogleOAuthOptions());
+			// Could try-catch here (for 'access disallowed'?)
+			$config->setToken(unserialize(base64_decode(getOption('gmailOAuthAccessToken'))));
+			$config->setRequestMethod('GET');
+			$url = 'https://mail.google.com/mail/b/' . $email_address . '/smtp/';
+
+			$httpUtility = new Zend_Oauth_Http_Utility();
+			$params = $httpUtility->assembleParams($url, $config);
+			ksort($params);
+			$oauthParams = array();
+			foreach ($params as $key => $value)
+				if (strpos($key, 'oauth_') === 0)
+					$oauthParams []= $key . '="' . urlencode($value) . '"';
+			$initClientRequest = 'GET ' . $url . ' ' . implode(',', $oauthParams);
+
+			$config = array(
+				'ssl' => 'ssl',
+				'port' => '465', //465,587
+				'auth' => 'xoauth',
+				'xoauth_request' => base64_encode($initClientRequest)
+			);
+			$transport = new Zend_Mail_Transport_Smtp('smtp.gmail.com', $config);
+			$mail = new Zend_Mail('UTF-8');
+			if ($isHTML)  $mail->setBodyHTML($content);
+			else          $mail->setBodyText($content);
+			$mail->setFrom($email_address, 'Aplikacja WWW');
+			if (is_array($to))
+				foreach ($to as $t)
+					$mail->addTo($t[1], $t[0]);
+			else  $mail->addTo($to);
+			$mail->setSubject("[WWW][app] $subject");
+			$mail->send($transport);
+
+			/* If you ever needed to access IMAP this way too: */
+			//require_once 'Zend/Mail/Protocol/Imap.php';
+			//require_once 'Zend/Mail/Storage/Imap.php';
+			/*
+			$imap = new Zend_Mail_Protocol_Imap('imap.gmail.com', '993', true);
+			$authenticateParams = array('XOAUTH', base64_encode($initClientRequest));
+			$imap->requestAndResponse('AUTHENTICATE', $authenticateParams);
+
+			$storage = new Zend_Mail_Storage_Imap($imap);
+
+			echo '<html><head><title>2legged OAuth test</title></head><body>';
+			echo '<h1>Total messages: ' . $storage->countMessages() . "</h1>\n";
+
+			echo 'First five messages: <ul>';
+			for ($i = 1; $i <= $storage->countMessages() && $i <= 5; $i++ )
+				echo '<li>' . htmlentities($storage->getMessage($i)->subject) . "</li>\n";
+			echo '</ul>';
+			echo '</body></html>';
+			*/
+		}
+	}
+	// Error handlers send mails, sometimes it hangs and no error would be registered without this.
+	catch (Exception $e)
+	{
+		errorLog("CAUGHT\n". $e->getMessage() ."TRACE\n". $e->getTraceAsString());
+		throw $e;
 	}
 }
 

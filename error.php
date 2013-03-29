@@ -9,7 +9,11 @@
 		class PolicyException - throwed at privilege escalation attempts
 		errorHandler(), errorParse() - passed to set_exception_handler()
 			and set_error_handler(), will send errors to my email.
+		shutdownHandler() - passed to register_shutdown_function(), handles fatal errors.
 		dumpSuperGlobals() - returns a description of $_GET,$_POST,$_SESSION,$_SERVER
+		errorLog($s) - writes $s with timestamp to ERROR_LOG, rotates it.
+			Used as a backup, mails should be enough.
+		actionShowErrorLog() - shows the ERROR_LOG.
 */
 
 function initErrors()
@@ -25,6 +29,7 @@ function initErrors()
 
 	set_error_handler('errorHandler');
 	set_exception_handler('errorHandler');
+	register_shutdown_function('shutdownHandler');
 }
 
 function errorParse($errno, $errstr='', $errfile='', $errline='', &$logMessage=null)
@@ -171,13 +176,26 @@ function errorHandler($errno, $errstr='', $errfile='', $errline='')
 			$logMessage = '';
 			$parsed = @errorParse($errno,$errstr,$errfile,$errline,$logMessage);
 			echo "<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"><body>$parsed</body></html>";
-			$mail = 'token@token.homelinux.com';
+			errorLog($logMessage);
 			if (ERROR_EMAIL)  sendMail('warsztatyWWW error', $logMessage, ERROR_EMAIL_ADDRESS);
 		}
 	}
 	catch (Exception $e)
 	{
 		echo 'Error within handler: <pre>'.$e->getMessage().'</pre> on line '.$e->getLine();
+	}
+}
+
+function shutdownHandler()
+{
+	// Check for fatal error on shutdown.
+	$error = error_get_last();
+	if (is_array($error) && in_array($error['type'], array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR), true))
+	{
+		$logMessage = "FATAL ERROR\n". $error['file'] .' : '. $error['line'] ."\n";
+		$logMessage .= $error['message'];
+		errorLog($logMessage);
+		if (ERROR_EMAIL)  sendMail('warsztatyWWW fatal error', $logMessage, ERROR_EMAIL_ADDRESS);
 	}
 }
 
@@ -266,3 +284,30 @@ function dumpSuperGlobals()
 
 	return $result;
 }
+
+function errorLog($logMessage)
+{
+	touch(ERROR_LOG);
+	$lines = file(ERROR_LOG);
+	if (is_array($lines))
+		$lines = array_slice($lines, -1000);
+	else
+		$lines = array();
+	$lines[]= "LOGGED at ". strftime("%Y-%m-%d %H:%M:%S") ."\n\n";
+	$lines[]= $logMessage ."\n";
+	file_put_contents(ERROR_LOG, $lines);
+}
+
+function actionShowErrorLog()
+{
+	global $DB, $USER, $PAGE;
+	if (!userCan('showLog'))  return;
+	if (!ERROR_LOG)
+		$PAGE->addMessage(_('Error log disabled in configuration.'));
+	else
+	{
+		$contents = file_get_contents(ERROR_LOG);
+		$PAGE->addMessage('<pre>'. htmlspecialchars($contents) .'</pre>');
+	}
+}
+

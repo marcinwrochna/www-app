@@ -322,4 +322,3 @@ function actionPasswordReset()
 	$DB->users[$uid]->update(array('password'=>passHash($password)));
 	$PAGE->addMessage(_('An e-mail message with the new password has been sent.'), 'success');
 }
-
