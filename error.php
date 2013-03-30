@@ -175,7 +175,10 @@ function errorHandler($errno, $errstr='', $errfile='', $errline='')
 				header('HTTP/1.1 '. $errno->status);
 			$logMessage = '';
 			$parsed = @errorParse($errno,$errstr,$errfile,$errline,$logMessage);
-			echo "<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"><body>$parsed</body></html>";
+			echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
+			echo '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl" dir="ltr"><head>';
+			echo '    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+			echo "</head><body>$parsed</body></html>";
 			errorLog($logMessage);
 			if (ERROR_EMAIL)  sendMail('warsztatyWWW error', $logMessage, ERROR_EMAIL_ADDRESS);
 		}

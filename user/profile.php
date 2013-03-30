@@ -37,6 +37,7 @@ function actionEditProfile($uid = null)
 		NAME            => TYPE;          tDESCRIPTION;            bREADONLY; VALIDATION;
 		registered      => timestamp;     registered;              true;      ;
 		logged          => timestamp;     last login;              true;      ;
+		avatar          => custom;        photo;                   true;      ;
 		name            => text;          full name;               $nadmin;   charset(name),length(3 70);
 		login           => text;          username;                $nadmin;   charset(name digit),length(3 20);
 		email           => text;          e-mail;                  $nadmin;   email;
@@ -49,7 +50,18 @@ function actionEditProfile($uid = null)
 		howdoyouknowus  => text;          how do you know us?;     false;     ;
 		interests       => richtextarea;  interests;               false;     ;
 	");
+
+	$inputs['avatar']['default'] = '<div onclick=\'$("#avatarSign").toggle(); $("#avatarBox").toggle("fast");\' style="cursor: pointer">
+			 <span id="avatarSign">+</span> '. _('change') .'...</div><div id="avatarBox">'.
+			 '<div id="avatarUpload"></div> <img id="avatar" ';
+	$src = 'fineuploader/avatars/user'. $uid .'.jpg';
+	if (file_exists($src))
+		$inputs['avatar']['default'] .= 'src="'. $src .'?'. filemtime($src) .'"';
+	$inputs['avatar']['default'] .=
+			 ' /> </div>';
 	$inputs['password']['default'] = '<a href="changePassword">'. _('change') .'</a>';
+
+
 	if ($admin)
 		unset($inputs['password']);
 	else
@@ -155,9 +167,36 @@ function actionEditProfile($uid = null)
 		}
 	}
 
+	$uploader = array(
+		'request' => array(
+			'endpoint' => 'fineuploader/handle.php',
+			'params' => array('uid' => $uid)
+		),
+		'validation' => array(
+			'allowedExtensions' => array('jpeg', 'jpg'),
+			'sizeLimit' => 5 * 1024 * 1024, // 5M
+		),
+		'debug' => true, // log messages in browser console
+		'multiple' => false,
+		'text' => array('uploadButton' => _('Upload'))
+	);
+	$PAGE->jsOnLoad .= 'var avatarUploader = $("#avatarUpload").fineUploader('.
+		json_encode($uploader) .')'.
+		'.on("complete", function(event, id, fileName, responseJSON) {
+			if (responseJSON.success) {
+				$("#avatar").attr("src",
+					"fineuploader/avatars/user'. $uid .'.jpg?"+ new Date().getTime());
+				setTimeout(function(){ $("#avatarUpload").fineUploader("reset"); }, 3000);
+			} });
+	';
+
 	return print $form->getHTML();
 }
 
+function actionHandleAvatarUpload()
+{
+	exit;
+}
 
 function actionEditAdditionalInfo($uid = null)
 {

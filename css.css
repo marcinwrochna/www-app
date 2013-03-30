@@ -278,7 +278,7 @@ table.tasks td {
 	display: block;
 	clear:left;
 	margin-top: 5px;
-	margin-bottom: -8px;	
+	margin-bottom: -8px;
 }
 .tabs a {
 	border: 1px #D0CFCC solid;
@@ -323,3 +323,5 @@ table.bordered td { color: black; }
 .inline * { display: inline; }
 
 img.latex { font-size: 0.7em; }
+
+#avatarBox { display: none; }

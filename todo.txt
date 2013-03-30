@@ -21,7 +21,7 @@ replace mimetext with jsmath?
 language choice.
 "payed" checkbox
 move columns from table_users to table_edition_users:  motivationletter, gatherplace, comments?
-in actionEditWorkshop make url in JS when title changes: http://warsztatywww.wikidot.com/www7:tytul-warsztatow
+detect when the url is default http://warsztatywww.wikidot.com/www7:tytul-warsztatow
 make printable tables (through buildTableHTML)
 export those tables to GoogleDocs API?
 tinymce <code> (for task solutions - at least handle indentation)

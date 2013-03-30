@@ -72,14 +72,18 @@ function actionHomepage()
 		NAME               => tNOT_DONE_TEXT; tDONE_TEXT;    tCOMMON_TEXT;                    ACTION;
 		applyAsParticipant => Apply;          You applied;   as a participant.;               applyAsParticipant;
 		fillProfile        => Fill;           You filled;    your profile.;                   editProfile;
-		signupForWorkshops => Sign up;        You signed up; for at least 4 workshop blocks.; listPublicWorkshops;
+		signupForWorkshops => Sign up;        You signed up; for at least 4 workshop blocks; listPublicWorkshops;
 		writeMotLetter     => Write;          You wrote;     a motivation letter.;            editMotivationLetter;
 		solveTasks         => Solve;          You solved;    qualification tasks;
-		qualify            => Wait for results.;  You have been qualified.; ;
+		qualify            => Wait for results;  You have been qualified; ;
 		fillAdditionalInfo => Fill;           You filled;    the additional info form.;       editAdditionalInfo;
 	');
+	$did['signupForWorkshops']['commonText'] .= ' ('. _('preferably before') .' '.
+		fixedStrftime(_('%e %B'), $DB->editions[$currentEdition]->get('signupdeadline')) .').';
 	$did['solveTasks']['commonText'] .= ' ('. _('before') .' '.
-		fixedStrftime(_('%e %B'), strtotime('2012/07/14')) .').';
+		fixedStrftime(_('%e %B'), $DB->editions[$currentEdition]->get('solvedeadline')) .').';
+	$did['qualify']['commonText'] .= ' ('. _('before') .' '.
+		fixedStrftime(_('%e %B'), $DB->editions[$currentEdition]->get('qualifydeadline')) .').';
 
 	$did['applyAsParticipant']['done'] = $didApplyAsParticipant;
 	$did['applyAsParticipant']['enabled'] = !$didApplyAsLecturer;
@@ -146,18 +150,20 @@ function actionHomepage()
 		applyAsLecturer    => Apply;          You applied;   as a lecturer.;        applyAsLecturer;
 		fillProfile        => Fill;           You filled;    your profile.;         editProfile;
 		proposeWorkshop    => Propose;        You proposed;  a workshop block.;     createWorkshop;
-		qualify            => Wait for preliminary approval.; Your workshop block has been preliminarly approved.; ;
+		qualify            => Wait for preliminary approval; Your workshop block has been preliminarly approved; ;
 		writeDescription   => Write;          You wrote;     a decription for users on wikidot;
 		checkTasks         => ;               ;              ;
 	');
 	$did['proposeWorkshop']['commonText'] .= ' ('. _('before') .' '.
 		fixedStrftime(_('%e %B'), $DB->editions[$currentEdition]->get('proposaldeadline')) .').';
+	$did['qualify']['commonText'] .= ' ('. _('before') .' '.
+		fixedStrftime(_('%e %B'), $DB->editions[$currentEdition]->get('acceptdeadline')) .').';
 	$did['writeDescription']['commonText'] .= ' ('. _('before') .' '.
-		fixedStrftime(_('%e %B'), strtotime('2012/04/28')) .').';
+		fixedStrftime(_('%e %B'), $DB->editions[$currentEdition]->get('wikidotdeadline')) .').';
 	$did['checkTasks']['notDoneText'] =
 		sprintf(_('Write (before %s) and check solutions to (before %s)'),
-		fixedStrftime(_('%e %B'), strtotime('2012/05/12')),
-		fixedStrftime(_('%e %B'), strtotime('2012/07/20')));
+		fixedStrftime(_('%e %B'), $DB->editions[$currentEdition]->get('taskdeadline')),
+		fixedStrftime(_('%e %B'), $DB->editions[$currentEdition]->get('checkdeadline')));
 	$did['checkTasks']['doneText'] = _('You wrote and checked solutions to');
 	$did['checkTasks']['commonText']  = _('qualification tasks.');
 
@@ -339,8 +345,16 @@ function actionEditOptions()
 		begintime        => timestamp; Workshops\' start time;
 		endtime          => timestamp; Workshops\' finish time;
 		importanthours   => text;      Hours selectable in \'staying time\', space separated (e.g. type 3 to know how many persons will need accomodation every night, 9 for breakfasts, ...).;
+		signupdeadline   => timestamp; Suggested time for participant-to-workshop signups;
+		solvedeadline    => timestamp; Deadline for solving tasks;
+		qualifydeadline  => timestamp; Deadline for qualification results;
 		proposaldeadline => timestamp; Deadline for proposals (soft);
+		acceptdeadline   => timestamp; Deadline for accepting proposals;
+		wikidotdeadline  => timestamp; Deadline for filling wikidot;
+		taskdeadline     => timestamp; Deadline for writing tasks;
+		checkdeadline    => timestamp; Deadline for checking tasks;
 	'));
+
 	if ($form->submitted())
 	{
 		$values = $form->fetchAndValidateValues();

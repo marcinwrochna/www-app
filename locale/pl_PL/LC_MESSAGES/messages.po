@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wwwApp 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-19 13:16+0200\n"
-"PO-Revision-Date: 2012-07-19 13:16+0100\n"
+"POT-Creation-Date: 2013-03-30 16:14+0100\n"
+"PO-Revision-Date: 2013-03-30 16:14+0100\n"
 "Last-Translator: Marcin Wrochna <mwrochna+gettext@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl\n"
@@ -21,17 +21,21 @@ msgstr ""
 msgid "unknown"
 msgstr "nieznany"
 
-#: error.php:131
+#: error.php:136
 msgid "Error"
 msgstr "Błąd"
 
-#: error.php:132
+#: error.php:137
 msgid "Oops, we're sorry, something exploded. Our team of kittens is working on the problem."
 msgstr "Ups, proszę wybaczyć, coś wybuchło."
 
-#: error.php:230
+#: error.php:251
 msgid "Access forbidden."
 msgstr "Odmowa dostępu."
+
+#: error.php:309
+msgid "Error log disabled in configuration."
+msgstr "Log błędów wyłączony w konfiguracji."
 
 #: form.php:21
 msgid "Save"
@@ -249,7 +253,7 @@ msgstr "Edycja zadania kwalifikacyjnego"
 
 #: tasks.php:116
 #: tasks.php:213
-#: workshop.php:566
+#: workshop.php:570
 msgid "back"
 msgstr "wróć"
 
@@ -330,10 +334,10 @@ msgstr "Edytor umożliwia załączanie plików."
 
 #: tasks.php:242
 #: tasks.php:435
-#: utils.php:336
-#: workshop.php:533
-#: user/profile.php:126
-#: user/profile.php:255
+#: utils.php:364
+#: workshop.php:537
+#: user/profile.php:135
+#: user/profile.php:292
 msgid "Saved."
 msgstr "Zapisano."
 
@@ -577,117 +581,126 @@ msgid "Main page"
 msgstr "Strona główna"
 
 #: utils.php:81
-#: utils.php:141
-#: utils.php:143
-msgid "before"
-msgstr "do"
+msgid "preferably before"
+msgstr "prosimy do"
 
 #: utils.php:82
-#: utils.php:142
-#: utils.php:144
-#: utils.php:147
-#: utils.php:148
+#: utils.php:84
+#: utils.php:86
+#: utils.php:158
+#: utils.php:160
+#: utils.php:162
+#: utils.php:165
+#: utils.php:166
 msgid "%e %B"
 msgstr "%e %B"
 
-#: utils.php:108
+#: utils.php:83
+#: utils.php:85
+#: utils.php:157
+#: utils.php:159
+#: utils.php:161
+msgid "before"
+msgstr "do"
+
+#: utils.php:112
 #, php-format
 msgid " a longer motivation letter (you wrote %d < %d words)"
 msgstr "dłuższy list motywacyjny (napisał$ś %d < %d słów)"
 
-#: utils.php:124
+#: utils.php:140
 msgid "Want to participate in workshops only?"
 msgstr "Chcesz tylko uczestniczyć w warsztatach?"
 
-#: utils.php:126
-#: utils.php:183
+#: utils.php:142
+#: utils.php:201
 msgid "Create an account"
 msgstr "Utwórz konto"
 
-#: utils.php:126
-#: utils.php:183
+#: utils.php:142
+#: utils.php:201
 msgid "log in"
 msgstr "zaloguj się"
 
-#: utils.php:146
+#: utils.php:164
 #, php-format
 msgid "Write (before %s) and check solutions to (before %s)"
 msgstr "Napisz treści (do %s) i sprawdź rozwiązania (do %s)"
 
-#: utils.php:149
+#: utils.php:167
 msgid "You wrote and checked solutions to"
 msgstr "Napisał$ś i sprawdził$ś rozwiązania do "
 
-#: utils.php:150
+#: utils.php:168
 msgid "qualification tasks."
 msgstr "zadań kwalifikacyjnych."
 
-#: utils.php:181
+#: utils.php:199
 msgid "Want to give a workshop block?"
 msgstr "Chcesz poprowadzić warsztaty?"
 
-#: utils.php:187
+#: utils.php:205
 msgid "If more than one lecturer is to give a workshop block, one of them should submit a proposition, and then attach the remaining lecturers."
 msgstr "Jeśli blok warsztatowy ma prowadzić więcej osób, jedna z nich powinna wysłać propozycję i później podpiąć do niej pozostałych."
 
-#: utils.php:190
+#: utils.php:208
 msgid "Wikidot accounts are separate - to edit anything there you'll have to use a wikidot account."
 msgstr "Konta na wikidot są osobne - żeby cokolwiek tam zmienić będziesz potrzebował wikidot'owego konta."
 
-#: utils.php:237
+#: utils.php:255
 msgid "You have already been signed up for this year's edition."
 msgstr "Już zostałeś zgłoszony do tegorocznej edycji."
 
-#: utils.php:248
+#: utils.php:266
 msgid "Signed you up for this year's edition."
 msgstr "Zgłoszono Cię do tegorocznej edycji."
 
-#: utils.php:255
+#: utils.php:273
 msgid "Report a problem"
 msgstr "Zgłoś błąd"
 
-#: utils.php:256
+#: utils.php:274
 msgid "Something doesn't work like it should? Things are unclear, overcomplicated, ugly, inconvenient? You absolutely have to report this!"
 msgstr "Coś nie działa jak powinno? Coś jest niejasne, nazbyt skomplikowane, brzydkie, niewygodne? Koniecznie to zgłoś!"
 
-#: utils.php:259
+#: utils.php:277
 msgid "Write how to contact you, if you expect an answer."
 msgstr "Wspomnij jakiś kontakt, jeśli oczekujesz odpowiedzi."
 
-#: utils.php:261
+#: utils.php:279
 msgid "By default we'll reply by e-mail"
 msgstr "Domyślnie odpowiemy na e-maila"
 
-#: utils.php:263
+#: utils.php:281
 msgid "problem"
 msgstr "problem"
 
-#: utils.php:291
+#: utils.php:311
 msgid "Credits"
 msgstr "Credits"
 
-#: utils.php:320
+#: utils.php:340
 msgid "Settings"
 msgstr "Ustawienia"
 
-#: utils.php:322
+#: utils.php:342
 msgid "Current workshops edition"
 msgstr "Obecna edycja warsztatów"
 
-#: utils.php:343
+#: utils.php:371
 msgid "Global settings"
 msgstr "Ogólne ustawienia"
 
-#: utils.php:356
+#: utils.php:384
 msgid "use a new number to create a new edition"
 msgstr "użyj nowego numeru by utworzyć nową edycję"
 
-#: utils.php:374
+#: utils.php:402
 #, php-format
 msgid "Created edition %d."
 msgstr "Utworzono edycję %d."
 
-#: utils.php:379
+#: utils.php:407
 msgid "Saved global settings."
 msgstr "Zapisano ogólne ustawienia."
 
@@ -729,7 +742,7 @@ msgid "Workshop not found."
 msgstr "Nie znaleziono bloku warsztatowego."
 
 #: workshop.php:258
-#: user/profile.php:65
+#: user/profile.php:74
 msgid "Lecturer"
 msgid_plural "Lecturers"
 msgstr[0] "Prowadzący"
@@ -770,7 +783,8 @@ msgid "Your status:"
 msgstr "Twój status:"
 
 #: workshop.php:406
-#: user/profile.php:52
+#: user/profile.php:55
+#: user/profile.php:59
 msgid "change"
 msgstr "zmień"
 
@@ -782,103 +796,103 @@ msgstr "Poruszana tematyka, trudność, zakres materiału, co będziesz robić (
 msgid "non-standard durations should be<br/> consulted with the organizers."
 msgstr "niestandardowe długości<br/> konsultować z organizatorami."
 
-#: workshop.php:426
+#: workshop.php:430
 msgid "Propose a new workshop block"
 msgstr "Zaproponuj nowy blok warsztatowy"
 
-#: workshop.php:426
+#: workshop.php:430
 msgid "Edit a workshop block"
 msgstr "Edytuj blok warsztatowy"
 
-#: workshop.php:428
+#: workshop.php:432
 msgid "view"
 msgstr "zobacz"
 
-#: workshop.php:444
+#: workshop.php:448
 msgid "The deadline for workshop proposal submissions has expired. Fill the form at your own risk."
 msgstr "Deadline zgłaszania propozycji warsztatów minął. Wypełniasz na własną odpowiedzialność."
 
-#: workshop.php:475
+#: workshop.php:479
 msgid "You'll be able to add more lecturers later, by editing this workshop block."
 msgstr "Więcej prowadzących można dodać później, edytując warsztaty."
 
-#: workshop.php:522
+#: workshop.php:526
 msgid "Your proposal has been submitted."
 msgstr "Twoja propozycja została wysłana."
 
-#: workshop.php:551
+#: workshop.php:555
 msgid "remove"
 msgstr "usuń"
 
-#: workshop.php:557
+#: workshop.php:561
 msgid "Full name or uid"
 msgstr "Imię i nazwisko lub uid"
 
-#: workshop.php:565
+#: workshop.php:569
 msgid "Add/remove lecturers"
 msgstr "Dodaj/usuń prowadzących"
 
-#: workshop.php:575
+#: workshop.php:579
 msgid "Add"
 msgstr "Dodaj"
 
-#: workshop.php:588
+#: workshop.php:592
 msgid "The user is not a lecturer."
 msgstr "Użytkownik nie jest prowadzącym."
 
-#: workshop.php:591
+#: workshop.php:595
 msgid "Are you sure you want to remove yourself from lecturers?"
 msgstr "Czy na pewno chcesz usunąć siebie z prowadzących?"
 
-#: workshop.php:592
-#: workshop.php:652
+#: workshop.php:596
+#: workshop.php:656
 msgid "yes"
 msgstr "tak"
 
-#: workshop.php:593
-#: workshop.php:653
+#: workshop.php:597
+#: workshop.php:657
 msgid "cancel"
 msgstr "anuluj"
 
-#: workshop.php:599
+#: workshop.php:603
 msgid "The user has been removed from lecturers here."
 msgstr "Użytkownik został usunięty z prowadzących te zajęcia."
 
-#: workshop.php:615
+#: workshop.php:619
 #: user/profile.php:17
 msgid "User not found."
 msgstr "Nie znaleziono użytkownika."
 
-#: workshop.php:638
+#: workshop.php:642
 #, php-format
 msgid "Fuzzy-matched user #%d"
 msgstr "Niedokładnie dopasowano użytkownika #%d"
 
-#: workshop.php:643
+#: workshop.php:647
 msgid "The user you selected already is a lecturer here."
 msgstr "Wskazany użytkownik już jest tu prowadzącym."
 
-#: workshop.php:650
+#: workshop.php:654
 msgid "The user already signed up as a participant. Sign him out and add to lecturers?"
 msgstr "Wskazany użytkownik już zapisał się tu jako uczestnik. Wypisać i dodać do prowadzących?"
 
-#: workshop.php:662
+#: workshop.php:666
 msgid "Added user to lecturers."
 msgstr "Dodano użytkownika do prowadzących."
 
-#: workshop.php:686
+#: workshop.php:690
 msgid "You're already signed up for this workshop block."
 msgstr "Już zapisał$ś się na ten blok warsztatowy."
 
-#: workshop.php:690
+#: workshop.php:694
 msgid "Signed up for a workshop block."
 msgstr "Zapisano na blok warsztatowy."
 
-#: workshop.php:702
+#: workshop.php:706
 msgid "Your can't resign from your status: "
 msgstr "Nie możesz zrezygnować ze swojego statusu:"
 
-#: workshop.php:704
+#: workshop.php:708
 msgid "Resigned from workshop block."
 msgstr "Zrezygnowano z bloku warsztatowego."
 
@@ -1002,90 +1016,94 @@ msgstr "Wykonuje wszystko tak jak by zalogować Cię jako ta osoba."
 msgid "impersonate"
 msgstr "impersonuj"
 
-#: user/profile.php:60
+#: user/profile.php:69
 msgid "masculine"
 msgstr "męski"
 
-#: user/profile.php:60
+#: user/profile.php:69
 msgid "feminine"
 msgstr "żeński"
 
-#: user/profile.php:62
+#: user/profile.php:71
 msgid "None"
 msgstr "Brak"
 
-#: user/profile.php:63
+#: user/profile.php:72
 msgid "Candidate"
 msgstr "Kandydat"
 
-#: user/profile.php:64
+#: user/profile.php:73
 msgid "Qualified candidate"
 msgstr "Zakwalifikowany kandydat"
 
-#: user/profile.php:66
+#: user/profile.php:75
 msgid "Qualified lecturer"
 msgstr "Zakwalifikowany prowadzący"
 
-#: user/profile.php:69
+#: user/profile.php:78
 msgid "Admin"
 msgstr "Admin"
 
-#: user/profile.php:70
+#: user/profile.php:79
 msgid "Tutor"
 msgstr "Tutor"
 
-#: user/profile.php:148
+#: user/profile.php:157
 msgid "the user hasn't confirmed his e-mail yet"
 msgstr "użytkownik nie potwierdził jeszcze e-maila"
 
-#: user/profile.php:153
+#: user/profile.php:162
 msgid "the user hasn't logged in yet"
 msgstr "użytkownik jeszcze się nie logował"
 
-#: user/profile.php:180
+#: user/profile.php:178
+msgid "Upload"
+msgstr "Upload"
+
+#: user/profile.php:217
 msgid "Additional info"
 msgstr "Dodatkowe informacje"
 
-#: user/profile.php:189
+#: user/profile.php:226
 msgid "The user hasn't signed up for this edition yet."
 msgstr "Użytkownik nie zapisał się jeszcze na tę edycję warsztatów."
 
-#: user/profile.php:191
+#: user/profile.php:228
 msgid "You should first sign up as a participant or lecturer."
 msgstr "Zgłoś się najpierw jako uczestnik lub prowadzący."
 
-#: user/profile.php:230
+#: user/profile.php:267
 msgid "Warsaw PKP"
 msgstr "Warszawa PKP"
 
-#: user/profile.php:230
+#: user/profile.php:267
 msgid "Olsztyn PKP"
 msgstr "Olsztyn PKP"
 
-#: user/profile.php:230
+#: user/profile.php:267
 msgid "I'll arrive on my own."
 msgstr "We własnym zakresie."
 
-#: user/profile.php:233
+#: user/profile.php:270
 msgid "on my own"
 msgstr "we własnym zakresie"
 
-#: user/profile.php:234
+#: user/profile.php:271
 msgid "applies to Olsztyn residents, for example"
 msgstr "dotyczy np. mieszkańców Olsztyna"
 
-#: user/profile.php:281
+#: user/profile.php:318
 #: user/admin.php:148
 #: template
 msgid "Motivation letter"
 msgstr "List motywacyjny"
 
-#: user/profile.php:289
+#: user/profile.php:326
 #, php-format
 msgid "Write (in %d - %d words)<br/>1. What do you expect from these workshops?<br/>2. What are your interests in science?<br/>3. (Optional) Would you like to make a short (15 min.) presentation?<br/><small>Tell us something about a topic you would choose, or (if you have no good idea)<br/>describe as precisely as possible what would you suggest you'd like to talk about.<br/>(This will be taken into account in case we get many good applications).</small>"
 msgstr "Napisz (w %d - %d słowach)<br/>1. Czego oczekujesz od wasztatów?<br/>2. Jakie są twoje zainteresowania naukowe?<br/>3. (Opcjonalnie) Czy zechciał$abyś poprowadzić krótką (15 min.) prezentację?<br/><small>Napisz coś o temacie, który byś wybrał$a, lub (jeśli nie masz dobrego pomysłu)<br/>opisz możliwie dokładnie swoje preferencje.<br/>"
 
-#: user/profile.php:305
+#: user/profile.php:342
 msgid "Your motivation letter has been saved."
 msgstr "Zapisano list motywacyjny."
 
@@ -1426,7 +1444,7 @@ msgstr "zgłoś błąd"
 #: utils.php:71
 #: column:'notDoneText'
 #: row:'applyAsParticipant'
-#: utils.php:132
+#: utils.php:148
 #: row:'applyAsLecturer'
 msgid "Apply"
 msgstr "Zgłoś się"
@@ -1434,7 +1452,7 @@ msgstr "Zgłoś się"
 #: utils.php:71
 #: column:'doneText'
 #: row:'applyAsParticipant'
-#: utils.php:132
+#: utils.php:148
 #: row:'applyAsLecturer'
 msgid "You applied"
 msgstr "Zgłosił$ś się"
@@ -1449,7 +1467,7 @@ msgstr "jako uczestnik."
 #: column:'notDoneText'
 #: row:'fillProfile'
 #: row:'fillAdditionalInfo'
-#: utils.php:132
+#: utils.php:148
 msgid "Fill"
 msgstr "Wypełnij"
 
@@ -1457,14 +1475,14 @@ msgstr "Wypełnij"
 #: column:'doneText'
 #: row:'fillProfile'
 #: row:'fillAdditionalInfo'
-#: utils.php:132
+#: utils.php:148
 msgid "You filled"
 msgstr "Wypełnił$ś"
 
 #: utils.php:71
 #: column:'commonText'
 #: row:'fillProfile'
-#: utils.php:132
+#: utils.php:148
 msgid "your profile."
 msgstr "profil."
 
@@ -1483,13 +1501,13 @@ msgstr "Zapisał$ś się"
 #: utils.php:71
 #: column:'commonText'
 #: row:'signupForWorkshops'
-msgid "for at least 4 workshop blocks."
-msgstr "na co najmniej 4 bloki warsztatowe."
+msgid "for at least 4 workshop blocks"
+msgstr "na co najmniej 4 bloki warsztatowe"
 
 #: utils.php:71
 #: column:'notDoneText'
 #: row:'writeMotLetter'
-#: utils.php:132
+#: utils.php:148
 #: row:'writeDescription'
 msgid "Write"
 msgstr "Napisz"
@@ -1497,7 +1515,7 @@ msgstr "Napisz"
 #: utils.php:71
 #: column:'doneText'
 #: row:'writeMotLetter'
-#: utils.php:132
+#: utils.php:148
 #: row:'writeDescription'
 msgid "You wrote"
 msgstr "Napisał$ś"
@@ -1529,14 +1547,14 @@ msgstr "zadania kwalifikacyjne"
 #: utils.php:71
 #: column:'notDoneText'
 #: row:'qualify'
-msgid "Wait for results."
-msgstr "Czekaj na wyniki."
+msgid "Wait for results"
+msgstr "Czekaj na wyniki"
 
 #: utils.php:71
 #: column:'doneText'
 #: row:'qualify'
-msgid "You have been qualified."
-msgstr "Został$ś zakwalifikowan$y."
+msgid "You have been qualified"
+msgstr "Został$ś zakwalifikowan$y"
 
 #: utils.php:71
 #: column:'commonText'
@@ -1544,78 +1562,120 @@ msgstr "Został$ś zakwalifikowan$y."
 msgid "the additional info form."
 msgstr "formularz z dodatkowymi danymi."
 
-#: utils.php:132
+#: utils.php:148
 #: column:'commonText'
 #: row:'applyAsLecturer'
 msgid "as a lecturer."
 msgstr "jako prowadzący."
 
-#: utils.php:132
+#: utils.php:148
 #: column:'notDoneText'
 #: row:'proposeWorkshop'
 msgid "Propose"
 msgstr "Zaproponuj"
 
-#: utils.php:132
+#: utils.php:148
 #: column:'doneText'
 #: row:'proposeWorkshop'
 msgid "You proposed"
 msgstr "Zaproponował$ś"
 
-#: utils.php:132
+#: utils.php:148
 #: column:'commonText'
 #: row:'proposeWorkshop'
 msgid "a workshop block."
 msgstr "blok warsztatowy"
 
-#: utils.php:132
+#: utils.php:148
 #: column:'notDoneText'
 #: row:'qualify'
-msgid "Wait for preliminary approval."
-msgstr "Czekaj na wstępną akceptację."
+msgid "Wait for preliminary approval"
+msgstr "Czekaj na wstępną akceptację"
 
-#: utils.php:132
+#: utils.php:148
 #: column:'doneText'
 #: row:'qualify'
-msgid "Your workshop block has been preliminarly approved."
-msgstr "Twój blok warsztatowy został wstępnie zaakceptowany."
+msgid "Your workshop block has been preliminarly approved"
+msgstr "Twój blok warsztatowy został wstępnie zaakceptowany"
 
-#: utils.php:132
+#: utils.php:148
 #: column:'commonText'
 #: row:'writeDescription'
 msgid "a decription for users on wikidot"
 msgstr "opis dla użytkowników na wikidocie"
 
-#: utils.php:323
+#: utils.php:343
 #: column:'description'
 #: row:'begintime'
 msgid "Workshops' start time"
 msgstr "Początek warsztatów"
 
-#: utils.php:323
+#: utils.php:343
 #: column:'description'
 #: row:'endtime'
 msgid "Workshops' finish time"
 msgstr "Koniec warsztatów"
 
-#: utils.php:323
+#: utils.php:343
 #: column:'description'
 #: row:'importanthours'
 msgid "Hours selectable in 'staying time', space separated (e.g. type 3 to know how many persons will need accomodation every night, 9 for breakfasts, ...)."
 msgstr "Godziny wybieralne jako 'czas pobytu', oddzielone spacjami (np. wpisz 3 żeby wiedzieć ile noclegów, 9 dla śniadań, …)."
 
-#: utils.php:323
+#: utils.php:343
+#: column:'description'
+#: row:'signupdeadline'
+msgid "Suggested time for participant-to-workshop signups"
+msgstr "Sugerowany termin zapisywania się na warsztaty"
+
+#: utils.php:343
+#: column:'description'
+#: row:'solvedeadline'
+msgid "Deadline for solving tasks"
+msgstr "Deadline dla rozwiązywania zadań"
+
+#: utils.php:343
+#: column:'description'
+#: row:'qualifydeadline'
+msgid "Deadline for qualification results"
+msgstr "Deadline dla wyników kwalifikacji"
+
+#: utils.php:343
 #: column:'description'
 #: row:'proposaldeadline'
 msgid "Deadline for proposals (soft)"
 msgstr "Deadline dla propozycji (soft)"
 
-#: utils.php:293
+#: utils.php:343
+#: column:'description'
+#: row:'acceptdeadline'
+msgid "Deadline for accepting proposals"
+msgstr "Deadline dla akceptacji propozycji"
+
+#: utils.php:343
+#: column:'description'
+#: row:'wikidotdeadline'
+msgid "Deadline for filling wikidot"
+msgstr "Deadline dla opisów na wikidot"
+
+#: utils.php:343
+#: column:'description'
+#: row:'taskdeadline'
+msgid "Deadline for writing tasks"
+msgstr "Deadline dla tworzenia zadań kwalifikacyjnych"
+
+#: utils.php:343
+#: column:'description'
+#: row:'checkdeadline'
+msgid "Deadline for checking tasks"
+msgstr "Deadline dla sprawdzenia zadań"
+
+#: utils.php:313
 #: template
 msgid "Coders"
 msgstr "Koderzy"
 
-#: utils.php:294
+#: utils.php:314
 #: template
 msgid "Icons"
 msgstr "Ikonki"
@@ -1847,6 +1907,12 @@ msgstr "ostatnie logowanie"
 
 #: user/profile.php:36
 #: column:'description'
+#: row:'avatar'
+msgid "photo"
+msgstr "zdjęcie"
+
+#: user/profile.php:36
+#: column:'description'
 #: row:'gender'
 msgid "grammatical gender"
 msgstr "rodzaj gramatyczny"
@@ -1887,61 +1953,61 @@ msgstr "skąd wiesz o WWW?"
 msgid "interests"
 msgstr "zainteresowania"
 
-#: user/profile.php:195
+#: user/profile.php:232
 #: column:'description'
 #: row:'pesel'
 msgid "PESEL number"
 msgstr "numer PESEL"
 
-#: user/profile.php:195
+#: user/profile.php:232
 #: column:'description'
 #: row:'address'
 msgid "address <small>(for the insurance)</small>"
 msgstr "adres <small>(do ubezpieczenia)</small>"
 
-#: user/profile.php:195
+#: user/profile.php:232
 #: column:'description'
 #: row:'telephone'
 msgid "telephone"
 msgstr "telefon"
 
-#: user/profile.php:195
+#: user/profile.php:232
 #: column:'description'
 #: row:'parenttelephone'
 msgid "telephone to your parents/carers"
 msgstr "telefon do rodziców/opiekunów"
 
-#: user/profile.php:195
+#: user/profile.php:232
 #: column:'description'
 #: row:'staybegintime'
 msgid "staying time: <span class=\"right\">from</span>"
 msgstr "pobyt: <span class=\"right\">od</span>"
 
-#: user/profile.php:195
+#: user/profile.php:232
 #: column:'description'
 #: row:'stayendtime'
 msgid "<span class=\"right\">to</span>"
 msgstr "<span class=\"right\">do</span>"
 
-#: user/profile.php:195
+#: user/profile.php:232
 #: column:'description'
 #: row:'gatherplace'
 msgid "I'll join the gathering at"
 msgstr "Miejsce zbiórki"
 
-#: user/profile.php:195
+#: user/profile.php:232
 #: column:'description'
 #: row:'isselfcatered'
 msgid "accomodation and meals"
 msgstr "nocleg i wyżywienie"
 
-#: user/profile.php:195
+#: user/profile.php:232
 #: column:'description'
 #: row:'tshirtsize'
 msgid "preferred t-shirt size"
 msgstr "preferowany rozmiar t-shirt'u"
 
-#: user/profile.php:195
+#: user/profile.php:232
 #: column:'description'
 #: row:'comments'
 msgid "comments (e.g. vegetarian)"

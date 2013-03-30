@@ -240,4 +240,19 @@ switch ($version)
 		insertPermission('qualified lecturer', 'seeWorkshopStatus');
 		setVersion(51);
 	case(51):
+		$DB->query('ALTER TABLE w1_editions ADD COLUMN signupdeadline int');
+		$DB->query('ALTER TABLE w1_editions ADD COLUMN solvedeadline int');
+		$DB->query('ALTER TABLE w1_editions ADD COLUMN qualifydeadline int');
+		$DB->query('ALTER TABLE w1_editions ADD COLUMN acceptdeadline int');
+		$DB->query('ALTER TABLE w1_editions ADD COLUMN wikidotdeadline int');
+		$DB->query('ALTER TABLE w1_editions ADD COLUMN taskdeadline int');
+		$DB->query('ALTER TABLE w1_editions ADD COLUMN checkdeadline int');
+		$DB->query('UPDATE w1_editions SET signupdeadline=$1 WHERE edition=9', strtotime('2013/06/23 10:00'));
+		$DB->query('UPDATE w1_editions SET solvedeadline=$1 WHERE edition=9', strtotime('2013/07/07 10:00'));
+		$DB->query('UPDATE w1_editions SET qualifydeadline=$1 WHERE edition=9', strtotime('2013/07/14 10:00'));
+		$DB->query('UPDATE w1_editions SET acceptdeadline=$1 WHERE edition=9', strtotime('2013/05/09 10:00'));
+		$DB->query('UPDATE w1_editions SET wikidotdeadline=$1 WHERE edition=9', strtotime('2013/05/15 10:00'));
+		$DB->query('UPDATE w1_editions SET taskdeadline=$1 WHERE edition=9', strtotime('2013/05/24 10:00'));
+		$DB->query('UPDATE w1_editions SET checkdeadline=$1 WHERE edition=9', strtotime('2013/07/10 10:00'));
+		setVersion(52);
 }

@@ -25,14 +25,16 @@ function writeMTime($f)
 	<link rel="stylesheet" type="text/css" href="<?php writeMTime('css.css'); ?>" />
 	<link rel="stylesheet" type="text/css" href="<?php writeMTime('images/icons_png.css'); ?>" />
 	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/themes/ui-lightness/jquery-ui.css" type="text/css" media="all" />
+	<link rel="stylesheet" type="text/css" href="<?php writeMTime('fineuploader/fineuploader-3.3.1.css'); ?>" />
 	<title>%title% - WWW</title>
 
 	%head%
 	<script type="text/javascript" src="<?php writeMTime('common.js'); ?>"></script>
 	<script type="text/javascript" src="<?php writeMTime('tinymce/tiny_mce_gzip.js'); ?>"></script>
 	<script type="text/javascript" src="<?php writeMTime('tinymce/config.js'); ?>"></script>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="fineuploader/jquery.fineuploader-3.3.1.js"></script>
 	<script type="text/javascript">tinyMCE_GZ.init(tinyMCE_GZ_config);</script>
 	<script type="text/javascript">
 		tinyMCE_config.latex_renderUrl = "%latexPath%";

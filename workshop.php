@@ -420,7 +420,11 @@ function actionEditWorkshop($wid)
 		_('non-standard durations should be<br/> consulted with the organizers.')
 		 .')</span>';
 
-	// $inputs['title']['properties'] = 'onchange="$(\'#link\').value = this.value; alert(this.value);"';
+	/* It seems more annoying than useful.
+	$inputs['title']['properties'] = 'onchange="$(\'#link\')[0].value = \''.
+	'http://warsztatywww.wikidot.com/www9:'.
+	'\' +this.value.replace(/[^a-zA-Z0-9]/g,\'_\');"';
+	*/
 
 
 	$PAGE->title = $new ? _('Propose a new workshop block') : _('Edit a workshop block');
