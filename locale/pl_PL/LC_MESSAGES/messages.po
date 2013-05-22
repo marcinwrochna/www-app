@@ -1077,8 +1077,8 @@ msgid "Warsaw PKP"
 msgstr "Warszawa PKP"
 
 #: user/profile.php:267
-msgid "Olsztyn PKP"
-msgstr "Olsztyn PKP"
+msgid "Węgorzewo PKP"
+msgstr "Węgorzewo PKP"
 
 #: user/profile.php:267
 msgid "I'll arrive on my own."
@@ -1089,8 +1089,8 @@ msgid "on my own"
 msgstr "we własnym zakresie"
 
 #: user/profile.php:271
-msgid "applies to Olsztyn residents, for example"
-msgstr "dotyczy np. mieszkańców Olsztyna"
+msgid "applies to Węgorzewo residents, for example"
+msgstr "dotyczy np. mieszkańców Węgorzewa"
 
 #: user/profile.php:318
 #: user/admin.php:148
@@ -1210,8 +1210,8 @@ msgstr "prośba o szczegóły"
 #: enum.php:95
 #: column:'decision'
 #: row:'rejected'
-msgid "poor"
-msgstr "słabe"
+msgid "rejected"
+msgstr "odrzucone"
 
 #: enum.php:95
 #: column:'status'
