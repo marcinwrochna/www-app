@@ -404,14 +404,16 @@ function actionEditMotivationLetter()
 		motivationletter   => richtextarea;
 	');
 	$inputs['motivationletter']['description'] = sprintf(genderize(_(
-			'Write (in %d - %d words)<br/>'.
-			'1. What do you expect from these workshops?<br/>'.
-			'2. What are your interests in science?<br/>'.
-			'3. (Optional) Would you like to make a short (15 min.) presentation?<br/>'.
-			'<small>Tell us something about a topic you would choose, or (if you have no good idea)<br/>'.
-			'describe as precisely as possible what would you suggest you\'d like to talk about.<br/>'.
-			'(This will be taken into account in case we get many good applications).</small>')),
-		getOption('motivationLetterWords'), 300);
+			 'Write (in %d - %d words)<br/>'
+			.'1. Describe your main scientific interests. A detailed description would be welcome (if you’re interested in mathematics - which area are you most interested in; if it’s programming - what programs are you making and in what language, etc.).<br/>'
+			.'2. How do you develop your interests from section 1.? Write down what books you read, what type of tasks and problems you solve, etc. If you have your own projects, works, experiments, programs - describe them. If you’re a member of Polish Children’s Fund, briefly describe what you do in the program.<br/>'
+			.'3. If you’re interested in something not strictly scientific (that is, besides math/physics/computer science) or you are involved in other initiatives, describe them briefly.<br/>'
+			.'4. If you participate in competitions or olympic contests, describe your achievements (participation, awards).<br/>'
+			.'5. About which of your interests would you tell others most preferably?<br/>'
+			.'6. What do you expect from your participation in WWW, what encouraged you to apply? If you want to contribute somehow (organise something, give an evening lecture, etc.), describe it.<br/>'
+			.'7. Are you willing to give a 15-minute speech at WWW (which would be appreciated)? If so, describe its title and topic. If you are not sure about what you want to say, please contact us.<br/>'
+			.'8. Here you can write anything which didn’t fit in sections 1.-7. <br/>')),
+		getOption('motivationLetterWords'), 1000); //TODO maybe set it as option?
 	$form = new Form($inputs);
 
 	if ($form->submitted())
