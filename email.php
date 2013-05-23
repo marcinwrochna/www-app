@@ -1,6 +1,6 @@
 <?php
 /*	email.php - defines sendMail() and validEmail(). It's large and complicated due to
- * 	the implementation of OAUTH access for sending email that reliably won't be filtered as spam.
+ * 	the implementation of OAUTH 2access for sending email that reliably won't be filtered as spam.
  *
  *	Defines:
  *		sendMail($subject, $content, $to, $isHTML = false).
@@ -16,39 +16,24 @@
  * 	const EMAIL_METHOD - either
  * 		'display' - don't send emails, just show them to the user when they would be sent.
  * 		'simple' - use php's builtin mail() function - DEPRECATED.
- * 		'gmail' - use a gmail account (SMTP) through OAUTH -
+ * 		'gmail' - use a gmail account (SMTP) through OAUTH2 -
  * 			that's the only good way I found for emails not to fall into spam.
- * 	const OAUTH_CONSUMER_KEY - usually just use your domain name (the same when registering).
- * 	const OAUTH_METHOD - 'HMAC-SHA1' or 'RSA-SHA1'
- *		const OAUTH_CONSUMER_SECRET -
- * 		if using HMAC - a ~24char string given by https://www.google.com/accounts/ManageDomains
- * 		if using RSA  - path to your .pem key
+ * 	const OAUTH2_CLIENT_ID, OAUTH2_CLIENT_SECRET - values from the Google API Console
+ * 	To use gmail, through oauth2, you need to register your application instance at
+ * 		https://code.google.com/apis/console/
  *
- *	To make 3-legged oauth (the method here implemented) work with HMAC-SHA1 you need to:
- *	Register your domain at https://www.google.com/accounts/ManageDomains
- *	Define OAUTH_CONSUMER_SECRET with the secret you'll get there.
- *
- * To use RSA-SHA1 instead:
- *	Generate an RSA key and certificate for you application:
- *			(subj only has to contain CN=your.domain.name, other data is optional)
- *			The key is your consumerSecret, available only to the application,
- * 		the certificate is a file you'll give to Google and probably won't need later.
- * 		(Details: http://code.google.com/apis/gdata/docs/auth/authsub.html#Registered)
- * 	openssl req -x509 -nodes -days 365 -newkey rsa:1024 -sha1 \
- * 	-subj '/C=US/ST=CA/L=Mountain View/CN=www.example.com' \
- * 	-keyout myrsakey.pem -out /tmp/myrsacert.pem
- * Register your web-app with google:
- * read http://code.google.com/apis/accounts/docs/RegistrationForWebAppsAuto.html
- * goto: https://www.google.com/accounts/ManageDomains
- * (Details: http://code.google.com/apis/accounts/docs/OAuth.html#ReadyOauth)
- *
- * I added Zend/Mail/Protocol/Smtp/Auth/Xoauth.php to the Zend Package.
+ * I added Zend/Mail/Protocol/Smtp/Auth/Xoauth2.php to the Zend Package.
  */
 require_once 'Zend/Oauth/Consumer.php';
 require_once 'Zend/Crypt/Rsa/Key/Private.php';
 require_once 'Zend/Mail/Transport/Smtp.php';
 require_once 'Zend/Mail.php';
 require_once 'Zend/Oauth/Token/Access.php';
+
+require_once 'Zend/Google/Google_Client.php';
+
+require_once 'Zend/Mail/Protocol/Imap.php';
+require_once 'Zend/Mail/Storage/Imap.php';
 
 function sendMail($subject, $content, $to, $isHTML = false)
 {
@@ -83,63 +68,31 @@ function sendMail($subject, $content, $to, $isHTML = false)
 
 		else if (EMAIL_METHOD == 'gmail')
 		{
-			$email_address = getOption('gmailOAuthEmail');
 			if (!$isHTML)
 				$content .= "\n__\nEmail automatycznie wysłany z ". $_SERVER['HTTP_HOST'];
 
-			$config = new Zend_Oauth_Config();
-			$config->setOptions(getGoogleOAuthOptions());
-			// Could try-catch here (for 'access disallowed'?)
-			$config->setToken(unserialize(base64_decode(getOption('gmailOAuthAccessToken'))));
-			$config->setRequestMethod('GET');
-			$url = 'https://mail.google.com/mail/b/' . $email_address . '/smtp/';
-
-			$httpUtility = new Zend_Oauth_Http_Utility();
-			$params = $httpUtility->assembleParams($url, $config);
-			ksort($params);
-			$oauthParams = array();
-			foreach ($params as $key => $value)
-				if (strpos($key, 'oauth_') === 0)
-					$oauthParams []= $key . '="' . urlencode($value) . '"';
-			$initClientRequest = 'GET ' . $url . ' ' . implode(',', $oauthParams);
+			$emailAddress = getOption('gmailOAuthEmail');
+			$accessToken = unserialize(base64_decode(getOption('gmailOAuthAccessToken')));
+			$accessToken = json_decode($accessToken);
+			$accessToken = $accessToken->access_token;
 
 			$config = array(
-				'ssl' => 'ssl',
-				'port' => '465', //465,587
-				'auth' => 'xoauth',
-				'xoauth_request' => base64_encode($initClientRequest)
+				'ssl' => 'ssl', // ssl,tls
+				'port' => '465', //465,587 (docs say use tls and 465, or 587 if client issues text before STARTLS)
+				'auth' => 'xoauth2',
+				'xoauth_request' => base64_encode("user=$emailAddress\1auth=Bearer $accessToken\1\1")
 			);
 			$transport = new Zend_Mail_Transport_Smtp('smtp.gmail.com', $config);
 			$mail = new Zend_Mail('UTF-8');
 			if ($isHTML)  $mail->setBodyHTML($content);
 			else          $mail->setBodyText($content);
-			$mail->setFrom($email_address, 'Aplikacja WWW');
+			$mail->setFrom($emailAddress, 'Aplikacja WWW');
 			if (is_array($to))
 				foreach ($to as $t)
 					$mail->addTo($t[1], $t[0]);
 			else  $mail->addTo($to);
 			$mail->setSubject("[WWW][app] $subject");
 			$mail->send($transport);
-
-			/* If you ever needed to access IMAP this way too: */
-			//require_once 'Zend/Mail/Protocol/Imap.php';
-			//require_once 'Zend/Mail/Storage/Imap.php';
-			/*
-			$imap = new Zend_Mail_Protocol_Imap('imap.gmail.com', '993', true);
-			$authenticateParams = array('XOAUTH', base64_encode($initClientRequest));
-			$imap->requestAndResponse('AUTHENTICATE', $authenticateParams);
-
-			$storage = new Zend_Mail_Storage_Imap($imap);
-
-			echo '<html><head><title>2legged OAuth test</title></head><body>';
-			echo '<h1>Total messages: ' . $storage->countMessages() . "</h1>\n";
-
-			echo 'First five messages: <ul>';
-			for ($i = 1; $i <= $storage->countMessages() && $i <= 5; $i++ )
-				echo '<li>' . htmlentities($storage->getMessage($i)->subject) . "</li>\n";
-			echo '</ul>';
-			echo '</body></html>';
-			*/
 		}
 	}
 	// Error handlers send mails, sometimes it hangs and no error would be registered without this.
@@ -155,17 +108,19 @@ function actionFetchGmailOAuthAccessToken()
 	global $DB, $PAGE;
 	if (!userIs('admin'))  throw new PolicyException();
 	logUser('redoOAuth');
-	$consumer = new Zend_Oauth_Consumer(getGoogleOAuthOptions());
-	if (!isset($_SESSION['REQUEST_TOKEN'])) {
-		// Get Request Token and redirect to Google
-		$scopes = array('https://mail.google.com/');
-		$_SESSION['REQUEST_TOKEN'] = serialize($consumer->getRequestToken(array('scope' => implode(' ', $scopes))));
-		$consumer->redirect();
-	} else {
-		// Have Request Token already, Get Access Token
-		$requestToken = unserialize($_SESSION['REQUEST_TOKEN']);
-		unset($_SESSION['REQUEST_TOKEN']);
-		$accessToken = $consumer->getAccessToken($_GET, $requestToken);
+
+	$client = new Google_Client();
+	$client->setApplicationName('Summer Scientific Schools');
+	$client->setClientId(OAUTH2_CLIENT_ID);
+	$client->setClientSecret(OAUTH2_CLIENT_SECRET);
+	$client->setRedirectUri(getCurrentUrl(false));
+	$client->setScopes('https://mail.google.com/');
+
+	if (!isset($_GET['code']))
+		header('Location: '. $client->createAuthUrl());
+	else
+	{
+		$accessToken = $client->authenticate();
 		$accessToken = base64_encode(serialize($accessToken));
 		$DB->options['gmailOAuthAccessToken']->update(array('value' => $accessToken));
 		$PAGE->addMessage("Successfully received accessToken: <pre>$accessToken</pre>", 'success');
@@ -173,34 +128,20 @@ function actionFetchGmailOAuthAccessToken()
 	}
 }
 
-function getGoogleOAuthOptions()
+function getCurrentUrl($includeQuery = true)
 {
-	return array(
-		'requestScheme' => Zend_Oauth::REQUEST_SCHEME_HEADER,
-		'version' => '1.0',
-		'consumerKey' => OAUTH_CONSUMER_KEY,
-		'signatureMethod' => OAUTH_METHOD,
-		'consumerSecret' =>
-			(OAUTH_METHOD == 'RSA-SHA1') ?
-				new Zend_Crypt_Rsa_Key_Private(file_get_contents(OAUTH_CONSUMER_SECRET)) :
-				OAUTH_CONSUMER_SECRET,
-		'callbackUrl' => getCurrentUrl(),
-		'requestTokenUrl' => 'https://www.google.com/accounts/OAuthGetRequestToken',
-		'userAuthorizationUrl' => 'https://www.google.com/accounts/OAuthAuthorizeToken',
-		'accessTokenUrl' => 'https://www.google.com/accounts/OAuthGetAccessToken'
-	);
-}
-
-function getCurrentUrl($includeQuery = true) {
-  $scheme =  empty($_SERVER['HTTPS']) ? 'http' : 'https';
-  $hostname = $_SERVER['SERVER_NAME'];
-  $port = $_SERVER['SERVER_PORT'];
-  $uri = ($includeQuery) ? $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_NAME'];
-  if (($port == '80' && $scheme == 'http') || ($port == '443' && $scheme == 'https'))
-      $url = $scheme . '://' . $hostname . $uri;
-  else
-      $url = $scheme . '://' . $hostname . ':' . $port . $uri;
-  return $url;
+	$scheme =  empty($_SERVER['HTTPS']) ? 'http' : 'https';
+	$hostname = $_SERVER['SERVER_NAME'];
+	$port = $_SERVER['SERVER_PORT'];
+	$uri = $_SERVER['REQUEST_URI'];
+	if (!$includeQuery)
+	{
+		$uri = explode('?', $uri);
+		$uri = $uri[0];
+	}
+	if (!($port == '80' && $scheme == 'http') && !($port == '443' && $scheme == 'https'))
+		$hostname .= ':'. $port;
+  return $scheme . '://' . $hostname . $uri;
 }
 
 
