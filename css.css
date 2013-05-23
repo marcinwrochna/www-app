@@ -325,3 +325,4 @@ table.bordered td { color: black; }
 img.latex { font-size: 0.7em; }
 
 #avatarBox { display: none; }
+.avatar { float: right; border: 1p #987 solid; }

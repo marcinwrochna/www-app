@@ -109,7 +109,8 @@ foreach ($dirs as $dir)  foreach (glob($dir .'*.php') as $filename)
 
 $filenames = implode(' ', $filenames);
 // xgettext should be essentially equal to what the table search would do with $funcname='_';
-echo `xgettext -k_ --from-code utf-8 -o locale/tmp1.pot --no-wrap $filenames`;
+echo "Launching: xgettext -k_ -k'_n:1,2' --from-code utf-8 -o locale/tmp1.pot --no-wrap $filenames\n";
+echo `xgettext -k_ -k'_n:1,2' --from-code utf-8 -o locale/tmp1.pot --no-wrap $filenames`;
 
 chdir('locale/');
 echo `cp head.pot tmp2.pot`;
@@ -121,8 +122,8 @@ foreach ($poData as $s => $comments)
 	$poOutput .= "msgstr \"\"\n\n";
 }
 file_put_contents('tmp2.pot', $poOutput, FILE_APPEND);
-echo `msgcat tmp1.pot tmp2.pot > $outputFile`;
-echo `rm tmp1.pot tmp2.pot`;
+echo `msgcat  --no-wrap tmp1.pot tmp2.pot > $outputFile`;
+#echo `rm tmp1.pot tmp2.pot`;
 echo "Total: $total string found.\n";
 
 foreach ($languages as $lang)
@@ -133,8 +134,8 @@ foreach ($languages as $lang)
 	if (!is_dir("$lang/LC_MESSAGES"))
 		mkdir("$lang/LC_MESSAGES");
 	if (!is_file("$lang/LC_MESSAGES/messages.po"))
-		echo `msginit -l $ll -o $lang/LC_MESSAGES/messages.po -i messages.pot`;
+		echo `msginit --no-wrap -l $ll -o $lang/LC_MESSAGES/messages.po -i messages.pot`;
 	else
-		echo `msgmerge       -U $lang/LC_MESSAGES/messages.po    messages.pot`;
+		echo `msgmerge --no-wrap      -U $lang/LC_MESSAGES/messages.po    messages.pot`;
 	echo "locale/$lang/LC_MESSAGES/messages.po updated - fill in missing translations with a .po editor.\n";
 }

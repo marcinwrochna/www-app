@@ -255,4 +255,9 @@ switch ($version)
 		$DB->query('UPDATE w1_editions SET taskdeadline=$1 WHERE edition=9', strtotime('2013/05/24 10:00'));
 		$DB->query('UPDATE w1_editions SET checkdeadline=$1 WHERE edition=9', strtotime('2013/07/10 10:00'));
 		setVersion(52);
+	case(52):
+		insertPermission('admin', 'showProfile');
+		insertPermission('owner', 'showProfile');
+		insertPermission('registered', 'showProfile');
+		setVersion(53);
 }

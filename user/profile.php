@@ -3,6 +3,84 @@
  * user/profile.php
  */
 
+function getAvatarPath($uid = null)
+{
+	if (is_null($uid))
+		return 'fineuploader/avatars/';
+	else
+		return 'fineuploader/avatars/user'. $uid .'.jpg';
+}
+
+// Unfinished function for showing someone's profile (to anyone registered).
+function actionShowProfile($uid = null)
+{
+	global $USER, $PAGE, $DB;
+	$currentEdition = getOption('currentEdition');
+	$own = is_null($uid) || ($uid == $USER['uid']);
+	$uid = $own ? $USER['uid'] : intval($uid);
+	if (!userCan('showProfile', $uid))  throw new PolicyException();
+	if (!isset($DB->users[$uid]))
+		throw new KnownException(_('User not found.'));
+
+	$user = $DB->users[$uid]->assoc('*');
+
+	$gender = $user['gender'];
+	$PAGE->title = $user['name']. ' - '. _('profile');
+	$PAGE->headerTitle = '<span class="left">'. $uid .'.&nbsp;</span>';
+	$PAGE->headerTitle .= '<h2>'. $user['name']. ' - '. _('profile') .'</h2>';
+
+	$avatar = getAvatarPath($uid);
+	if (file_exists($avatar))
+		$user['avatar'] = '<img class="avatar" src="'. $avatar .'?'. filemtime($avatar) .'" />';
+	else
+		$user['avatar'] = '';
+
+	//print '<a href="mailto:'. $user['name'] .' <'. $user['email'] .'>">'. $user['email'] .'</a><br/>';
+
+	$gradOptions = getGraduationYearOptions(true);
+	if (isset($gradOptions[$graduation]))
+		$user['graduationyear'] = $gradOptions[$user['graduationyear']];
+
+	$user['interests'] = parseUserHTML($user['interests']);
+	$user['motivationletter'] = parseUserHTML($user['motivationletter']);
+	$user['badge'] = getUserBadge($uid, true);
+	$user['school'] = parseUserHTML($user['school']);
+
+	$template = new SimpleTemplate($user);
+	?>
+		<span class="left">%badge% (%login%)</span>
+		<span class="right">%school% - ({{graduation year}}: %graduationyear%)</span><br/>
+		%avatar%
+
+		<h3 onclick='$("#interests_sign").toggle(); $("#interests").toggle("fast");' style='cursor: pointer'>
+			 <span id='interests_sign'>+</span> {{Interests}}</h3>
+		<div class="descriptionBox" id="interests" style="display:none">%interests%</div>
+	<?php
+	if (userCan('adminUsers'))
+	{
+	?>
+		<h3 onclick='$("#motivation_sign").toggle(); $("#motivation").toggle("fast");' style='cursor: pointer'>
+			<span id='motivation_sign'>+</span> {{Motivation letter}}</h3>
+		<div class="descriptionBox" id="motivation" style="display:none">%motivationletter%</div>
+	<?php
+		// TODO show roles, howdoyouknowus
+		print '<br/>';
+		print genderize(_('registered'), $gender) .': ';
+		print fixedStrftime('%Y-%m-%d %H:%M (%ago%)', $user['registered']) ;
+		print ', &nbsp;';
+		print _('last login') .': ';
+		if ($user['confirm'] > 0)
+			print _('the user hasn\'t confirmed his e-mail yet');
+		else if ($user['logged'] == 0)
+			print _('the user hasn\'t logged in yet');
+		else
+			print fixedStrftime('%Y-%m-%d %H:%M (%ago%)', $user['logged']);
+		print '<br/>';
+	}
+
+	echo $template->finish(true);
+}
+
 function actionEditProfile($uid = null)
 {
 	global $USER, $PAGE, $DB;
@@ -54,7 +132,7 @@ function actionEditProfile($uid = null)
 	$inputs['avatar']['default'] = '<div onclick=\'$("#avatarSign").toggle(); $("#avatarBox").toggle("fast");\' style="cursor: pointer">
 			 <span id="avatarSign">+</span> '. _('change') .'...</div><div id="avatarBox">'.
 			 '<div id="avatarUpload"></div> <img id="avatar" ';
-	$src = 'fineuploader/avatars/user'. $uid .'.jpg';
+	$src = getAvatarPath($uid);
 	if (file_exists($src))
 		$inputs['avatar']['default'] .= 'src="'. $src .'?'. filemtime($src) .'"';
 	$inputs['avatar']['default'] .=
@@ -167,6 +245,7 @@ function actionEditProfile($uid = null)
 		}
 	}
 
+	// Avatar uploader.
 	$uploader = array(
 		'request' => array(
 			'endpoint' => 'fineuploader/handle.php',
@@ -185,7 +264,7 @@ function actionEditProfile($uid = null)
 		'.on("complete", function(event, id, fileName, responseJSON) {
 			if (responseJSON.success) {
 				$("#avatar").attr("src",
-					"fineuploader/avatars/user'. $uid .'.jpg?"+ new Date().getTime());
+					"'. getAvatarPath($uid) .'?"+ new Date().getTime());
 				setTimeout(function(){ $("#avatarUpload").fineUploader("reset"); }, 3000);
 			} });
 	';
@@ -352,7 +431,7 @@ function actionEditMotivationLetter()
 
 
 // Returns an array of 9 most probable graduation years.
-function getGraduationYearOptions()
+function getGraduationYearOptions($withComment = false)
 {
 	// I decided not to use the text descriptions anymore, they're imprecise and confusing.
 	// (so this table's values are not actually used).
@@ -365,7 +444,9 @@ function getGraduationYearOptions()
 	$graduationYearOptions = array();
 	foreach ($classOptions as $i=>$opt)
 	{
-		$graduationYearOptions[$year] = $year; // ." ($opt)";
+		$s = $year;
+		if ($withComment)  $s .= " (~$opt)";
+		$graduationYearOptions[$year] = $s;
 		$year--;
 	}
 	return $graduationYearOptions;

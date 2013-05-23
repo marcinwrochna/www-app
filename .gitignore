@@ -1,0 +1,9 @@
+*~
+*.mo
+*.pot
+htmlpurifier/[^l][^i][^b]*
+google*.html
+.buildpath
+.metadata
+.settings
+errorLog.txt

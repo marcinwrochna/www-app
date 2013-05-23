@@ -579,8 +579,34 @@ function dbg($o)
 	$PAGE->addMessage(htmlspecialchars(json_encode($o)));
 }
 
+function timeToStrAgo($timestamp)
+{
+	$s = time() - $timestamp;
+	$delay = 1.5;
+	if ($s < $delay * 60)
+		return sprintf(ngettext('%d second ago', '%d seconds ago', $s), $s);
+	$m = round($s/60);
+	if ($m < $delay * 60)
+		return sprintf(ngettext('%d minute ago', '%d minutes ago', $m), $m);
+	$h = round($m/60);
+	if ($h < $delay * 24)
+		return sprintf(ngettext('%d hour ago', '%d hours ago', $h), $h);
+	$d = round($h/24);
+	if ($d < $delay * 7)
+		return sprintf(ngettext('%d day ago', '%d days ago', $d), $d);
+	$w = round($d/7);
+	if ($d < $delay * 30.5)
+		return sprintf(ngettext('%d week ago', '%d weeks ago', $w), $w);
+	$n = round($d/30.5);
+	if ($n < $delay * 12)
+		return sprintf(ngettext('%d month ago', '%d months ago', $n), $n);
+	$y = round($d/365.25);
+	return sprintf(ngettext('%d year ago', '%d years ago', $y), $y);
+}
+
 /**
- * Equal to strftime, but with correctly inflected month names in polish.
+ * Equal to strftime, but with correctly inflected month names in polish
+ * and replaces %ago% with timeToStrAgo()
  */
 function fixedStrftime($format, $timestamp)
 {
@@ -598,5 +624,6 @@ function fixedStrftime($format, $timestamp)
 		'listopad'    => 'listopada',
 		'grudzień'    => 'grudnia'
 	);
+	$format = str_replace('%ago%', timeToStrAgo($timestamp), $format);
 	return str_replace(array_keys($polish), array_values($polish), strftime($format, $timestamp));
 }
