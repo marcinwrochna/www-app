@@ -7,3 +7,4 @@ google*.html
 .metadata
 .settings
 errorLog.txt
+config.php

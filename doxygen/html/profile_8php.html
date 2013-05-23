@@ -142,11 +142,11 @@ Functions</h2></td></tr>
         $inputs[<span class="stringliteral">&#39;staybegintime&#39;</span>][<span class="stringliteral">&#39;options&#39;</span>] = $stayoptions;
         $inputs[<span class="stringliteral">&#39;stayendtime&#39;</span>][<span class="stringliteral">&#39;options&#39;</span>]   = $stayoptions;
 
-        $inputs[<span class="stringliteral">&#39;gatherplace&#39;</span>][<span class="stringliteral">&#39;options&#39;</span>] = array(<span class="stringliteral">&#39;warszawa&#39;</span>=&gt;_(<span class="stringliteral">&#39;Warsaw PKP&#39;</span>),<span class="stringliteral">&#39;olsztyn&#39;</span>=&gt;_(<span class="stringliteral">&#39;Olsztyn PKP&#39;</span>),<span class="stringliteral">&#39;none&#39;</span>=&gt;_(<span class="stringliteral">&#39;I\&#39;ll arrive on my own.&#39;</span>));
+        $inputs[<span class="stringliteral">&#39;gatherplace&#39;</span>][<span class="stringliteral">&#39;options&#39;</span>] = array(<span class="stringliteral">&#39;warszawa&#39;</span>=&gt;_(<span class="stringliteral">&#39;Warsaw PKP&#39;</span>),<span class="stringliteral">&#39;węgorzewo&#39;</span>=&gt;_(<span class="stringliteral">&#39;Węgorzewo PKP&#39;</span>),<span class="stringliteral">&#39;none&#39;</span>=&gt;_(<span class="stringliteral">&#39;I\&#39;ll arrive on my own.&#39;</span>));
         $tshirtsizes = array(<span class="stringliteral">&#39;XS&#39;</span>,<span class="charliteral">&#39;S&#39;</span>,<span class="charliteral">&#39;M&#39;</span>,<span class="charliteral">&#39;L&#39;</span>,<span class="stringliteral">&#39;XL&#39;</span>,<span class="stringliteral">&#39;XXL&#39;</span>);
         $inputs[<span class="stringliteral">&#39;tshirtsize&#39;</span>][<span class="stringliteral">&#39;options&#39;</span>] = array_combine($tshirtsizes, $tshirtsizes);;
         $inputs[<span class="stringliteral">&#39;isselfcatered&#39;</span>][<span class="stringliteral">&#39;text&#39;</span>] = _(<span class="stringliteral">&#39;on my own&#39;</span>) .
-                <span class="stringliteral">&#39;&lt;small &#39;</span>. <a class="code" href="template_8php.html#a9b9585537fe5238d4d5b54478251ccfa">getTipJS</a>(_(<span class="stringliteral">&#39;applies to Olsztyn residents, for example&#39;</span>)) .<span class="stringliteral">&#39;&gt;[?]&lt;/small&gt;&#39;</span>;
+                <span class="stringliteral">&#39;&lt;small &#39;</span>. <a class="code" href="template_8php.html#a9b9585537fe5238d4d5b54478251ccfa">getTipJS</a>(_(<span class="stringliteral">&#39;applies to Węgorzewo residents, for example&#39;</span>)) .<span class="stringliteral">&#39;&gt;[?]&lt;/small&gt;&#39;</span>;
 
 
         $form = <span class="keyword">new</span> <a class="code" href="classForm.html">Form</a>($inputs);
