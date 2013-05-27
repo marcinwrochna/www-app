@@ -185,7 +185,9 @@ function errorHandler($errno, $errstr='', $errfile='', $errline='')
 	}
 	catch (Exception $e)
 	{
+		echo '<b>Błąd w samej obsłudze błędów - pewnie nie udaje się wysłać raportu. Napisz proszę do '. BUGREPORT_EMAIL_ADDRESS .'</b><br/>';
 		echo 'Error within handler: <pre>'.$e->getMessage().'</pre> on line '.$e->getLine();
+
 	}
 }
 
@@ -293,7 +295,7 @@ function errorLog($logMessage)
 	touch(ERROR_LOG);
 	$lines = file(ERROR_LOG);
 	if (is_array($lines))
-		$lines = array_slice($lines, -1000);
+		$lines = array_slice($lines, -8000);
 	else
 		$lines = array();
 	$lines[]= "LOGGED at ". strftime("%Y-%m-%d %H:%M:%S") ."\n\n";

@@ -74,6 +74,9 @@ function sendMail($subject, $content, $to, $isHTML = false)
 			$emailAddress = getOption('gmailOAuthEmail');
 			$accessToken = unserialize(base64_decode(getOption('gmailOAuthAccessToken')));
 			$accessToken = json_decode($accessToken);
+			$client = getGoogleClient();
+			$client->refreshToken($accessToken->refresh_token);
+			$accessToken = json_decode($client->getAccessToken());
 			$accessToken = $accessToken->access_token;
 
 			$config = array(
@@ -103,18 +106,25 @@ function sendMail($subject, $content, $to, $isHTML = false)
 	}
 }
 
-function actionFetchGmailOAuthAccessToken()
+function getGoogleClient()
 {
-	global $DB, $PAGE;
-	if (!userIs('admin'))  throw new PolicyException();
-	logUser('redoOAuth');
-
 	$client = new Google_Client();
 	$client->setApplicationName('Summer Scientific Schools');
 	$client->setClientId(OAUTH2_CLIENT_ID);
 	$client->setClientSecret(OAUTH2_CLIENT_SECRET);
 	$client->setRedirectUri(getCurrentUrl(false));
 	$client->setScopes('https://mail.google.com/');
+	$client->setAccessType('offline');
+	return $client;
+}
+
+function actionFetchGmailOAuthAccessToken()
+{
+	global $DB, $PAGE;
+	if (!userIs('admin'))  throw new PolicyException();
+	logUser('redoOAuth');
+
+	$client = getGoogleClient();
 
 	if (!isset($_GET['code']))
 		header('Location: '. $client->createAuthUrl());
