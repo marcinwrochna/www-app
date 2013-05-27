@@ -404,7 +404,7 @@ function actionEditMotivationLetter()
 		motivationletter   => richtextarea;
 	');
 	$inputs['motivationletter']['description'] = sprintf(genderize(_(
-			 'Write (in %d - %d words)<br/>'
+			 'Write (in %d - %d words) referring to each point in a separate paragraph:<br/>'
 			.'1. Describe your main scientific interests. A detailed description would be welcome (if you’re interested in mathematics - which area are you most interested in; if it’s programming - what programs are you making and in what language, etc.).<br/>'
 			.'2. How do you develop your interests from section 1.? Write down what books you read, what type of tasks and problems you solve, etc. If you have your own projects, works, experiments, programs - describe them. If you’re a member of Polish Children’s Fund, briefly describe what you do in the program.<br/>'
 			.'3. If you’re interested in something not strictly scientific (that is, besides math/physics/computer science) or you are involved in other initiatives, describe them briefly.<br/>'
