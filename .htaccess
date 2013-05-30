@@ -5,13 +5,14 @@ RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^(.*)$           -                                                [last,L,NE]
 # Pass doxygen.
 RewriteRule ^doxygen         -                                                [last,L,NE]
-# Pass some fixed files that don't exists (to standard 404)
+# Pass some fixed files that don't exist (to standard 404 that bots can recognise)
 RewriteRule ^crossdomain.xml       -                                          [last,L,NE]
 RewriteRule ^sitemap.xml           -                                          [last,L,NE]
 
-
-
 # Warning: actions can't have the same name as a directory.
+
+# impersonate($1)/someStaticFile.js
+RewriteRule ^impersonate\((.+)\)/(.*\...?)$               $2 [last,L,NE]
 # impersonate($1)/$2($3)
 RewriteRule ^impersonate\((.+)\)/(.+)\((.*)\)$            index.php?impersonate=$1&action=$2&args=$3&%{QUERY_STRING} [last,L,NE]
 # impersonate($1)/$2
