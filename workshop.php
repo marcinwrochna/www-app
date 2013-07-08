@@ -196,7 +196,7 @@ function listWorkshops($which, $where, $columns)
 			$tip = '';
 			foreach (enumParticipantStatus() as $statusName => $status)
 				$tip .= genderize($status->description, 'p') .': '. $row["count_$statusName"] .'<br/>';
-			$row['participants'] .= '<a '. getTipJS($tip) .'>';
+			$row['participants'] .= '<a href="showWorkshopTasks('. $row['wid'] .')" '. getTipJS($tip) .'>';
 			$row['participants'] .= ($row['count_accepted'] + $row['count_autoaccepted']) .'</a>';
 		}
 
