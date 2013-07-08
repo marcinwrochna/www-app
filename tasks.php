@@ -5,7 +5,7 @@
 */
 // TODO review and translate.
 
-// Called by actionShowWorkshop
+// Called by actionShowWorkshopTasks
 function buildTaskList($wid)
 {
 	global $USER, $DB;
@@ -244,12 +244,13 @@ function actionEditSolution($wid, $tid)
 	callAction('editSolution', array($wid, $tid));
 }
 
-// Called by actionShowWorkshop
+// Called by actionShowWorkshopTasks
 function buildParticipantList($wid)
 {
 	global $DB, $PAGE;
 	$wid = intval($wid);
 	$template = new SimpleTemplate();
+	$lecturers = getLecturers($wid);
 	$DB->query('SELECT wu.uid, wu.participant, wu.points, u.gender
 		FROM table_workshop_users wu, table_users u
 		WHERE wu.uid=u.uid AND wu.wid=$1 AND wu.participant>0
@@ -304,7 +305,9 @@ function buildParticipantList($wid)
 			echo '<td>'. $participant['points'] .'</td>';
 			$desc = genderize(enumParticipantStatus($status)->description, $participant['gender']);
 			$icon = getIcon('arrow-right.png',	_('see & grade solutions'), "showTaskSolutions($wid;$uid)");
-			echo '<td>'. $desc .'<span class="right">'. $icon . '</span>';
+			echo '<td>'. $desc;
+			if (userCan('editTasks', $lecturers))
+				echo '<span class="right">'. $icon . '</span>';
 			echo '</td></tr>';
 		}
 	}
