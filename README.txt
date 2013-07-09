@@ -1,6 +1,7 @@
 == Installation ==
 === Requirements ===
 PHP >= 5.2 - required to support enums and database magic syntax.
+PHP extensions: curl,json,pgsql,hash,gettext
 PostgreSQL >= 9? - while it should be easy to modify db/postgresql.php, I only test on pg,
 	so some queries might require modification if you use another DBMS.
 CGI and Perl for latex and upload status bar

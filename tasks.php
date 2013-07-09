@@ -249,6 +249,15 @@ function buildParticipantList($wid)
 {
 	global $DB, $PAGE;
 	$wid = intval($wid);
+	//parses POST data with points, status and comments
+	foreach($_POST['data'] as $userId => $row)
+	{
+		if ($row['points'] == '')
+			$row['points'] = 'NULL';
+
+		$DB->query('UPDATE w1_workshop_users SET points=' . $row['points'] . ' WHERE wid=' . $wid . ' AND uid=' .$userId); 
+	}
+
 	$template = new SimpleTemplate();
 	$DB->query('SELECT wu.uid, wu.participant, wu.points, u.gender
 		FROM table_workshop_users wu, table_users u
@@ -272,7 +281,7 @@ function buildParticipantList($wid)
 
 	echo '<h3 style="display:inline-block">'. _('Signups') .'</h3>';
 	echo '<table class="right"><tr><td>'. implode('</td><td>', $countDescription) .'</td></tr></table><br/>';
-
+	echo '<form action="showWorkshopTasks(' . $wid . ')" method="post">';
 	echo '<table style="border-top: 1px black solid">';
 	echo '<thead><tr><th>'. _('participant') .'</th>';
 	foreach ($tasks as $tid)  echo "<th>$tid</th>";
@@ -301,15 +310,28 @@ function buildParticipantList($wid)
 				$s = enumSolutionStatus($solutions[$tid]);
 				echo '<td>'. getIcon($s->icon, $s->description) .'</td>';
 			}
-			echo '<td>'. $participant['points'] .'</td>';
+			echo '<td>' . '<select name="data['. $uid .'][points]">';
+			$points = ['', 0, 1, 2, 3, 4, 5, 6];
+			foreach ($points as $i)
+			{
+				if ($i == $participant['points'] && $participant['points'] != '')
+				{
+					echo '<option selected value="' . $i . '">' . $i . '</option>';
+				}
+				else 
+				{
+					echo '<option value="' . $i . '">' . $i . '</option>';
+				}
+			}
+			echo '</select></td>';
 			$desc = genderize(enumParticipantStatus($status)->description, $participant['gender']);
 			$icon = getIcon('arrow-right.png',	_('see & grade solutions'), "showTaskSolutions($wid;$uid)");
 			echo '<td>'. $desc .'<span class="right">'. $icon . '</span>';
 			echo '</td></tr>';
 		}
 	}
-
 	echo '</tbody></table>';
+	echo '<input type="submit" value="' . _('save') . '"/></form>';
 	if (!empty($staff))
 		echo _('from staff: '). implode(', ', $staff) . '<br/>';
 
