@@ -260,4 +260,7 @@ switch ($version)
 		insertPermission('owner', 'showProfile');
 		insertPermission('registered', 'showProfile');
 		setVersion(53);
+	case(53):
+		insertPermission('owner', 'editTasks');
+		setVersion(54);
 }
