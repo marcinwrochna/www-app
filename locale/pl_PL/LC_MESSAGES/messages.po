@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-27 21:01+0200\n"
 "PO-Revision-Date: 2013-05-27 21:02+0100\n"
-"Last-Translator: Patryk Hes <hesonator@gmail.com>\n"
+"Last-Translator: Jakub Sygnowski <sygnowski@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -1111,8 +1111,12 @@ msgid "Warsaw PKP"
 msgstr "Warszawa PKP"
 
 #: user/profile.php:348
-msgid "Węgorzewo PKP"
-msgstr "Węgorzewo PKP"
+msgid "Olsztyn PKP"
+msgstr "Olsztyn PKP"
+
+#: user/profile.php:348
+msgid "Węgorzewo - hostel"
+msgstr "Węgorzewo - schronisko"
 
 #: user/profile.php:348
 msgid "I'll arrive on my own."

@@ -345,7 +345,7 @@ function actionEditAdditionalInfo($uid = null)
 	$inputs['staybegintime']['options'] = $stayoptions;
 	$inputs['stayendtime']['options']   = $stayoptions;
 
-	$inputs['gatherplace']['options'] = array('warszawa'=>_('Warsaw PKP'),'wegorzewo'=>_('Węgorzewo PKP'),'none'=>_('I\'ll arrive on my own.'));
+	$inputs['gatherplace']['options'] = array('warszawa'=>_('Warsaw PKP'),'olsztyn'=>_('Olsztyn PKP'),'wegorzewo'=>_('Węgorzewo - hostel'),'none'=>_('I\'ll arrive on my own.'));
 	$tshirtsizes = array('XS','S','M','L','XL','XXL');
 	$inputs['tshirtsize']['options'] = array_combine($tshirtsizes, $tshirtsizes);;
 	$inputs['isselfcatered']['text'] = _('on my own') .
