@@ -312,7 +312,7 @@ function buildParticipantList($wid)
 				echo '<td>'. getIcon($s->icon, $s->description) .'</td>';
 			}
 			echo '<td>' . '<select name="data['. $uid .'][points]">';
-			$points = ['', 0, 1, 2, 3, 4, 5, 6];
+			$points = array('', 0, 1, 2, 3, 4, 5, 6);
 			foreach ($points as $i)
 			{
 				if ($i == $participant['points'] && $participant['points'] != '')
