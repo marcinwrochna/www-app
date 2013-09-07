@@ -24,7 +24,8 @@ class Page extends SimpleTemplate
 
 		if (DEBUG>=2) $this->content .= dumpSuperGlobals();
 
-		$this->latexPath = 'http://'. $_SERVER['HTTP_HOST'] . '/cgi-bin/mimetex.cgi';
+		//$this->latexPath = 'http://'. $_SERVER['HTTP_HOST'] . '/cgi-bin/mimetex.cgi';
+		$this->latexPath = 'http://latex.codecogs.com/gif.latex?';
 		$this->uploadGetter = 'http://'. $_SERVER['HTTP_HOST'] . '/uploader/getfile.php';
 
 		if (!isset($this->headerTitle))

@@ -106,21 +106,24 @@ class SimpleTemplate
 	}
 }
 
-function parseUserHTML($html) {
+function parseUserHTML($html)
+{
 	// TODO: test prevention of XSS attacks with HTMLPurifier.
-	// Parse [tex]code[/tex] into <img src="pathtorenderer.cgi?code"/>.
-	preg_match_all("#\\[tex\\](.*?)\\[/tex\\]#si",$html,$tex_matches);
+
+	// DEPRECATED: Using mathjax instead, see html.php
+	//Parse [tex]code[/tex] into <img src="pathtorenderer.cgi?code"/>.
+	/*preg_match_all("#\\[tex\\](.*?)\\[/tex\\]#si",$html,$tex_matches);
 	for ($i=0; $i < count($tex_matches[0]); $i++) {
 		$pos = strpos($html, $tex_matches[0][$i]); // TODO low: this seems stupid?
 		$len = strlen($tex_matches[0][$i]);
 		$latex_formula = $tex_matches[1][$i];
 		$url = 'http://'. $_SERVER['HTTP_HOST'] . '/cgi-bin/mimetex.cgi?';
-		//urlencode($latex_formula)
+		////urlencode($latex_formula)
 		$url .= htmlspecialchars($latex_formula, ENT_QUOTES);
 		$img = "<img src='$url' alt='[tex]". htmlspecialchars($latex_formula, ENT_QUOTES) .
 			"[/tex](". _('missing picture'). ")' class='latex' align='absmiddle'/>";
-		$html = substr_replace($html, $img,$pos,$len);
-	}
+		$html = substr_replace($html, $img, $pos, $len);
+	}*/
 
 	// TODO see why TinyMCE includes html-escaped comment tags with MS Word stuff.
 	$offset = 0;

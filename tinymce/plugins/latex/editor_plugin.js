@@ -1,10 +1,11 @@
 (function() {
 /* Import plugin specific language pack */
-tinyMCE.PluginManager.requireLangPack("latex");
+tinymce.PluginManager.requireLangPack("latex");
 
 tinymce.create('tinymce.plugins.LatexPlugin', {	
 	init : function(ed, url) {
 		this.url = url + '/';
+
 		ed.addButton('latex', {
 				title : 'latex.desc',
 				cmd : 'mceLatex'
@@ -14,7 +15,7 @@ tinymce.create('tinymce.plugins.LatexPlugin', {
 			if (node == null)  return;
 
 			do {
-				if (node.nodeName.toLowerCase() == "img" && ed.dom.hasClass(node,'latexEquation')) {
+				if (node.nodeName.toLowerCase() == "img" && ed.dom.hasClass(node,'latexFormula')) {
 					cm.setActive('latex', true);
 					return true;
 				}
@@ -25,41 +26,25 @@ tinymce.create('tinymce.plugins.LatexPlugin', {
 		});
 		
 		ed.onBeforeSetContent.add(function(ed, o) {
-			var lrurl;
-			lrurl = ed.getParam("latex_renderUrl");
-			if(lrurl)
-			{
-				o.content = o.content.replace(/\[tex\]/gi, '<img class="latexEquation" src="'+lrurl+'?');
-				o.content = o.content.replace(/\[\/tex\]/gi, '" border="0" align="absmiddle" alt="latex" />');
-			}
+			o.content = o.content.replace(/\[tex\]((.|\n|\r)*?)\[\/tex\]/gi, function(match0, match1) {
+				return '<img class="latexFormula" '+
+					'alt="'+ match1.replace("\"", "&#34;") +'" '+
+					'src="'+ ed.getParam("latex_renderUrl") + encodeURIComponent(match1) +'"/>';
+			}); 
 		});
-		
-		function getAttr(s, n) {
-			n = new RegExp(n + '=\"([^\"]+)\"', 'g').exec(s);
-			return n ? ed.dom.decode(n[1]) : '';
-		};
+
+
+		ed.onSetContent.add(function(ed, o) {
+		});
 
 		ed.onPostProcess.add(function(ed, o) {
-			var lrurl;
-			lrurl = ed.getParam("latex_renderUrl");
-			if (o.set) {
-				if(lrurl)
-				{
-					o.content = o.content.replace(/\[tex\]/gi, '<img class="latexEquation" title="mimetex" src="'+lrurl+'?');
-					o.content = o.content.replace(/\[\/tex\]/gi, '" border="0" align="absmiddle" alt="latex" />');
-				}
-			}
+			/*if (o.set) {
+				o.content = o.content.replace(/\[tex\]/gi, '<span class="latexFormula"[^>]*>[tex]');
+				o.content = o.content.replace(/\[\/tex\]/gi, '[/tex]</span>');
+			}*/
 			if (o.get) {
-				o.content = o.content.replace(/<img[^>]+>/g, function(im) {
-					if(!/latexEquation/.test(getAttr(im,'class')))
-						return im;
-					var src = getAttr(im,'src');
-					//src = src.replace(new RegExp(lrurl, 'gi'), '');
-					src = src.replace(new RegExp('^.*mimetex.cgi\\?', 'gi'), '');
-					//src = src.replace(/^\?/gi, '');
-					html = '[tex]'+decodeURIComponent(src)+'[/tex]';
-					return html;
-				});	
+				o.content = o.content.replace(new RegExp('<img class="latexFormula"[^>]* alt="([^"]*)"[^>]*>','g'),
+					function(match0, match1) { return '[tex]'+ match1.replace("&#34;", "\"").replace("&quot;", "\"") +'[/tex]'; });
 			}
 		});
 		
@@ -83,17 +68,14 @@ tinymce.create('tinymce.plugins.LatexPlugin', {
 		// Handle commands
 		switch (command) {
 			case "mceLatex":
-				var template = new Array() , value = "", lrurl;
+				var template = new Array() , value = "";
 				var ed = tinyMCE.activeEditor;
-				lrurl = ed.getParam("latex_renderUrl");
 
-				if (ed.selection.getNode() != null && ed.selection.getNode().nodeName.toLowerCase() == "img"
-						&& ed.dom.hasClass(ed.selection.getNode(),'latexEquation')) {					
-					var nd = ed.selection.getNode();
+				var nd = ed.selection.getNode();
+				if (nd != null && nd.nodeName.toLowerCase() == "img"
+						&& ed.dom.hasClass(nd,'latexFormula')) {
 					if (nd) {
-						value = nd.getAttribute('src') ? nd.getAttribute('src') : "";
-						value = value.replace(new RegExp('^.*mimetex.cgi\\?', 'gi'), '');
-						value = decodeURIComponent(value);
+						value = nd.alt;
 					}
 
 					ed.windowManager.open({
@@ -102,20 +84,18 @@ tinymce.create('tinymce.plugins.LatexPlugin', {
 							height: 480 + parseInt(ed.getLang('latex.delta_height', 0))
 						},{
 							value: value,
-							lrurl: lrurl,
-							mceDo: 'update'
+							mceDo: 'update',
+							renderURL: ed.getParam("latex_renderUrl")
 					});
 				} else {					
 					var inst = ed;
-					var	st = inst.selection.getContent();
+					var st = inst.selection.getContent();
 					var html = '', value = '';
 					
 					if(st && st.length > 0) {
-						st = st.replace("\"", "&#34;");
-						if(lrurl)
-							html = '<img class="latexEquation" src="'+lrurl+'?'+st+'" border="0" align="absmiddle" alt="latex" />';
-						else
-							html = '[tex]'+st+'[/tex]';
+						html = '<img class="latexFormula" '+
+							'alt="'+ st.replace("\"", "&#34;") +'" '+
+							'src="'+ 'http://latex.codecogs.com/gif.latex?' + encodeURIComponent(st) +'"/>';
 						inst.execCommand("mceInsertContent", false, html);
 					}
 					else {
@@ -125,8 +105,8 @@ tinymce.create('tinymce.plugins.LatexPlugin', {
 								height: 480 + parseInt(ed.getLang('latex.delta_height', 0))
 							},{
 								value: value,
-								lrurl: lrurl,
-								mceDo: 'insert'
+								mceDo: 'insert',
+								renderURL: ed.getParam("latex_renderUrl")
 							}
 						);
 					}

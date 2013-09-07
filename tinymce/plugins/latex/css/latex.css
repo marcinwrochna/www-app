@@ -10,6 +10,7 @@
 	overflow-y: auto;
 	height: 160px;
 	width: 540px;
+	font-size: 12pt;
 }
 
 #preview_fieldset {

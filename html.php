@@ -34,6 +34,19 @@ function writeMTime($f)
 	<script type="text/javascript" src="<?php writeMTime('tinymce/config.js'); ?>"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+	<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+			tex2jax: {
+				inlineMath: [ ['[tex]','[/tex]'] ], //, ['\\(','\\)']  ],
+				displayMath: [ ['$$','$$'] ], //, ['\\[','\\]'] ],
+				processEnvironments: false,
+				processClass: "userHTML|tex2jax_process"
+				// The <body> has class tex2jax_ignore, so only these classes get parsed.
+				// Unfortunately skipping <code> tags doesn't work because of that.
+			}
+		});
+	</script>
+	<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>	
 	<script type="text/javascript" src="fineuploader/jquery.fineuploader-3.3.1.js"></script>
 	<script type="text/javascript">tinyMCE_GZ.init(tinyMCE_GZ_config);</script>
 	<script type="text/javascript">
@@ -69,7 +82,7 @@ function writeMTime($f)
 		</script>
 	<?php endif; ?>
 </head>
-<body>
+<body class="tex2jax_ignore">
 	<div id="tooltip"></div>
 	<div id="globalContainer">
 		<div id="headerBox"><h1><a href="homepage">

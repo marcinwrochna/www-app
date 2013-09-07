@@ -1,69 +1,40 @@
 var LatexDialog = {
-	
 init : function(ed) {
 	var formObj = document.forms[0];
 	var val = tinyMCEPopup.getWindowArg('value');
-	var lrurl = tinyMCEPopup.getWindowArg('lrurl');
-	
-	
+	this.renderURL = tinyMCEPopup.getWindowArg('renderURL');
+		
 	formObj.formula.innerHTML  = val;
 	formObj.insert.value = tinyMCEPopup.getLang('latex.' + tinyMCEPopup.getWindowArg('mceDo'),'Insert',true);
-	formObj.lrurl.value = lrurl;
-	if(!lrurl) {
-		document.getElementById("preview_fieldset").style.display = 'none';
-		document.getElementById("preview_row").style.display = 'none';
-	}
-	else {
-		if(formObj.formula.value) {
-			formObj.preview.src = lrurl+'?'+formObj.formula.value;
-			formObj.preview.style.display='inline';
-		}
-		else {
-			formObj.preview.style.display='none';
-		}
-	}
+
+	formObj.formula.onkeyup = this.updatePreview;
+	formObj.formula.onclick = this.updatePreview;
+	this.updatePreview();
+	MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 	
-	tinyMCEPopup.resizeToInnerSize();
+	//tinyMCEPopup.resizeToInnerSize();
 },
 
 updatePreview : function () {
-	var formObj = document.forms[0];
-	var lrurl = formObj.lrurl.value;
-	
-	if(lrurl && formObj.formula.value) {
-		formObj.preview.src = lrurl+'?'+formObj.formula.value;
-		formObj.preview.style.display='inline';
-	}
-	else {
-		formObj.preview.style.display='none';
-	}
+	var formula = document.forms[0].formula.value;
+	var preview = document.getElementById("preview");
+	preview.innerHTML = '[tex]'+ formula +'[/tex]';
+	MathJax.Hub.Queue(["Typeset",MathJax.Hub,preview]);
+	// var math = MathJax.Hub.getAllJax(preview)[0];
+	// MathJax.Hub.Queue(["Text",math,formObj.formula.value]);
 },
 
 insertLatex : function () {
 	var ed = tinyMCEPopup.editor, dom = ed.dom;
-	var formObj = document.forms[0];
-	var value   = formObj.formula.value;
-	var lrurl = formObj.lrurl.value;
+	var formula = document.forms[0].formula.value;
 	var html = '';
-	
-	value = value.replace("\"", "&#34;");
 
-	if(lrurl && value) {
+	if (formula) {
 		html = dom.createHTML('img', {
-			src : lrurl + '?' + value,
-			alt : "latex",
-			align: "absmiddle",
-			'class': 'latexEquation'
-			
+			'class': 'latexFormula',
+			'alt': formula,
+			'src': this.renderURL + encodeURIComponent(formula)
 		});
-		//html = '<img class="latexEquation" align="absmiddle" src="'+lrurl+'?'+value+'" alt="latex"/>';
-	}
-	else { 
-		if(value) {
-			html = '[tex]'+value+'[/tex]';
-		} else {
-			html = ' ';
-		}
 	}
 
 	tinyMCEPopup.execCommand("mceInsertRawHTML", false, html);
