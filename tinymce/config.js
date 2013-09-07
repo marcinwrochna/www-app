@@ -3,7 +3,7 @@ tinyMCE_GZ_config =
 	plugins : 'nonbreaking,latex,paste,ubrupload',
 	themes : 'advanced',
 	languages : 'en,pl',
-	disk_cache : true,
+	disk_cache : false,
 	debug : false,
 	suffix : '_src'
 };

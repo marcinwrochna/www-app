@@ -95,7 +95,7 @@ tinymce.create('tinymce.plugins.LatexPlugin', {
 					if(st && st.length > 0) {
 						html = '<img class="latexFormula" '+
 							'alt="'+ st.replace("\"", "&#34;") +'" '+
-							'src="'+ 'http://latex.codecogs.com/gif.latex?' + encodeURIComponent(st) +'"/>';
+							'src="'+ ed.getParam("latex_renderUrl") + encodeURIComponent(st) +'"/>';
 						inst.execCommand("mceInsertContent", false, html);
 					}
 					else {
