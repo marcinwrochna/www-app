@@ -6,6 +6,7 @@
 
 define('ABSOLUTE_PATH_PREFIX', '/www/www/'); // Should end with a slash.
 define('ROOT_PASSWORD', 'introduce smooth sawtooth trajectory');
+define('PASSWORD_SALT', 'somerandomstring');
 define('GOOGLE_ANALYTICS_ACCOUNT', false); // E.g. 'UA-12345678-9'.
 // Database
 define('TABLE_PREFIX', 'w1_'); // Shouldn't be empty.

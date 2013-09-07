@@ -1,4 +1,5 @@
 *~
+*.bak
 *.mo
 *.pot
 htmlpurifier/[^l][^i][^b]*
@@ -6,5 +7,7 @@ google*.html
 .buildpath
 .metadata
 .settings
+.projekt
+error_log
 errorLog.txt
 config.php

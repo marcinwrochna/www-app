@@ -141,5 +141,5 @@ function passHash($password)
 	// installation scripts only have to write 'rootpassword' instead of a sha1().
 	if ($password === ROOT_PASSWORD)
 		return 'rootpassword';
-	return sha1('SALAD'. $password);
+	return sha1(PASSWORD_SALT . $password);
 }
