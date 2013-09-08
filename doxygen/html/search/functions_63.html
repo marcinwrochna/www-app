@@ -2,53 +2,16 @@
 <html><head><title></title>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <link rel="stylesheet" type="text/css" href="search.css"/>
+<script type="text/javascript" src="functions_63.js"></script>
 <script type="text/javascript" src="search.js"></script>
 </head>
 <body class="SRPage">
 <div id="SRIndex">
 <div class="SRStatus" id="Loading">Loading...</div>
-<div class="SRResult" id="SR_callaction">
- <div class="SREntry">
-  <a id="Item0" onkeydown="return searchResults.Nav(event,0)" onkeypress="return searchResults.Nav(event,0)" onkeyup="return searchResults.Nav(event,0)" class="SRSymbol" href="../index_8php.html#a6e8525da6dad002542958c13132118e4" target="_parent">callAction</a>
-  <span class="SRScope">index.php</span>
- </div>
-</div>
-<div class="SRResult" id="SR_checkusercanedittasks">
- <div class="SREntry">
-  <a id="Item1" onkeydown="return searchResults.Nav(event,1)" onkeypress="return searchResults.Nav(event,1)" onkeyup="return searchResults.Nav(event,1)" class="SRSymbol" href="../tasks_8php.html#a17b2ff0082f478470dc8ca4d28b6568f" target="_parent">checkUserCanEditTasks</a>
-  <span class="SRScope">tasks.php</span>
- </div>
-</div>
-<div class="SRResult" id="SR_connect">
- <div class="SREntry">
-  <a id="Item2" onkeydown="return searchResults.Nav(event,2)" onkeypress="return searchResults.Nav(event,2)" onkeyup="return searchResults.Nav(event,2)" class="SRSymbol" href="javascript:searchResults.Toggle('SR_connect')">connect</a>
-  <div class="SRChildren">
-    <a id="Item2_c0" onkeydown="return searchResults.NavChild(event,2,0)" onkeypress="return searchResults.NavChild(event,2,0)" onkeyup="return searchResults.NavChild(event,2,0)" class="SRScope" href="../classDB.html#a031c0b13b6803f486c377a4c98774f4d" target="_parent">DB::connect()</a>
-    <a id="Item2_c1" onkeydown="return searchResults.NavChild(event,2,1)" onkeypress="return searchResults.NavChild(event,2,1)" onkeyup="return searchResults.NavChild(event,2,1)" class="SRScope" href="../classDB__PostgreSQL.html#a35c72d161281997ab74e7d2db24e3b4e" target="_parent">DB_PostgreSQL::connect()</a>
-  </div>
- </div>
-</div>
-<div class="SRResult" id="SR_count">
- <div class="SREntry">
-  <a id="Item3" onkeydown="return searchResults.Nav(event,3)" onkeypress="return searchResults.Nav(event,3)" onkeyup="return searchResults.Nav(event,3)" class="SRSymbol" href="javascript:searchResults.Toggle('SR_count')">count</a>
-  <div class="SRChildren">
-    <a id="Item3_c0" onkeydown="return searchResults.NavChild(event,3,0)" onkeypress="return searchResults.NavChild(event,3,0)" onkeyup="return searchResults.NavChild(event,3,0)" class="SRScope" href="../classDBResult__Postgresql.html#a0e38325eb55607dea2d44147e983111c" target="_parent">DBResult_Postgresql::count()</a>
-    <a id="Item3_c1" onkeydown="return searchResults.NavChild(event,3,1)" onkeypress="return searchResults.NavChild(event,3,1)" onkeyup="return searchResults.NavChild(event,3,1)" class="SRScope" href="../classDBRow__SQL.html#a04f36c0947b2b0f9f27bcbb2745dc04b" target="_parent">DBRow_SQL::count()</a>
-  </div>
- </div>
-</div>
-<div class="SRResult" id="SR_create">
- <div class="SREntry">
-  <a id="Item4" onkeydown="return searchResults.Nav(event,4)" onkeypress="return searchResults.Nav(event,4)" onkeyup="return searchResults.Nav(event,4)" class="SRSymbol" href="../classDB.html#aebc4d944d05977ab3fc55d910bec39a4" target="_parent">create</a>
-  <span class="SRScope">DB</span>
- </div>
-</div>
-<div class="SRResult" id="SR_current">
- <div class="SREntry">
-  <a id="Item5" onkeydown="return searchResults.Nav(event,5)" onkeypress="return searchResults.Nav(event,5)" onkeyup="return searchResults.Nav(event,5)" class="SRSymbol" href="../classDBResult__Postgresql.html#abba9dd676c95a2719e80e5610d76e3f6" target="_parent">current</a>
-  <span class="SRScope">DBResult_Postgresql</span>
- </div>
-</div>
+<div id="SRResults"></div>
+<script type="text/javascript"><!--
+createResults();
+--></script>
 <div class="SRStatus" id="Searching">Searching...</div>
 <div class="SRStatus" id="NoMatches">No Matches</div>
 <script type="text/javascript"><!--

@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['db',['DB',['../classDB.html',1,'']]],
+  ['db_2ephp',['db.php',['../db_8php.html',1,'']]],
+  ['db_5fconnection_5fstring',['DB_CONNECTION_STRING',['../config_8php_8template.html#a267d3f58b569457e559f090f113dee0f',1,'config.php.template']]],
+  ['db_5fdriver',['DB_DRIVER',['../config_8php_8template.html#a47a6f3afb72e2ba299cd75c4104ecc65',1,'config.php.template']]],
+  ['db_5fpostgresql',['DB_PostgreSQL',['../classDB__PostgreSQL.html',1,'']]],
+  ['db_5fsql',['DB_SQL',['../classDB__SQL.html',1,'']]],
+  ['dbexception',['DbException',['../classDbException.html',1,'']]],
+  ['dbg',['dbg',['../utils_8php.html#a3c6d6f6ae1d6a16dcf633e15bde46eda',1,'utils.php']]],
+  ['dbresult',['DBResult',['../classDBResult.html',1,'']]],
+  ['dbresult_5fpostgresql',['DBResult_Postgresql',['../classDBResult__Postgresql.html',1,'']]],
+  ['dbresult_5fsql',['DBResult_SQL',['../classDBResult__SQL.html',1,'']]],
+  ['dbrow',['DBRow',['../classDBRow.html',1,'']]],
+  ['dbrow_5fpostgresql',['DBRow_PostgreSQL',['../classDBRow__PostgreSQL.html',1,'']]],
+  ['dbrow_5fsql',['DBRow_SQL',['../classDBRow__SQL.html',1,'']]],
+  ['dbtable',['DBTable',['../classDBTable.html',1,'']]],
+  ['dbtable_5fpostgresql',['DBTable_PostgreSQL',['../classDBTable__PostgreSQL.html',1,'']]],
+  ['dbtable_5fsql',['DBTable_SQL',['../classDBTable__SQL.html',1,'']]],
+  ['defineenum',['defineEnum',['../classEnum.html#a5939a6b533f48568cc6eacfcc52fbc97',1,'Enum']]],
+  ['delete',['delete',['../classDBRow.html#aaea1d6d0bfa114fc7db1e1541a9376cf',1,'DBRow\delete()'],['../classDBRow__SQL.html#a953d8a43a5049b65612478185c3bebab',1,'DBRow_SQL\delete()']]],
+  ['dumpsuperglobals',['dumpSuperGlobals',['../error_8php.html#a9eb4c4183b3422da2c46809ba4cd7244',1,'error.php']]]
+];
