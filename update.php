@@ -263,4 +263,7 @@ switch ($version)
 	case(53):
 		insertPermission('owner', 'editTasks');
 		setVersion(54);
+	case(54):
+		$DB->query('UPDATE w1_users SET password = \'old:0::\' || password');
+		setVersion(55);
 }

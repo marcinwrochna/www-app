@@ -16,6 +16,7 @@ define('USER_ANONYMOUS', -2);
 require_once('user/profile.php');
 require_once('user/admin.php');
 require_once('user/utils.php');
+require_once('user/password.php');
 
 /**
  * Initializes the global $USER with the current user's commonly used data.
@@ -81,18 +82,26 @@ function actionLogin()
 {
 	global $DB, $PAGE, $USER;
 	$result = $DB->query(
-		'SELECT uid FROM table_users
-		 WHERE (login=$1 OR email=$1) AND password=$2',
-		$_POST['login'], passHash($_POST['password'])
+		'SELECT uid,password FROM table_users
+		 WHERE (login=$1 OR email=$1)',
+		$_POST['login']
 	);
-	if (!count($result))
+	$uid = false;
+	if (count($result))
+	{
+		$result = $result->fetch();
+		$uid = intval($result['uid']);
+		$hash = $result['password'];
+	}
+ 	if ($uid === false || !validatePassword($_POST['password'], $hash))
 	{
 		unset($_SESSION['user_id']);
 		$PAGE->addMessage(_('Wrong username/e-mail or password.'), 'userError');
 		return callAction('homepage');
 	}
+	if (passwordNeedsRehash($hash))
+		$DB->users[$uid]->update(array('password' => createPasswordHash($_POST['password'])));
 
-	$uid = intval($result->fetch());
 	if ($DB->users[$uid]->get('confirm'))
 	{
 		unset($_SESSION['user_id']);
@@ -168,7 +177,7 @@ function actionRegister()
 	$form = new Form(parseTable('
 		NAME            => TYPE;     tDESCRIPTION;    VALIDATION;
 		login           => text;     username;        charset(name digit),length(4 20);
-		password        => password; password;        length(3 200);
+		password        => password; password;        length(8 100);
 		password_repeat => password; retype password; equal(password);
 		name            => text;     full name;       charset(name),length(4 60);
 		email           => text;     e-mail;          email;
@@ -195,7 +204,7 @@ function actionRegister()
 
 	$DB->users[]= array(
 		'login' => $values['login'],
-		'password' => passHash($values['password']),
+		'password' => createPasswordHash($values['password']),
 		'name' => $values['name'],
 		'email' => $values['email'],
 		'confirm' => $confirmKey,
@@ -266,12 +275,12 @@ function actionChangePassword()
 		return print $form->getHTML();
 
 	$values = $form->fetchAndValidateValues();
-	$pass = $DB->users[$USER['uid']]->get('password');
-	$form->assert($pass === passHash($values['oldpassword']), _('Old password doesn\'t match.'));
+	$hash = $DB->users[$USER['uid']]->get('password');
+	$form->assert(validatePassword($values['oldpassword'], $hash), _('Old password doesn\'t match.'));
 	if (!$form->valid)
 		return print $form->getHTML();
 
-	$DB->users[$USER['uid']]->update(array('password' => passHash($values['newpassword'])));
+	$DB->users[$USER['uid']]->update(array('password' => createPasswordHash($values['newpassword'])));
 	$PAGE->addMessage(_('Password succesfully changed.'), 'success');
 	logUser('user pass change');
 	callAction('editProfile');
@@ -305,20 +314,21 @@ function actionPasswordReset()
 
 	list($uid, $address, $login) = $r->fetch_vector();
 	logUser('pass reset', $uid);
-	$password = substr(sha1(uniqid('prefix', true)),0,10);
+	$passwordLength = 20;
+	$password = generateRandomPassword($passwordLength);
 
 	$message = sprintf(_(
 			'Your password at %s has been reset.\n'.
 			'username: %s\ne-mail:  %s\npassword: %s\n'.
-			'(the password has 10 hex characters)\n\n'.
+			'(the password has %d hex characters)\n\n'.
 			'If you don\'t know what this is about, report abuse:\n%s\n'
 		),
 		'http://'. $_SERVER['HTTP_HOST'] . ABSOLUTE_PATH_PREFIX,
-		$login, $address, $password,
+		$login, $address, $password, $passwordLength,
 		'http://'. $_SERVER['HTTP_HOST'] . ABSOLUTE_PATH_PREFIX .'reportBug\n'
 	);
 	$message = str_replace('\n', "\n", $message);
 	sendMail(_('New password'), $message, $address);
-	$DB->users[$uid]->update(array('password'=>passHash($password)));
+	$DB->users[$uid]->update(array('password' => createPasswordHash($password)));
 	$PAGE->addMessage(_('An e-mail message with the new password has been sent.'), 'success');
 }

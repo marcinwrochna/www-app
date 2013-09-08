@@ -131,15 +131,3 @@ function getUserRoles($uid)
 	return $roles;
 }
 
-/**
- * Returns a hash used for storing passwords. Store the value 'rootpassword' instead of a real hash
- * whenever you want someone's password to be the one defined in config.php's const ROOT_PASSWORD.
- */
-function passHash($password)
-{
-	// The root password is hashed this way so it can be set in config.php,
-	// installation scripts only have to write 'rootpassword' instead of a sha1().
-	if ($password === ROOT_PASSWORD)
-		return 'rootpassword';
-	return sha1(PASSWORD_SALT . $password);
-}

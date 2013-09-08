@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wwwApp 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-15 13:46+0200\n"
-"PO-Revision-Date: 2013-07-15 13:47+0100\n"
+"POT-Creation-Date: 2013-09-08 16:00+0200\n"
+"PO-Revision-Date: 2013-09-08 16:01+0100\n"
 "Last-Translator: Marcin Wrochna <mwrochna+gettext@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl\n"
@@ -118,7 +118,7 @@ msgstr "Osoby, które nie wypełniły swoich danych:"
 
 #: summary.php:117
 #: summary.php:147
-#: user.php:168
+#: user.php:177
 #: column:'description'
 #: row:'name'
 #: user/admin.php:47
@@ -427,64 +427,64 @@ msgstr "Oceniono zadanie %d."
 msgid "Application database has just been updated to version %d."
 msgstr "Baza danych aplikacji została zaktualizowana do wersji %d."
 
-#: user.php:49
+#: user.php:50
 msgid "Anonym"
 msgstr "Anonim"
 
-#: user.php:56
+#: user.php:57
 #, php-format
 msgid "User #%d doesn't exist"
 msgstr "Użytkownik #%d nie istnieje"
 
-#: user.php:73
+#: user.php:74
 msgid "Logged out."
 msgstr "Wylogowano."
 
-#: user.php:91
+#: user.php:99
 msgid "Wrong username/e-mail or password."
 msgstr "Niepoprawny użytkownik/hasło."
 
-#: user.php:99
+#: user.php:108
 msgid "This account hasn't been confirmed yet. Check your mailbox."
 msgstr "To konto nie potwierdziło e-maila. Sprawdź swoją skrzynkę."
 
-#: user.php:108
+#: user.php:117
 msgid "Successfully logged in."
 msgstr "Pomyślnie zalogowano."
 
-#: user.php:152
+#: user.php:161
 msgid "You are now logged in as another person."
 msgstr "Jesteś teraz zalogowan$y jako inna osoba."
 
-#: user.php:153
+#: user.php:162
 msgid "return"
 msgstr "wróć"
 
-#: user.php:157
+#: user.php:166
 msgid "Log out"
 msgstr "Wyloguj się"
 
-#: user.php:167
+#: user.php:176
 msgid "Create your account"
 msgstr "Utwórz konto"
 
-#: user.php:176
+#: user.php:185
 msgid "All fields are required. Your e-mail will only be visible to signed-in users.<br/>One account should correspond to one person (e.g. don't create an account for another lecturer).<br/>"
 msgstr "Wszystkie pola są wymagane. Twój e-mail będzie widoczny tylko dla zarejestrowanych.<br/>Jedno konto powinno odpowiadać jednej osobie (np. nie twórz konta dla współwykładowcy).<br/>"
 
-#: user.php:186
+#: user.php:195
 msgid "This login is already taken."
 msgstr "Login jest już zajęty."
 
-#: user.php:188
+#: user.php:197
 msgid "This email address is already registered. If you didn't receive an email with confirmation, check your spam or"
 msgstr "Podany adres e-mail jest już zarejestrowany. Jeśli nie dotarła wiadomość z potwierdzeniem, sprawdź spam lub"
 
-#: user.php:190
+#: user.php:199
 msgid "report a bug"
 msgstr "zgłoś błąd"
 
-#: user.php:214
+#: user.php:223
 #, php-format
 msgid ""
 "A new user account has been created on %s using this e-mail address.\\n"
@@ -499,59 +499,59 @@ msgstr ""
 "\\n"
 "(Jeśli się nic o tym nie wiesz, po prostu zignoruj.)\\n"
 
-#: user.php:219
+#: user.php:228
 msgid "New user account"
 msgstr "Utwórz konto"
 
-#: user.php:221
+#: user.php:230
 msgid "Your account has been successfully created. Now, click the link you received in an e-mail to confirm.<br/>(If not, wait 15 minutes and check your spam.)"
 msgstr "Twoje konto zostało pomyślnie utworzone. Potwierdź teraz klikając w link otrzymany mailem.<br/>(W razie braku zaczekaj 15 minut i sprawdź spam.)"
 
-#: user.php:234
+#: user.php:243
 msgid "The link you opened doesn't contain the confirmation number. Please copy the whole link from the e-mail you received."
 msgstr "Podany link nie zawiera numerku potwierdzającego. Skopiuj ręcznie cały link z otrzymanego emaila."
 
-#: user.php:238
-#: user.php:241
+#: user.php:247
+#: user.php:250
 msgid "Invalid confirmation number."
 msgstr "Niepoprawny numerek potwierdzający."
 
-#: user.php:246
+#: user.php:255
 msgid "Welcome! Now tell us something about yourself."
 msgstr "Napisz coś o sobie."
 
-#: user.php:257
+#: user.php:266
 msgid "Password change"
 msgstr "Zmiana hasła"
 
-#: user.php:270
+#: user.php:279
 msgid "Old password doesn't match."
 msgstr "Stare hasło się nie zgadza."
 
-#: user.php:275
+#: user.php:284
 msgid "Password succesfully changed."
 msgstr "Pomyślnie zmieniono hasło."
 
-#: user.php:287
+#: user.php:296
 msgid "Password reset"
 msgstr "Zapomniałem hasła"
 
-#: user.php:288
+#: user.php:297
 msgid "Type your username or e-mail address. You'll recevie a message with a new password."
 msgstr "Wpisz login lub adres e-mail. Dostaniesz wiadomość z nowym hasłem."
 
-#: user.php:302
+#: user.php:311
 msgid "No account found with such login/e-mail."
 msgstr "Brak konta z takim loginem/e-mailem."
 
-#: user.php:311
+#: user.php:321
 #, php-format
 msgid ""
 "Your password at %s has been reset.\\n"
 "username: %s\\n"
 "e-mail:  %s\\n"
 "password: %s\\n"
-"(the password has 10 hex characters)\\n"
+"(the password has %d hex characters)\\n"
 "\\n"
 "If you don't know what this is about, report abuse:\\n"
 "%s\\n"
@@ -560,16 +560,16 @@ msgstr ""
 "login: %s\\n"
 "e-mail:  %s\\n"
 "hasło: %s\\n"
-"(hasło zawiera 10 znaków hex)\\n"
+"(hasło zawiera %d znaków hex)\\n"
 "\\n"
 "Jeśli nie wiesz o co chodzi, zgłoś nadużycie:\\n"
 "%s\\n"
 
-#: user.php:321
+#: user.php:331
 msgid "New password"
 msgstr "Nowe hasło"
 
-#: user.php:323
+#: user.php:333
 msgid "An e-mail message with the new password has been sent."
 msgstr "Wysłano e-maila z nowym hasłem."
 
@@ -1011,7 +1011,7 @@ msgstr "q"
 #: user/profile.php:28
 #: user/profile.php:30
 #: user/profile.php:97
-#: user.php:141
+#: user.php:150
 #: column:'title'
 #: row:'editProfile'
 msgid "profile"
@@ -1054,7 +1054,7 @@ msgid "previous"
 msgstr "poprzedni"
 
 #: user/admin.php:221
-#: user.php:141
+#: user.php:150
 #: column:'title'
 #: row:'editAdditionalInfo'
 msgid "additional info"
@@ -1434,71 +1434,71 @@ msgstr "twoje podanie"
 msgid "list of applications"
 msgstr "lista podań"
 
-#: user.php:141
+#: user.php:150
 #: column:'title'
 #: row:'editMotivationLetter'
 msgid "motivation letter"
 msgstr "list motywacyjny"
 
-#: user.php:168
+#: user.php:177
 #: column:'description'
 #: row:'login'
-#: user.php:289
+#: user.php:298
 #: user/profile.php:114
 msgid "username"
 msgstr "login"
 
-#: user.php:168
+#: user.php:177
 #: column:'description'
 #: row:'password'
 #: user/profile.php:114
 msgid "password"
 msgstr "hasło"
 
-#: user.php:168
+#: user.php:177
 #: column:'description'
 #: row:'password_repeat'
 msgid "retype password"
 msgstr "powtórz hasło"
 
-#: user.php:168
+#: user.php:177
 #: column:'description'
 #: row:'email'
-#: user.php:289
+#: user.php:298
 #: user/admin.php:47
 #: user/profile.php:114
 msgid "e-mail"
 msgstr "e-mail"
 
-#: user.php:258
+#: user.php:267
 #: column:'description'
 #: row:'oldpassword'
 msgid "old password"
 msgstr "stare hasło"
 
-#: user.php:258
+#: user.php:267
 #: column:'description'
 #: row:'newpassword'
 msgid "new password"
 msgstr "nowe hasło"
 
-#: user.php:258
+#: user.php:267
 #: column:'description'
 #: row:'newpassword_repeat'
 msgid "type new password again"
 msgstr "powtórz hasło"
 
-#: user.php:123
+#: user.php:132
 #: template
 msgid "Log in"
 msgstr "Zaloguj"
 
-#: user.php:124
+#: user.php:133
 #: template
 msgid "create account"
 msgstr "utwórz konto"
 
-#: user.php:125
+#: user.php:134
 #: template
 msgid "forgot password?"
 msgstr "nie pamiętasz hasła?"
