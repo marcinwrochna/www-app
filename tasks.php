@@ -253,9 +253,9 @@ function buildParticipantList($wid)
 	foreach($_POST['data'] as $userId => $row)
 	{
 		if ($row['points'] == '')
-			$row['points'] = 'NULL';
+			$row['points'] = null;
 
-		$DB->query('UPDATE w1_workshop_users SET points=' . $row['points'] . ' WHERE wid=' . $wid . ' AND uid=' .$userId); 
+		$DB->query('UPDATE w1_workshop_users SET points=$1 WHERE wid=$2 AND uid=$3', $row['points'], $wid, $userId); 
 	}
 
 	$template = new SimpleTemplate();
