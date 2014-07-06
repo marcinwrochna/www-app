@@ -20,6 +20,7 @@ initUser(); // initializes the $USER global.
 require_once('workshop.php');
 require_once('summary.php');
 include_once('tutoring.php');
+require_once('generatecsv.php');
 
 /**
  * Calls an action, by default with a 303 redirect - implementing the POST-REDIRECT-GET pattern.
