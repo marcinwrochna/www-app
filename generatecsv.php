@@ -8,13 +8,13 @@ function actionGenerateCSV()
 {
 	global $USER, $DB, $PAGE;
     $PAGE->title = _('Generating CSV in progress');
-	if (!userCan('adminUsers'))  throw new PolicyException();
+	if (!userCan('generatingCSV'))  throw new PolicyException();
 
     $workshops = $DB->query('
 		SELECT w.wid, w.title, 
                 (SELECT ws.subject FROM table_workshop_subjects AS ws
                     WHERE ws.wid=w.wid LIMIT 1) AS subject
-        FROM table_workshops w WHERE w.status=4 AND w.wid<139 AND NOT w.wid=135 AND NOT w.wid=132 AND w.edition=$1 ORDER BY subject, w.wid', getOption('currentEdition') - 1);
+        FROM table_workshops w WHERE w.status=4 AND w.edition=$1 ORDER BY subject, w.wid', getOption('currentEdition'));
         
     $workshops = $workshops->fetch_all();
     
@@ -161,28 +161,5 @@ function actionGenerateCSV()
             $rows[] = $row;
     }
     
-    
-    
     buildTableHTML($rows, $headers);
-    
-    // Trying to generate CSV
-    /*
-    function outputCSV($data) {
-        $output = fopen("php://output", "w");
-        foreach ($data as $row) {
-            fputcsv($output, $row); // here you can change delimiter/enclosure
-        }
-        fclose($output);
-    }
-    
-    header("Content-type: text/csv");
-    header("Content-Disposition: attachment; filename=file.csv");
-    header("Pragma: no-cache");
-    header("Expires: 0");
-
-    outputCSV(array(
-        array("name 1", "age 1", "city 1"),
-        array("name 2", "age 2", "city 2"),
-        array("name 3", "age 3", "city 3")
-    ));*/
 }
