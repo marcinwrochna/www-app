@@ -250,12 +250,12 @@ function buildParticipantList($wid)
 	global $DB, $PAGE;
 	$wid = intval($wid);
 	//parses POST data with points, status and comments
-	foreach($_POST['data'] as $userId => $row)
+	foreach($_POST['data'] as $userId => $points)
 	{
-		if ($row['points'] == '')
-			$row['points'] = null;
+		if ($points == '')
+			$points = null;
 
-		$DB->query('UPDATE w1_workshop_users SET points=$1 WHERE wid=$2 AND uid=$3', $row['points'], $wid, $userId); 
+		$DB->query('UPDATE w1_workshop_users SET points=$1 WHERE wid=$2 AND uid=$3', $points, $wid, $userId); 
 	}
 
 	$template = new SimpleTemplate();
@@ -311,7 +311,7 @@ function buildParticipantList($wid)
 				$s = enumSolutionStatus($solutions[$tid]);
 				echo '<td>'. getIcon($s->icon, $s->description) .'</td>';
 			}
-			echo '<td>' . '<select name="data['. $uid .'][points]">';
+			echo '<td>' . '<select name="data['. $uid .']">';
 			$points = array('', 0, 1, 2, 3, 4, 5, 6);
 			foreach ($points as $i)
 			{
