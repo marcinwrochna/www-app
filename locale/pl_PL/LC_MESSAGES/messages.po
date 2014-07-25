@@ -1153,24 +1153,24 @@ msgid "Warsaw PKP"
 msgstr "Warszawa PKP"
 
 #: user/profile.php:348
-msgid "Olsztyn PKP"
-msgstr "Olsztyn PKP"
+msgid "Wrocław Główny"
+msgstr "Wrocław Główny (PKP)"
 
 #: user/profile.php:348
-msgid "Węgorzewo - hostel"
-msgstr "Węgorzewo - schronisko"
+msgid "Głogów PKP"
+msgstr "Głogów PKP"
 
 #: user/profile.php:348
 msgid "I'll arrive on my own."
-msgstr "We własnym zakresie."
+msgstr "Nie ogarniam."
 
 #: user/profile.php:351
 msgid "on my own"
 msgstr "we własnym zakresie"
 
 #: user/profile.php:352
-msgid "applies to Węgorzewo residents, for example"
-msgstr "dotyczy np. mieszkańców Węgorzewa"
+msgid "applies to Głogów residents, for example"
+msgstr "dotyczy np. mieszkańców Głogowa"
 
 #: user/profile.php:399
 #: user/admin.php:148
