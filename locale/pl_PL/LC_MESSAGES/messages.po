@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wwwApp 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-08 16:00+0200\n"
-"PO-Revision-Date: 2013-09-08 16:01+0100\n"
+"POT-Creation-Date: 2014-07-25 12:09+0200\n"
+"PO-Revision-Date: 2014-07-25 12:13+0100\n"
 "Last-Translator: Marcin Wrochna <mwrochna+gettext@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl\n"
@@ -90,7 +90,11 @@ msgstr "inne..."
 msgid "or"
 msgstr "lub"
 
-#: index.php:50
+#: generatecsv.php:10
+msgid "Generating CSV in progress"
+msgstr "Tworzenie CSV w trakcie"
+
+#: index.php:51
 msgid "Unknown action requested."
 msgstr "Nieznana akcja."
 
@@ -1162,7 +1166,7 @@ msgstr "Głogów PKP"
 
 #: user/profile.php:348
 msgid "I'll arrive on my own."
-msgstr "Nie ogarniam."
+msgstr "Przyjadę we własnym zakresie."
 
 #: user/profile.php:351
 msgid "on my own"
