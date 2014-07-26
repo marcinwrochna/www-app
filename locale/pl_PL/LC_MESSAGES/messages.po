@@ -1168,6 +1168,10 @@ msgstr "Głogów PKP"
 msgid "I'll arrive on my own."
 msgstr "Przyjadę we własnym zakresie."
 
+#: user/profile.php:348
+msgid "I have no idea what's going on."
+msgstr "Nie ogarniam."
+
 #: user/profile.php:351
 msgid "on my own"
 msgstr "we własnym zakresie"
